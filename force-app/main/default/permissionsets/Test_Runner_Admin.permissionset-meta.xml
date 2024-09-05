@@ -30,7 +30,7 @@
     </classAccesses>
     <classAccesses>
         <apexClass>TestRunAdminController</apexClass>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
         <apexClass>TestRunEmailController</apexClass>

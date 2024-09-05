@@ -571,10 +571,9 @@
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[ 
-					//(PermissionSet | Profile)/userPermissions[ name/text[@Text='ModifyAllData' or @Text='ViewAllData'] and enabled/text[@Text='true'] ] 
+					//(PermissionSet | Profile)/userPermissions[ name/text[@Text='ModifyAllData' or @Text='ViewAllData'] and enabled/text[@Text='true' and pmd:fileName() != 'Admin.profile-meta.xml'] ] 
 				]]></value>
 			</property>
-			<property name="violationSuppressXPath" value="pmd:fileName() != 'Admin.profile-meta.xml'" />
 		</properties>
 	</rule>
 
