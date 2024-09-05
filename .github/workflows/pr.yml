@@ -49,11 +49,13 @@ jobs:
         run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --minimum-priority "Medium High" --no-progress --property package=false --property ruleSet=false
 
       - name: Create MD
+        if: always()
         uses: petems/csv-to-md-table-action@master
         id: csv-table-output
         with:
           csvinput: pmd.csv
       - name: Step Table
+        if: always()
         id: md_to_output
         run: |
           echo ${{steps.csv-table-output.outputs.markdown-table}} >> $GITHUB_STEP_OUTPUT
