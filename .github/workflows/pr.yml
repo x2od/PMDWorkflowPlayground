@@ -65,7 +65,7 @@ jobs:
         if: always()
         id: md_to_output
         run: |
-          echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_OUTPUT
+          echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
   sfdx-scanner:
     runs-on: ubuntu-latest
