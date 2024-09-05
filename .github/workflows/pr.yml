@@ -48,6 +48,7 @@ jobs:
         id: pmd_csv
         run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --minimum-priority "Medium High" --no-progress --property package=false --property ruleSet=false
 
+
   sfdx-scanner:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
