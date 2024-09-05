@@ -72,8 +72,9 @@ jobs:
       - name: Run SFDX Scanner
         uses: mitchspano/sfdx-scan-pull-request@main
         with:
-          pmdconfig: 'config/pmd/deployRules.xml'
-          severity-threshold: 2
+          pmdconfig: 'config/pmd/ruleset.xml'
+          severity-threshold: 4
+          report-mode: 'check-runs'
           engine: 'pmd'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
