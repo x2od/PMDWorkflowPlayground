@@ -1,21 +1,16 @@
 # Unique name for this workflow
-name: On Push
+name: On PR
 
 # Definition when the workflow should run
 on:
   workflow_dispatch:
-  push:
-    # paths-ignore:
-    #   - 'sfdx-project.json'
-    #   - 'README.md'
-    #   - 'docs/**'
-    #   - 'doc-assets/**'
-    #   - '.vscode/**'
-    #   - '.github/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - 'force-app/**'
       - 'config/**'
-      - '.github/workflows/ci.yml'
+      #- 'package.json'
+      - '.github/workflows/pr.yml'
 
 # Jobs to be executed
 jobs:
@@ -68,7 +63,6 @@ jobs:
           pmdconfig: 'config/pmd/ruleset.xml'
           severity-threshold: 4
           report-mode: 'check-runs'
-          target: 'force-app'
           engine: 'pmd'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
