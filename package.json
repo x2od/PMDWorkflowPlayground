@@ -51,7 +51,7 @@
 		"eslint-plugin-prettier": "^5.2.1",
 		"highlightjs-apex": "^1.4.0",
 		"husky": "^9.0.11",
-		"lint-staged": "^15.2.7",
+		"lint-staged": "^15.2.10",
 		"marked": "^13.0.1",
 		"prettier": "^3.3.2",
 		"prettier-plugin-apex": "^2.1.4",
