@@ -127,3 +127,6 @@ package.xml
 **/networkBranding/**
 **/navigationMenus/**
 **/experiences/**
+**/tsconfig.json
+
+**/*.ts

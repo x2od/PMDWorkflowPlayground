@@ -1,10 +1,8 @@
 {
   "packageDirectories": [
     {
-      "path": "force-app",
-      "default": true,
-      "versionNumber": "0.3.4.NEXT"
-    }
+      "path": "force-app/main/default",
+      "default": true    }
   ],
   "name": "SFDX-Base",
   "replacements": [
