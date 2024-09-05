@@ -49,10 +49,11 @@ jobs:
         run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --minimum-priority "Medium High" --no-progress --property package=false --property ruleSet=false
 
       - name: Read CSV
+        if: always()
         id: csv
         uses: juliangruber/read-file-action@v1
         with:
-          path: ./pmd.csv
+          path: pmd.csv
 
       - name: Create MD
         if: always()
