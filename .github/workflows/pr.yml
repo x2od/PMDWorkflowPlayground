@@ -67,6 +67,13 @@ jobs:
         run: |
           echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ${{steps.csv-table-output.outputs.markdown-table}}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          allow-repeats: false
+
   sfdx-scanner:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
