@@ -1,0 +1,74 @@
+{
+	"name": "base-sfdx",
+	"private": true,
+	"version": "0.3.4",
+	"description": "DSchach Base SFDX Project",
+	"author": "David Schach",
+	"license": "",
+	"scripts": {
+		"apex:test": "rm testresults/* && sf apex run test --test-level RunLocalTests --output-dir testresults --result-format human --code-coverage",
+		"audittrail": "sf data query --query \"SELECT Id,Action,Section,CreatedDate,CreatedBy.Name,Display FROM SetupAuditTrail ORDER BY CreatedDate DESC\" --resultformat csv > logs/SetupAuditTrail.csv",
+		"cpd": "$HOME/pmd/bin/pmd cpd --dir force-app --language apex --minimum-tokens 100 --format vs",
+		"devhub-labs": "sf config set target-dev-hub=LabsLDO",
+		"devhub-x2od": "sf config set target-dev-hub=x2od",
+		"lint:aura": "eslint --no-error-on-unmatched-pattern **/aura/**/*.js",
+		"lint:lwc": "eslint --no-error-on-unmatched-pattern **/lwc/**/*.js",
+		"lint": "npm run lint:lwc && npm run lint:aura",
+		"myinfo": "sf org display --verbose",
+		"ncu": "ncu --interactive --format group",
+		"pmd:scan:csv": "$HOME/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file config/pmd/pmd.csv --cache .pmdCache --short-names",
+		"pmd:scan:deploy:csv": "$HOME/pmd/bin/pmd check --dir force-app --rulesets config/pmd/deployRules.xml --format csv --report-file config/pmd/deploy.csv --cache .pmdCache --short-names",
+		"precommit": "lint-staged",
+		"prepare": "husky",
+		"prettier:apex": "prettier --write \"force-app/**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,yaml,yml}\"",
+		"prettier:docs": "prettier --write \"doc*/*.html\"",
+		"prettier:verify:apex": "prettier --list-different \"force-app/**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,yaml,yml}\"",
+		"prettier:verify": "prettier --list-different \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+		"prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+		"prune": "git branch | grep -v \"main\" | xargs git branch -D",
+		"release:preview": "release-please release-pr --token=$GITHUB_TOKEN --repo-url=x2od/baseSFDXProject --dry-run --debug --target-branch=main",
+		"renovate:validate": "npm install -i renovate && npx renovate-config-validator && npm uninstall renovate",
+		"scratchorg": ". scripts/orginit.sh",
+		"test:unit:coverage": "sfdx-lwc-jest --coverage --skipApiVersionCheck -- --passWithNoTests",
+		"test:unit:debug": "sfdx-lwc-jest --debug --skipApiVersionCheck -- --passWithNoTests",
+		"test:unit:watch": "sfdx-lwc-jest --watch --skipApiVersionCheck -- --passWithNoTests",
+		"test:unit": "sfdx-lwc-jest --skipApiVersionCheck -- --passWithNoTests",
+		"test": "npm run test:unit",
+		"updateHighlight": ". doc-assets/updateHighlight.sh"
+	},
+	"devDependencies": {
+		"@lwc/eslint-plugin-lwc": "^1.8.2",
+		"@prettier/plugin-xml": "^3.4.1",
+		"@salesforce/eslint-config-lwc": "^3.6.0",
+		"@salesforce/eslint-plugin-aura": "^2.1.0",
+		"@salesforce/eslint-plugin-lightning": "^1.0.0",
+		"@salesforce/sfdx-lwc-jest": "^5.1.0",
+		"@x2od/prettier-config": "^0.0.3",
+		"eslint": "^8.57.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-import": "^2.29.1",
+		"eslint-plugin-jest": "^28.6.0",
+		"eslint-plugin-prettier": "^5.2.1",
+		"highlightjs-apex": "^1.4.0",
+		"husky": "^9.0.11",
+		"lint-staged": "^15.2.7",
+		"marked": "^13.0.1",
+		"prettier": "^3.3.2",
+		"prettier-plugin-apex": "^2.1.4",
+		"release-please": "^16.12.0"
+	},
+	"lint-staged": {
+		"force-app/**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,yaml,yml}": [
+			"prettier --write"
+		],
+		"force-app/**/{aura,lwc}/**": [
+			"eslint"
+		],
+		"docs/assets/*.css": [
+			"prettier --write"
+		],
+		"docs/**/*.html": [
+			"prettier --write"
+		]
+	}
+}

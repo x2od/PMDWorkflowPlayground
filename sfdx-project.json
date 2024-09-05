@@ -1,0 +1,21 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "versionNumber": "0.3.4.NEXT"
+    }
+  ],
+  "name": "SFDX-Base",
+  "replacements": [
+    {
+      "glob": "sfdx-project.json",
+      "stringToReplace": "",
+      "replaceWithEnv": "",
+      "allowUnsetEnvVariable": true
+    }
+  ],
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "59.0"
+}

@@ -1,0 +1,18 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["github>dschach/github-actions:renovate.json5"],
+	"major": { "autoApprove": true, "automerge": false },
+	"patch": { "autoApprove": true, "automerge": true, "labels": ["auto-merged"] },
+	"minor": { "autoApprove": true, "automerge": true, "labels": ["auto-merged"] },
+	"packageRules": [
+		{
+			"matchManagers": ["github-actions"],
+			"commitMessageExtra": "from {{currentVersion}} to {{#if isPinDigest}}{{{newDigestShort}}}{{else}}{{#if isMajor}}{{newVersion}}{{else}}{{#if isSingleVersion}}{{newVersion}}{{else}}{{#if newValue}}{{{newVersion}}}{{else}}{{{newDigestShort}}}{{/if}}{{/if}}{{/if}}{{/if}}"
+		}
+	],
+	"dependencyDashboardAutoclose": true,
+	"lockFileMaintenance": {
+		"enabled": false
+	},
+	"configWarningReuseIssue": false
+}

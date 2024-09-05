@@ -1,0 +1,36 @@
+{
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/.sfdx": true,
+		"**/.sf": true
+  },
+  "salesforcedx-vscode-core.retrieve-test-code-coverage": true,
+	"apexPMD.enableCache": true,
+	"apexPMD.rulesets": [
+		"config/pmd/ruleset.xml"
+	],
+	"apexPMD.priorityErrorThreshold": 2,
+	"apexPMD.priorityWarnThreshold": 3,
+	"apexPMD.runOnFileChange": true,
+	"apexPMD.runOnFileOpen": true,
+	"apexPMD.runOnFileSave": true,
+	"apexPMD.showErrors": true,
+	"editor.bracketPairColorization.enabled": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true,
+	"editor.guides.bracketPairs": "active",
+	"editor.insertSpaces": false,
+	"editor.linkedEditing": true,
+	"editor.tabSize": 2,
+	"force.showApexJavadocAuthorTag": true,
+	"force.showApexJavadocContext": true,
+	"force.showApexJavadocDescriptionTag": false,
+	"salesforcedx-vscode-core.push-or-deploy-on-save.enabled": false,
+	"html.format.maxPreserveNewLines": 2,
+	"[visualforce]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.formatOnSave": false
+	},
+	"git.autofetch": true
+}

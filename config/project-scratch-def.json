@@ -1,0 +1,17 @@
+{
+	"orgName": "dschach",
+	"edition": "Developer",
+	"features": ["Walkthroughs", "EnableSetPasswordInApi", "EinsteinGPTForDevelopers"],
+	"settings": {
+		"lightningExperienceSettings": {
+			"enableS1DesktopEnabled": true
+		},
+		"mobileSettings": {
+			"enableS1EncryptedStoragePref2": false
+		},
+		"userEngagementSettings": {
+			"enableOrchestrationInSandbox": true,
+			"enableShowSalesforceUserAssist": false
+		}
+	}
+}

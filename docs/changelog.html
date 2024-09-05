@@ -1,0 +1,1433 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Project code documentation</title>
+		<meta charset="UTF-8" />
+		<script src="./assets/index.js" type="module"></script>
+		<script src="./assets/search-idx.js" type="module"></script>
+		<script src="./assets/search.js" type="module"></script>
+		<script src="./assets/highlight.js" charset="UTF-8"></script>
+		<script src="./assets/mark.js" charset="UTF-8"></script>
+		<script src="./assets/lunr.js" charset="UTF-8"></script>
+		<link href="./assets/highlight.css" rel="stylesheet" />
+		<link type="text/css" href="./assets/index.css" rel="stylesheet" />
+		<link type="image/png" href="./assets/favicon.png" rel="shortcut icon" />
+	</head>
+
+	<body>
+		<div id="side-bar">
+			<div id="logo-container">
+				<div class="title">Project code documentation</div>
+				<img src="assets/logo.png" />
+				<div class="subtitle">
+					Documentation for
+					<a href="https://github.com/dschach/projectname" target="_blank" rel="noopener noreferrer">projectname</a>
+				</div>
+			</div>
+			<div id="search-wrapper">
+				<div class="search-icon"></div>
+				<input id="search-input" type="text" autocomplete="off" placeholder="Search..." />
+			</div>
+			<ul class="" id="search-results"></ul>
+			<div class="navbar">
+				<nav role="navigation">
+					<a class="nav-header" id="home" href="javascript:void(0)" onclick="goToLocation('index.html');">Home</a>
+					<details class="group-name" id="Miscellaneous">
+						<summary class="nav-header" id="header-Miscellaneous">
+							<span>Miscellaneous</span>
+						</summary>
+						<ul>
+							<!-- menu items -->
+							<li class="nav-item class public" id="item-DeleteThisTest" title="DeleteThisTest" onclick="goToLocation('DeleteThisTest.html');">
+								<a href="javascript:void(0)" tabindex="1">DeleteThisTest</a>
+							</li>
+						</ul>
+					</details>
+				</nav>
+			</div>
+		</div>
+		<table id="content">
+			<tr>
+				<td class="scoping-panel">
+					Show:
+					<input id="cbx-all" type="checkbox" checked="true" onclick="toggleAllScopes(this.checked);" />
+					<label for="cbx-all">All</label>
+					&nbsp;&nbsp;
+					<input id="cbx-global" type="checkbox" checked="true" onclick="toggleScope('global', this.checked);" />
+					<label for="cbx-global">global</label>
+					&nbsp;&nbsp;
+					<input id="cbx-public" type="checkbox" checked="true" onclick="toggleScope('public', this.checked);" />
+					<label for="cbx-public">public</label>
+					&nbsp;&nbsp;
+					<input id="cbx-protected" type="checkbox" checked="true" onclick="toggleScope('protected', this.checked);" />
+					<label for="cbx-protected">protected</label>
+					&nbsp;&nbsp;
+					<input id="cbx-private" type="checkbox" checked="true" onclick="toggleScope('private', this.checked);" />
+					<label for="cbx-private">private</label>
+					&nbsp;&nbsp;
+					<input id="cbx-testmethod" type="checkbox" checked="true" onclick="toggleScope('testmethod', this.checked);" />
+					<label for="cbx-testmethod">testMethod</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="doc-page">
+					<link href="assets/styling.css" rel="stylesheet" />
+					<h1>Changelog</h1>
+					<h2>
+						<a href="https://github.com/dschach/BaseSFDXProject/compare/v0.3.2...v0.3.3">0.3.3</a>
+						(2023-09-18)
+					</h2>
+					<h3>Features</h3>
+					<ul>
+						<li>
+							Add myinfo to package scripts (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/0ab64f6b3961e64ebca77d2def1fb66922c75d65">0ab64f6</a>
+							)
+						</li>
+						<li>
+							<strong>sfdx-scanner:</strong>
+							Move workflow, remove npm package (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/159">#159</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4e0fb89511e3165e8babb1e5be75888a46420fa1">4e0fb89</a>
+							)
+						</li>
+					</ul>
+					<h3>Bug Fixes</h3>
+					<ul>
+						<li>
+							Release-please release type (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c72f4c17f0f4e6ba3070d5d1f356bbb5bad150c0">c72f4c1</a>
+							)
+						</li>
+					</ul>
+					<h3>Performance Improvements</h3>
+					<ul>
+						<li>
+							<strong>sfdx:</strong>
+							Disable source tracking in PR scratch org (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/144">#144</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/3e1a1825f2fa845776a232b74874c7320e83cd91">3e1a182</a>
+							)
+						</li>
+					</ul>
+					<h3>Miscellaneous Chores</h3>
+					<ul>
+						<li>
+							<strong>ApexDox:</strong>
+							Update sample sourceUrl (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/f55030fbac31441721d6ca39c596202fdff78248">f55030f</a>
+							)
+						</li>
+						<li>
+							Clean up initialize script (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/89838852d9d83f5d0805b1ab7e5365a6bea331a9">8983885</a>
+							)
+						</li>
+						<li>
+							<strong>linguist:</strong>
+							Exclude vendor js files (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/9ec09e093680bbde1a8b75eddcb6a92c2f11693b">9ec09e0</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Reorder changelog sections (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/b34288bc0cb34f16788ce78e88a3dcc47ace4ee6">b34288b</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Reorder changelog sections (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/69e630086ed593238f4d7a4a6b359a1990c27fb1">69e6300</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Use github changelog type, sfdx release type (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/162">#162</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/25162cb15c8447b1943ec14bfea5ef17161ad038">25162cb</a>
+							)
+						</li>
+						<li>
+							Update release-please workflow file (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/2f8967a2c99e0a636166adf0ae961d85868e898c">2f8967a</a>
+							)
+						</li>
+					</ul>
+					<h3>Code Refactoring</h3>
+					<ul>
+						<li>
+							<strong>package.json:</strong>
+							Reorder scripts (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/7c3cf53fddaff6cb0a2925429d8ab144212e5f2a">7c3cf53</a>
+							)
+						</li>
+					</ul>
+					<h3>Documentation</h3>
+					<ul>
+						<li>
+							<strong>ApexDox:</strong>
+							Update ApexDox (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/d2881470d90ac36d51e8f702f99aa64c2f27989f">d288147</a>
+							)
+						</li>
+						<li>
+							<strong>ApexDox:</strong>
+							Update ApexDox (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/f4f84541a67513cca2761e2ca7af818a54a10c04">f4f8454</a>
+							)
+						</li>
+						<li>
+							<strong>ApexDox:</strong>
+							Update ApexDox (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/454acca117bdde5982a4caa1a58b891d96d2c86e">454acca</a>
+							)
+						</li>
+						<li>
+							Update ApexDox files (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/484cca004c8f2fcda0201f663825a7931e1f4a20">484cca0</a>
+							)
+						</li>
+						<li>
+							Update scripts, run ApexDox (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/bd037463b094e6f47e43196e04c75b6316294854">bd03746</a>
+							)
+						</li>
+					</ul>
+					<h3>Reverts</h3>
+					<ul>
+						<li>
+							<strong>codecov:</strong>
+							Use action v3, not v4 beta (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c9006f2c998b973e299b330fb541cfaa0e25a29f">c9006f2</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Revert changelog from github to standard type (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/1409549f57ad1c597594b7f2e887aaa840ba623d">1409549</a>
+							)
+						</li>
+						<li>
+							<strong>vscode:</strong>
+							Remove sfdx-scanner extension recommendation (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/009ecbbcce917365dbea50fc6344db49cbc7dd12">009ecbb</a>
+							)
+						</li>
+					</ul>
+					<h3>Build System</h3>
+					<ul>
+						<li>
+							Clean install-scratch script (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/777447e1540293275dded6554ae8759e03543890">777447e</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump @lwc/eslint-plugin-lwc from 1.6.2 to 1.6.3 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/107">#107</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/7cfb2e4e4f6d86a3125287172e32be49780140a0">7cfb2e4</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump @prettier/plugin-xml from 2.2.0 to 3.1.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/121">#121</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4e8ff23e237ad0caaa76cbeb26bb9169e327289c">4e8ff23</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump @prettier/plugin-xml from 3.1.1 to 3.2.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/135">#135</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/b75a9f2cd941383024305fbf77c65fd90b42eff6">b75a9f2</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump @salesforce/eslint-config-lwc from 3.4.0 to 3.5.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/109">#109</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/167faf8273a18a9e9d17ce2b4878d5591cdd734d">167faf8</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump @salesforce/eslint-config-lwc from 3.5.0 to 3.5.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/113">#113</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c94ee06a615609575a79ca18d89afe71a237932a">c94ee06</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump @salesforce/sfdx-lwc-jest from 1.3.0 to 1.4.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/105">#105</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/13166c112f7086a01a3c90f027ba07fd30302794">13166c1</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.34.0 to 8.35.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/63">#63</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/ebfcabf071c705386d5aa8d67ff95d6f3f171bb0">ebfcabf</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.35.0 to 8.36.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/67">#67</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/5f2967c6ea1d269005f87e7efb6e4c345fedab41">5f2967c</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.36.0 to 8.37.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/76">#76</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/e9ed482cbeafcac45d17a83b8d9e02415543c9ad">e9ed482</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.37.0 to 8.38.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/79">#79</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/8a91ec66c482de616bc79ee844b72e2c5e88fc7c">8a91ec6</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.38.0 to 8.39.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/84">#84</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/fc714874c446aab1c3975673217dc54f71a4b3dc">fc71487</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.39.0 to 8.40.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/91">#91</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/8b5d4d0b25e0fa6c56bf339e1272d2d51baf0b9c">8b5d4d0</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.40.0 to 8.41.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/95">#95</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/75c805bddf02d3c0c628fb230ffff62ba22a9f15">75c805b</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.41.0 to 8.42.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/101">#101</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/2b177f2c941d10ed507f16b4dbea8974f4313c0a">2b177f2</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.42.0 to 8.43.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/104">#104</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/00bb1585db00175450ee7d062a29d72854ce6a4f">00bb158</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.43.0 to 8.44.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/110">#110</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/9464b111e0ff1fde0f05dc513b5620191a0e59d9">9464b11</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.44.0 to 8.45.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/120">#120</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/afa5e27d5f29cde899caa6918ba53f4130641d2a">afa5e27</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.45.0 to 8.46.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/126">#126</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/262c9228639f5ae9f43450b7cc13b93b63b50312">262c922</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint from 8.46.0 to 8.47.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/138">#138</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/ea1e66321cd9207ef67ec7028d86a83506e3168a">ea1e663</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint-config-prettier from 8.6.0 to 8.7.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/64">#64</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/95f988c281b6852575fbdcdcb20e7c6e6abcf260">95f988c</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint-config-prettier from 8.7.0 to 8.8.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/71">#71</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/92dacefde094d35754efab68b42e53fa15bcdd96">92dacef</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint-config-prettier from 8.8.0 to 8.9.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/125">#125</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/e6439da2bf306f883b942eb0ae901607c2ec3f4d">e6439da</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint-config-prettier from 8.9.0 to 8.10.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/130">#130</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/89b15b1ecd8435cc2f520f16d4a630bf97c9e8ce">89b15b1</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint-plugin-import and marked (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/f18bf37119cd5f919ae2df28b0a6e5a14a57ba62">f18bf37</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint-plugin-import from 2.27.5 to 2.28.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/127">#127</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/bd703e34958977863914367b5f43b3777ea52cb4">bd703e3</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint-plugin-jest from 27.2.1 to 27.2.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/106">#106</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/9fbf9bdd5724852374c39fc6335fed7267d6a117">9fbf9bd</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint-plugin-jest from 27.2.2 to 27.2.3 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/119">#119</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/a4af4184e8578a3582c84768c12ac23056a30287">a4af418</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump eslint-plugin-prettier from 4.2.1 to 5.0.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/122">#122</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/51107c4b308d3a8e66c4a38b1704ef1039068b0d">51107c4</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump lint-staged from 13.1.2 to 13.2.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/66">#66</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/42ac97fdb190dafc7ac0afeac24e0ab75669cfdf">42ac97f</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump lint-staged from 13.2.0 to 13.2.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/80">#80</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/53345d697af545f08ad0e277805aaca0e6fc3229">53345d6</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump lint-staged from 13.2.1 to 13.2.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/224e3ed1de469dbd6f9ebb56dd3784a3a20c7da9">224e3ed</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump lint-staged from 13.2.2 to 13.2.3 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/108">#108</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/969b7744584f166dabac6d6a6e0233bba6a4b3d5">969b774</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump marked from 4.2.12 to 4.3.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/74">#74</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/81c057ae7a6f9e03238ccca6544d9da04cb6121e">81c057a</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump marked from 4.3.0 to 5.0.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/580366b9abc357d4ca3d995065836a0d26650dbb">580366b</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump marked from 5.0.2 to 5.0.3 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/98">#98</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/e2a5ae6a50af43399568c2c9905158a892efadbf">e2a5ae6</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump marked from 5.0.3 to 5.0.4 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/99">#99</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/50bab6f9db26a3fbb128dbfd70813be61e91983c">50bab6f</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump marked from 5.0.4 to 5.0.5 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/102">#102</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c38457c585176e973b0e850c6b6718ae207a2336">c38457c</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump marked from 5.0.5 to 5.1.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/103">#103</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/82b0a79e7026511952518168b0a85e08aea63949">82b0a79</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump marked from 5.1.0 to 5.1.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/114">#114</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/69f367755565338a1d51b3bf1a6b11e004e6cd80">69f3677</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump marked from 5.1.1 to 5.1.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/124">#124</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4b32ba9d59164b7e2533036733714340ca5f835d">4b32ba9</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump marked from 5.1.2 to 6.0.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/128">#128</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/b983343f3fd173fa8504dbec566be59e46f5431b">b983343</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump prettier and prettier-plugin-apex (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/24c85f036e5b7c6921b6ab693551d345ba409ef4">24c85f0</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump prettier from 2.8.4 to 2.8.5 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/72">#72</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/ec0742aa8e50a2110d5ae425281b9edee85a8abb">ec0742a</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump prettier from 2.8.5 to 2.8.6 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/73">#73</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/d70c6c1946cd0a3fd7956f9de60283cc513171af">d70c6c1</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump prettier from 2.8.6 to 2.8.7 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/75">#75</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/9bc38ef3eaf31747d7a369098bfddc58bcff5285">9bc38ef</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump prettier from 2.8.7 to 2.8.8 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/85">#85</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/1ec2d3cb42febf4ebb1dc434a755ef29ad040124">1ec2d3c</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump prettier from 3.0.0 to 3.0.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/129">#129</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c58857c8a4b8b725b7a8e22470cc2e827fc69cd1">c58857c</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump prettier-plugin-apex from 1.12.0 to 1.13.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/86">#86</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/581fc03f70fc716fbdd8e2dbb1c4781e64a76bae">581fc03</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.10.2 to 15.10.3 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/82">#82</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/98ffdc9f213aa8ae49b245c90b5d411be46d2a70">98ffdc9</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.10.3 to 15.10.4 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/83">#83</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c3541879aa696bb7e5d226f73b7071e00318b81d">c354187</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.10.4 to 15.10.5 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/97">#97</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/cc6e78ed0b7e530dd7aa2028ec7bf6329fe2daf3">cc6e78e</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.10.5 to 15.11.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/100">#100</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4ff00ccb94078aaa6243517aa02d7d9c6438d47c">4ff00cc</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.11.0 to 15.11.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/116">#116</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/50f762b355a527d4b32afd79d3428351d586bc9f">50f762b</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.11.2 to 15.12.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/118">#118</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/0a176c485946e1e057b69afd071994601f1b3bd2">0a176c4</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.8.0 to 15.8.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/65">#65</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/44c2e5049c3ced3a312ead0547b4626f4cded3a7">44c2e50</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.8.1 to 15.8.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/68">#68</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/05a6dd54fd382dcbd4e6fe94f6ab955faea77f32">05a6dd5</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.8.2 to 15.9.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/69">#69</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/d1844b4c50581b0e1a569866c0f2eea92564aa69">d1844b4</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.9.1 to 15.9.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/77">#77</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/ffe9302179280d813fab688a8d5beaa1d89a7b49">ffe9302</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump release-please from 15.9.2 to 15.10.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/81">#81</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/1f3719d6cc364eb68892e0547e7777bd7f7a211f">1f3719d</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Bump word-wrap from 1.2.3 to 1.2.4 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/123">#123</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/8f0be22b839d46ef69ded80c72ebfb141c529f89">8f0be22</a>
+							)
+						</li>
+						<li>
+							<strong>deps-dev:</strong>
+							Update npm packages (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/9423de334043510adeedccb4da01e26c81b987e7">9423de3</a>
+							)
+						</li>
+						<li>
+							<strong>deps:</strong>
+							Bump semver from 5.7.1 to 5.7.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/117">#117</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/7951fe9e535b4117a3433d45c543c59462b8407a">7951fe9</a>
+							)
+						</li>
+						<li>
+							<strong>deps:</strong>
+							Bump yaml from 2.2.1 to 2.2.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/87">#87</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/d103f0fb81a9bc7b85262f81574228f393665723">d103f0f</a>
+							)
+						</li>
+						<li>
+							Ensure LF for all files (MacOS standard) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/34cda2344bf597e83ac6b6f9da9774f05605f9fa">34cda23</a>
+							)
+						</li>
+						<li>
+							<strong>highlightjs:</strong>
+							Highlightjs to dependency to control version (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/143">#143</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4085b1d4ba23f9c97dd514ef3bf0f7302fb7a296">4085b1d</a>
+							)
+						</li>
+						<li>
+							<strong>prettier-apex:</strong>
+							Include anonymous apex parser (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/f02c10a267c242acf9d6f67347c5353b36073ed6">f02c10a</a>
+							)
+						</li>
+						<li>
+							<strong>sfdx:</strong>
+							Add Einstein for Developers to scratch org (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/54550d6a5fb8cfd6a1fbf010a9e2f48223473b88">54550d6</a>
+							)
+						</li>
+						<li>
+							<strong>sfdx:</strong>
+							Include sfdx scanner (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/47bc70c401e3e887fe0123c676d8f6b40edf7e7f">47bc70c</a>
+							)
+						</li>
+						<li>
+							<strong>sfdx:</strong>
+							Update dev scripts (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c11dac436da37ee313e8b6ddf18cef0ccb5a29a4">c11dac4</a>
+							)
+						</li>
+						<li>
+							<strong>sfdx:</strong>
+							Update scratch org scripts (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/bc181bdf9893c2f98ca77e6ca96d4bf21e52d3c4">bc181bd</a>
+							)
+						</li>
+						<li>
+							<strong>sfdx:</strong>
+							Update sfdx to sf commands (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/142">#142</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/40fd24973685d9f3fd019b07c6faca0e25b12c54">40fd249</a>
+							)
+						</li>
+					</ul>
+					<h3>Continuous Integration</h3>
+					<ul>
+						<li>
+							<strong>dependabot:</strong>
+							Remove manual PR name prefix (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4124df066ea654daba35550d774782271ebc6845">4124df0</a>
+							)
+						</li>
+						<li>
+							<strong>dependabot:</strong>
+							Update gh actions prefix (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/35029d86f9673c116e64d86e41098aeed3ec66c1">35029d8</a>
+							)
+						</li>
+						<li>
+							<strong>deps:</strong>
+							Bump mitchspano/sfdx-scan-pull-request from 0.1.10 to 0.1.11 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/94">#94</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/da1a15a3e316ed85661c598a8d993ece87affbd1">da1a15a</a>
+							)
+						</li>
+						<li>
+							<strong>deps:</strong>
+							Bump mitchspano/sfdx-scan-pull-request from 0.1.11 to 0.1.14 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/96">#96</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/456867d9ce599382ed479a9912a50b85b8de69b3">456867d</a>
+							)
+						</li>
+						<li>
+							<strong>deps:</strong>
+							Bump mitchspano/sfdx-scan-pull-request from 0.1.14 to 0.1.15 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/140">#140</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/61c0b2a58e9302ec0508aca9cb6f8658ccd8b56e">61c0b2a</a>
+							)
+						</li>
+						<li>
+							<strong>deps:</strong>
+							Bump mitchspano/sfdx-scan-pull-request from 0.1.7 to 0.1.8 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/70">#70</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/a46c7217dcfa30e2059f94f75c3ed9b023320779">a46c721</a>
+							)
+						</li>
+						<li>
+							<strong>deps:</strong>
+							Bump mitchspano/sfdx-scan-pull-request from 0.1.8 to 0.1.9 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/78">#78</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/a8384736df47402618412557bd6bf13b669c8ebb">a838473</a>
+							)
+						</li>
+						<li>
+							<strong>deps:</strong>
+							Bump mitchspano/sfdx-scan-pull-request from 0.1.9 to 0.1.10 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/88">#88</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/d449d84f9cbee47a0d54f00585fe1801756bd5e7">d449d84</a>
+							)
+						</li>
+						<li>
+							<strong>pmd:</strong>
+							Change severity threshold to 2 on PR (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/b1714eedea1aec7847df9dea16563f09d740b45f">b1714ee</a>
+							)
+						</li>
+						<li>
+							<strong>pmd:</strong>
+							Update actions to use PMD 7 (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/97d92e33f7a40bc25ee31181e59e831686c32e08">97d92e3</a>
+							)
+						</li>
+						<li>
+							Update GitHub actions, RP config (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/48f270f25cfeb8d895351bc05bf57d5010ec070f">48f270f</a>
+							)
+						</li>
+						<li>
+							Update On Push action (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/5e54e70323045363ffb09edc67916a5692d913e1">5e54e70</a>
+							)
+						</li>
+					</ul>
+					<h2>
+						<a href="https://github.com/dschach/BaseSFDXProject/compare/v0.3.1...v0.3.2">0.3.2</a>
+						(2023-02-22)
+					</h2>
+					<h3>Features</h3>
+					<ul>
+						<li>
+							Add release-please to project (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4f549d30160b05407caa3ea7a21f1a8ce21643be">4f549d3</a>
+							)
+						</li>
+						<li>
+							Enable fix prefix for dependabot (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/d820596ce060fa3faa2be4fd98c27223d24cf24a">d820596</a>
+							)
+						</li>
+						<li>
+							Install release-please (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/2e4f58e826dbb6a06d28ed3e7e4ab9c0c62f460e">2e4f58e</a>
+							)
+						</li>
+						<li>
+							Release-please install (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/45">#45</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/44abdd3f300d9c4bb31414607b17f2a8f34e76d6">44abdd3</a>
+							)
+						</li>
+						<li>
+							Starting release numbers (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/8e8418f14b8c8da2c68c1d07f6876f8d9ed8a2ad">8e8418f</a>
+							)
+						</li>
+						<li>
+							Update version in package.json (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/58d225e63b8bc2f5c0f21537cb77162761e1be9f">58d225e</a>
+							)
+						</li>
+						<li>
+							<strong>workflow:</strong>
+							Install SFDX with npm (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/18e2fa21aab07ad90daf5ffb285ea06fd945d470">18e2fa2</a>
+							)
+						</li>
+					</ul>
+					<h3>Bug Fixes</h3>
+					<ul>
+						<li>
+							Add initial version (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/60f6de10a405741b9d35640769ea61138a437bd5">60f6de1</a>
+							)
+						</li>
+						<li>
+							Bump @sideway/formula from 3.0.0 to 3.0.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/50">#50</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/6c95700dfd67d05d1bc3f79e5efc058ec8717450">6c95700</a>
+							)
+						</li>
+						<li>
+							Bump lint-staged from 13.1.0 to 13.1.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/48">#48</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/7c5b96e1e41e7156c66dd19b213957ccd8f282c7">7c5b96e</a>
+							)
+						</li>
+						<li>
+							Bump prettier from 2.8.3 to 2.8.4 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/49">#49</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/a07eed83056e038561a02f8ed127dc954e9bb450">a07eed8</a>
+							)
+						</li>
+						<li>
+							Github release notes type (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/5a6418cf90a618558667da42628eb9bdac753d0b">5a6418c</a>
+							)
+						</li>
+						<li>
+							Latest good release sha (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/602cc0cd8905ccbefd3d83c31c4f9d3b59169cb2">602cc0c</a>
+							)
+						</li>
+						<li>
+							Manifest release-type (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/d74fc825019afce5b60dc5c70dc8a43867fa0934">d74fc82</a>
+							)
+						</li>
+						<li>
+							Minor workflow update for release-please (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/e891ad3b14b423c7b78f13ecbd721279beac9bc7">e891ad3</a>
+							)
+						</li>
+						<li>
+							Move release-please to global (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/9c894accc5e087c2a7b531cf9b79ea491fecaa5a">9c894ac</a>
+							)
+						</li>
+						<li>
+							No spaces in project name (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/322ba888c37239657c6f9480bb48fc54992391e1">322ba88</a>
+							)
+						</li>
+						<li>
+							Pause running on push (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c025c97671f42ef74fbc17b3b5557b065857ca19">c025c97</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Remove comments from config (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c67409b0aaa80cc143f46d3e7ea14e61a17fcf1c">c67409b</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Run on push to main (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/78b3d50b547ac148cf6f4aa188e52aaab967ed01">78b3d50</a>
+							)
+						</li>
+						<li>
+							VersionString (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/6778aeda6e260b6c9270cf2af2fef914652a02be">6778aed</a>
+							)
+						</li>
+						<li>
+							Workflows and scripts (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/6ccaba7be6d320a61b6b47e16f105324bf59abd5">6ccaba7</a>
+							)
+						</li>
+					</ul>
+					<h3>Reverts</h3>
+					<ul>
+						<li>
+							&quot;fix: github release notes type&quot; (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/f3ad50a20e5f35c6b694f36fc39b5fbabc83b1a1">f3ad50a</a>
+							)
+						</li>
+					</ul>
+					<h3>Miscellaneous Chores</h3>
+					<ul>
+						<li>
+							Bootstrap releases for path: . (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/46">#46</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/018a1127ca53fe1cf15443407599801b09fd2329">018a112</a>
+							)
+						</li>
+						<li>
+							<strong>main:</strong>
+							Release SFDX-Base 0.3.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/faff2656a5550058f7305db58855353ff8831157">faff265</a>
+							)
+						</li>
+						<li>
+							Release main (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/51">#51</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/605e1a23a047d9687b778c6085e9440c8e88e9d1">605e1a2</a>
+							)
+						</li>
+						<li>
+							Release-please release (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/47">#47</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/f22de9f320eee966332fac4be15d386524db85d4">f22de9f</a>
+							)
+						</li>
+					</ul>
+					<h3>Continuous Integration</h3>
+					<ul>
+						<li>
+							<strong>codecov:</strong>
+							Add Codecov token to action (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/98db9b67d880c7d49fe54429ec7a495e0200bd36">98db9b6</a>
+							)
+						</li>
+						<li>
+							<strong>codecov:</strong>
+							Stop deleting temporary file (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/9193ddea07a8480c6bf5f246136b01129d6d0445">9193dde</a>
+							)
+						</li>
+						<li>
+							<strong>dependabot:</strong>
+							Update dependabot action (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/6c81b3fcaa860770da8cd256e92b057fb7d736e7">6c81b3f</a>
+							)
+						</li>
+						<li>
+							<strong>prettier:</strong>
+							Stop using local server (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/7c1b0a9b5af6bbff375f59263e118316281b9be7">7c1b0a9</a>
+							)
+						</li>
+						<li>
+							Speed up PMD. Packaging on demand (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/a3c6468a789018032f662ae032b9b82705ac687a">a3c6468</a>
+							)
+						</li>
+					</ul>
+					<h3>Build System</h3>
+					<ul>
+						<li>
+							<strong>ApexDox:</strong>
+							Update ApexDox config, Dependabot (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c3351f1c04fea96e12a2e81d559f3e67c5497398">c3351f1</a>
+							)
+						</li>
+						<li>
+							<strong>ApexDox:</strong>
+							Update ApexDox config, tasks (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4bd32749d00c1d95c2930c51795ec6869bfc4fc5">4bd3274</a>
+							)
+						</li>
+						<li>
+							Bump @lwc/eslint-plugin-lwc from 1.5.1 to 1.6.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/58">#58</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/173edef0b1535582a713b6a3de362112bb9048f8">173edef</a>
+							)
+						</li>
+						<li>
+							Bump @salesforce/eslint-config-lwc from 3.3.4 to 3.4.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/59">#59</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/80880e2775caad372d2fde558e6947a1db8ca3ce">80880e2</a>
+							)
+						</li>
+						<li>
+							Bump @salesforce/sfdx-lwc-jest from 1.2.1 to 1.3.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/57">#57</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/19429c8261e13984b935490192eb18014aec5073">19429c8</a>
+							)
+						</li>
+						<li>
+							Bump eslint from 8.33.0 to 8.34.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/54">#54</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/fb1d35f7565a55a710831b6a20d6de8a0b9e55f1">fb1d35f</a>
+							)
+						</li>
+						<li>
+							Bump lint-staged from 13.1.1 to 13.1.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/55">#55</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/eda03fe6db2b0704d5dbad208b9e4a4a4a84348e">eda03fe</a>
+							)
+						</li>
+						<li>
+							Bump mitchspano/sfdx-scan-pull-request from 0.1.3 to 0.1.7 (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/21d17e11e90ff95008fa2b1c3293ed19995c0990">21d17e1</a>
+							)
+						</li>
+						<li>
+							Bump release-please from 15.7.0 to 15.8.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/56">#56</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/bdf120454ce58c053dd232badd4b98bdf0a862a7">bdf1204</a>
+							)
+						</li>
+						<li>
+							Extensions, pmd (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/ca63067061486b103be19d61c4d2f0a1b88761d5">ca63067</a>
+							)
+						</li>
+						<li>
+							Release-please redo (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/b53ce6924168353a577d5db97eec06f1d5d0279d">b53ce69</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Update config (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/edbc8b9db4ac66790ce3e7205f0d3b406b7692dd">edbc8b9</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Update release-please-config (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/ef1d72adbbe38ec9b7bb585bad3957fb27106b1b">ef1d72a</a>
+							)
+						</li>
+						<li>
+							Remove last release sha (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/e94476290d1fcd92a43dea89bbf3cc5b2008e413">e944762</a>
+							)
+						</li>
+					</ul>
+					<h2>
+						<a href="https://github.com/dschach/BaseSFDXProject/compare/SFDX-Base-v0.3.0...SFDX-Base-v0.3.1">0.3.1</a>
+						(2023-02-22)
+					</h2>
+					<h3>Features</h3>
+					<ul>
+						<li>
+							Add release-please to project (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4f549d30160b05407caa3ea7a21f1a8ce21643be">4f549d3</a>
+							)
+						</li>
+						<li>
+							Enable fix prefix for dependabot (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/d820596ce060fa3faa2be4fd98c27223d24cf24a">d820596</a>
+							)
+						</li>
+						<li>
+							Install release-please (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/2e4f58e826dbb6a06d28ed3e7e4ab9c0c62f460e">2e4f58e</a>
+							)
+						</li>
+						<li>
+							Release-please install (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/45">#45</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/44abdd3f300d9c4bb31414607b17f2a8f34e76d6">44abdd3</a>
+							)
+						</li>
+						<li>
+							Starting release numbers (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/8e8418f14b8c8da2c68c1d07f6876f8d9ed8a2ad">8e8418f</a>
+							)
+						</li>
+						<li>
+							Update version in package.json (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/58d225e63b8bc2f5c0f21537cb77162761e1be9f">58d225e</a>
+							)
+						</li>
+						<li>
+							<strong>workflow:</strong>
+							Install SFDX with npm (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/18e2fa21aab07ad90daf5ffb285ea06fd945d470">18e2fa2</a>
+							)
+						</li>
+					</ul>
+					<h3>Bug Fixes</h3>
+					<ul>
+						<li>
+							Add initial version (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/60f6de10a405741b9d35640769ea61138a437bd5">60f6de1</a>
+							)
+						</li>
+						<li>
+							Bump @sideway/formula from 3.0.0 to 3.0.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/50">#50</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/6c95700dfd67d05d1bc3f79e5efc058ec8717450">6c95700</a>
+							)
+						</li>
+						<li>
+							Bump lint-staged from 13.1.0 to 13.1.1 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/48">#48</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/7c5b96e1e41e7156c66dd19b213957ccd8f282c7">7c5b96e</a>
+							)
+						</li>
+						<li>
+							Bump prettier from 2.8.3 to 2.8.4 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/49">#49</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/a07eed83056e038561a02f8ed127dc954e9bb450">a07eed8</a>
+							)
+						</li>
+						<li>
+							Github release notes type (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/5a6418cf90a618558667da42628eb9bdac753d0b">5a6418c</a>
+							)
+						</li>
+						<li>
+							Latest good release sha (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/602cc0cd8905ccbefd3d83c31c4f9d3b59169cb2">602cc0c</a>
+							)
+						</li>
+						<li>
+							Manifest release-type (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/d74fc825019afce5b60dc5c70dc8a43867fa0934">d74fc82</a>
+							)
+						</li>
+						<li>
+							Minor workflow update for release-please (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/e891ad3b14b423c7b78f13ecbd721279beac9bc7">e891ad3</a>
+							)
+						</li>
+						<li>
+							Move release-please to global (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/9c894accc5e087c2a7b531cf9b79ea491fecaa5a">9c894ac</a>
+							)
+						</li>
+						<li>
+							No spaces in project name (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/322ba888c37239657c6f9480bb48fc54992391e1">322ba88</a>
+							)
+						</li>
+						<li>
+							Pause running on push (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c025c97671f42ef74fbc17b3b5557b065857ca19">c025c97</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Remove comments from config (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c67409b0aaa80cc143f46d3e7ea14e61a17fcf1c">c67409b</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Run on push to main (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/78b3d50b547ac148cf6f4aa188e52aaab967ed01">78b3d50</a>
+							)
+						</li>
+						<li>
+							VersionString (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/6778aeda6e260b6c9270cf2af2fef914652a02be">6778aed</a>
+							)
+						</li>
+						<li>
+							Workflows and scripts (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/6ccaba7be6d320a61b6b47e16f105324bf59abd5">6ccaba7</a>
+							)
+						</li>
+					</ul>
+					<h3>Reverts</h3>
+					<ul>
+						<li>
+							&quot;fix: github release notes type&quot; (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/f3ad50a20e5f35c6b694f36fc39b5fbabc83b1a1">f3ad50a</a>
+							)
+						</li>
+					</ul>
+					<h3>Miscellaneous Chores</h3>
+					<ul>
+						<li>
+							Bootstrap releases for path: . (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/46">#46</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/018a1127ca53fe1cf15443407599801b09fd2329">018a112</a>
+							)
+						</li>
+						<li>
+							Release main (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/51">#51</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/605e1a23a047d9687b778c6085e9440c8e88e9d1">605e1a2</a>
+							)
+						</li>
+						<li>
+							Release-please release (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/47">#47</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/f22de9f320eee966332fac4be15d386524db85d4">f22de9f</a>
+							)
+						</li>
+					</ul>
+					<h3>Build System</h3>
+					<ul>
+						<li>
+							<strong>ApexDox:</strong>
+							Update ApexDox config, Dependabot (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/c3351f1c04fea96e12a2e81d559f3e67c5497398">c3351f1</a>
+							)
+						</li>
+						<li>
+							<strong>ApexDox:</strong>
+							Update ApexDox config, tasks (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/4bd32749d00c1d95c2930c51795ec6869bfc4fc5">4bd3274</a>
+							)
+						</li>
+						<li>
+							Bump @lwc/eslint-plugin-lwc from 1.5.1 to 1.6.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/58">#58</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/173edef0b1535582a713b6a3de362112bb9048f8">173edef</a>
+							)
+						</li>
+						<li>
+							Bump @salesforce/eslint-config-lwc from 3.3.4 to 3.4.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/59">#59</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/80880e2775caad372d2fde558e6947a1db8ca3ce">80880e2</a>
+							)
+						</li>
+						<li>
+							Bump @salesforce/sfdx-lwc-jest from 1.2.1 to 1.3.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/57">#57</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/19429c8261e13984b935490192eb18014aec5073">19429c8</a>
+							)
+						</li>
+						<li>
+							Bump eslint from 8.33.0 to 8.34.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/54">#54</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/fb1d35f7565a55a710831b6a20d6de8a0b9e55f1">fb1d35f</a>
+							)
+						</li>
+						<li>
+							Bump lint-staged from 13.1.1 to 13.1.2 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/55">#55</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/eda03fe6db2b0704d5dbad208b9e4a4a4a84348e">eda03fe</a>
+							)
+						</li>
+						<li>
+							Bump mitchspano/sfdx-scan-pull-request from 0.1.3 to 0.1.7 (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/21d17e11e90ff95008fa2b1c3293ed19995c0990">21d17e1</a>
+							)
+						</li>
+						<li>
+							Bump release-please from 15.7.0 to 15.8.0 (
+							<a href="https://github.com/dschach/BaseSFDXProject/issues/56">#56</a>
+							) (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/bdf120454ce58c053dd232badd4b98bdf0a862a7">bdf1204</a>
+							)
+						</li>
+						<li>
+							Extensions, pmd (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/ca63067061486b103be19d61c4d2f0a1b88761d5">ca63067</a>
+							)
+						</li>
+						<li>
+							Release-please redo (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/b53ce6924168353a577d5db97eec06f1d5d0279d">b53ce69</a>
+							)
+						</li>
+						<li>
+							<strong>release-please:</strong>
+							Update release-please-config (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/ef1d72adbbe38ec9b7bb585bad3957fb27106b1b">ef1d72a</a>
+							)
+						</li>
+						<li>
+							Remove last release sha (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/e94476290d1fcd92a43dea89bbf3cc5b2008e413">e944762</a>
+							)
+						</li>
+					</ul>
+					<h3>Continuous Integration</h3>
+					<ul>
+						<li>
+							<strong>codecov:</strong>
+							Add Codecov token to action (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/98db9b67d880c7d49fe54429ec7a495e0200bd36">98db9b6</a>
+							)
+						</li>
+						<li>
+							<strong>codecov:</strong>
+							Stop deleting temporary file (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/9193ddea07a8480c6bf5f246136b01129d6d0445">9193dde</a>
+							)
+						</li>
+						<li>
+							<strong>dependabot:</strong>
+							Update dependabot action (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/6c81b3fcaa860770da8cd256e92b057fb7d736e7">6c81b3f</a>
+							)
+						</li>
+						<li>
+							<strong>prettier:</strong>
+							Stop using local server (
+							<a href="https://github.com/dschach/BaseSFDXProject/commit/7c1b0a9b5af6bbff375f59263e118316281b9be7">7c1b0a9</a>
+							)
+						</li>
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<td class="footer">
+					<div>
+						<a href="https://github.com/no-stack-dub-sack/apexdox-vs-code" target="_blank" rel="noopener noreferrer">Powered By ApexDox VS Code</a>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
