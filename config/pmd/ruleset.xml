@@ -509,10 +509,6 @@
 		<priority>3</priority>
 	</rule>
 
-	<rule ref="category/ecmascript/performance.xml/AvoidConsoleStatements">
-		<priority>3</priority>
-	</rule>
-
 	<!-- HTML BEST-PRACTICES -->
 	<rule ref="category/html/bestpractices.xml/AvoidInlineStyles">
 		<priority>3</priority>
