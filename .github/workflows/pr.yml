@@ -14,13 +14,17 @@ on:
 
 # Jobs to be executed
 jobs:
-  pmd-analysis:
+  install-pmd:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       # Checkout the source code
       - name: 'Checkout source code'
         uses: actions/checkout@v4
+
+      - run: |
+          DIFF_OUTPUT=$(gh pr diff)
+          echo $DIFF_OUTPUT
 
       # Install PMD
       - name: 'Install PMD'
@@ -35,40 +39,44 @@ jobs:
 
       # Run PMD scan
       - name: 'Run PMD scan'
-        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --minimum-priority "Medium High" --no-progress
+        id: pmd_sarif
+        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error
 
       - name: Upload violations file in SARIF format
-        if: steps.pmd.outputs.violations != 0
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: pmd-cli-report.sarif
           category: PMD analysis
 
+      - name: Upload violations file
+        uses: actions/upload-artifact@v4
+        with:
+          path: pmd-cli-report.sarif
+          name: pmd-cli-report
+          compression-level: 0
+
       - name: 'Run PMD scan to CSV'
         id: pmd_csv
-        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --minimum-priority "Medium High" --no-progress --property package=false --property ruleSet=false --property problem=false
+        if: always()
+        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false --no-fail-on-violation --no-fail-on-error
 
       - name: Read CSV
-        if: always()
         id: csv
         uses: juliangruber/read-file-action@v1
         with:
-          path: pmd.csv
+          path: ./pmd.csv
 
       - name: Create MD
-        if: always()
         uses: petems/csv-to-md-table-action@master
         id: csv-table-output
         with:
           csvinput: ${{ steps.csv.outputs.content }}
       - name: Step Table
-        if: always()
         id: md_to_output
         run: |
           echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - uses: mshick/add-pr-comment@v2
-        if: always()
         with:
           message: |
             ${{steps.csv-table-output.outputs.markdown-table}}

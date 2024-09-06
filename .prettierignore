@@ -21,7 +21,6 @@ coverage/
 doc-assets/*.js
 docs/assets/*.js
 !docs/*
-*-meta.xml
 data/
 .pmdCache
 

@@ -10,7 +10,7 @@
 	<exclude-pattern>.*/node_modules/.*</exclude-pattern>
 	<exclude-pattern>.*/doc.*/.*</exclude-pattern>
 	<exclude-pattern>.*__.*</exclude-pattern>
-	
+
 	<!-- APEX SECURITY -->
 
 	<rule ref="category/apex/security.xml/ApexBadCrypto">
@@ -68,7 +68,7 @@
 	</rule>
 
 	<!-- APEX PERFORMANCE -->
-	
+
 	<rule ref="category/apex/performance.xml/AvoidDebugStatements" message="Avoid debug statements since they impact performance.">
 		<priority>3</priority>
 		<properties>
@@ -215,7 +215,7 @@
 	</rule>
 
 	<!-- APEX DOCUMENTATION -->
-	
+
 	<rule ref="category/apex/documentation.xml/ApexDoc">
 		<priority>3</priority>
 		<properties>
@@ -227,7 +227,7 @@
 	</rule>
 
 	<!-- APEX CODESTYLE -->
-	
+
 	<rule ref="category/apex/codestyle.xml/ClassNamingConventions">
 		<priority>1</priority>
 		<properties>
@@ -415,7 +415,7 @@
 	</rule>
 
 	<!-- XML -->
-	
+
 	<rule ref="category/xml/bestpractices.xml/MissingEncoding">
 		<priority>3</priority>
 	</rule>
@@ -443,7 +443,7 @@
 	</rule>
 
 	<!-- JAVASCRIPT BEST-PRACTICES -->
-	
+
 	<rule ref="category/ecmascript/bestpractices.xml/AvoidWithStatement">
 		<priority>1</priority>
 	</rule>
@@ -586,7 +586,7 @@
 		<priority>2</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[  (//(Profile | PermissionSet)/objectPermissions/(modifyAllRecords | viewAllRecords)/text[matches(@Text, 'true')])  ]]> </value>
+				<value><![CDATA[  //(Profile | PermissionSet)/objectPermissions/(modifyAllRecords | viewAllRecords)/text[matches(@Text, 'true')]  ]]> </value>
 			</property>
 		</properties>
 	</rule>
@@ -596,21 +596,7 @@
 		<priority>1</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[  
-				CustomObject/sharingModel/text[@Text='Read' or @Text='ReadWrite']				
-				]]> </value>
-			</property>
-		</properties>
-	</rule>
-
-	<rule name="MetadataRequiresDescription2" language="xml" message="Add a description to explain metadata" class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
-		<description>Provide a description for custom metadata</description>
-		<priority>2</priority>
-		<properties>
-			<property name="xpath">
-				<value><![CDATA[
-					//CustomField[count(description)=0]
-				]]></value>
+				<value><![CDATA[  //CustomObject/sharingModel/text[@Text='Read' or @Text='ReadWrite']  ]]> </value>
 			</property>
 		</properties>
 	</rule>
@@ -620,9 +606,7 @@
 		<priority>2</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[
-				//CustomField/not(description)
-			]]></value>
+				<value><![CDATA[ //(CustomField | Profile | CustomObject)[count(description) = 1] ]]></value>
 			</property>
 		</properties>
 	</rule>
@@ -645,9 +629,7 @@
 		<description>Stupid rule to check matches</description>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[
-								//CustomField/fullName/text[matches(@Text,'.*_.*__c')]
-						]]></value>
+				<value><![CDATA[  //CustomField/fullName/text[matches(@Text, '.*_.*__c')]  ]]></value>
 			</property>
 		</properties>
 	</rule>
@@ -663,11 +645,9 @@
 			</property>
 		</properties>
 	</rule>
-	
+
 	<rule name="DoNotUseProcessBuilder" language="xml" message="Convert Process Builders to Flows" class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
-		<description>
-			Salesforce is transitioning away from Process Builder in favor of Flow. Migrate automations to Flow.
-		</description>
+		<description>Salesforce is transitioning away from Process Builder in favor of Flow. Migrate automations to Flow.</description>
 		<priority>1</priority>
 		<properties>
 			<property name="xpath">

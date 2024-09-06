@@ -390,4 +390,9 @@ public inherited sharing virtual class TriggerBase {
 	@TestVisible
 	private class EmptyStackException extends Exception {
 	}
+
+	private void name() {
+		List<Contact> cons = [SELECT Id FROM Contact];
+		cons = null;
+	}
 }

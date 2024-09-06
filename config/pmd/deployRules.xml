@@ -33,7 +33,6 @@
 <priority>4</priority>
 </rule> -->
 
-
 	<!-- CODE STYLE : NAMING -->
 	<rule ref="category/apex/codestyle.xml/ClassNamingConventions" message="Class name does not fit naming convention">
 		<priority>2</priority>
@@ -112,7 +111,6 @@
 	</rule>
 
 	<!-- SECURITY -->
-
 
 	<!-- PERFORMANCE -->
 	<rule ref="category/apex/performance.xml/OperationWithLimitsInLoop" message="Avoid operations in loops that may hit governor limits">
