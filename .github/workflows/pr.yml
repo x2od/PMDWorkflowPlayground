@@ -14,7 +14,7 @@ on:
 
 # Jobs to be executed
 jobs:
-  pmd-analysis:
+  install-pmd:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
@@ -33,6 +33,10 @@ jobs:
           mv ~/pmd-bin-$PMD_VERSION ~/pmd
           ~/pmd/bin/pmd --version
 
+  pmd-sarif:
+    runs-on: ubuntu-latest
+    needs: install-pmd
+    steps:
       # Run PMD scan
       - name: 'Run PMD scan'
         run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress
@@ -51,32 +55,35 @@ jobs:
           path: pmd-cli-report.sarif
           name: pmd-cli-report
           compression-level: 0
-
+  pmd-csv:
+    runs-on: ubuntu-latest
+    needs: install-pmd
+    steps:
       - name: 'Run PMD scan to CSV'
         id: pmd_csv
         run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false
 
       - name: Read CSV
-        if: always()
+        if: steps.pmd_csv.outcome != 'success'
         id: csv
         uses: juliangruber/read-file-action@v1
         with:
-          path: pmd.csv
+          path: ./pmd.csv
 
       - name: Create MD
-        if: always()
+        if: steps.pmd_csv.outcome != 'success'
         uses: petems/csv-to-md-table-action@master
         id: csv-table-output
         with:
           csvinput: ${{ steps.csv.outputs.content }}
       - name: Step Table
-        if: always()
+        if: steps.pmd_csv.outcome != 'success'
         id: md_to_output
         run: |
           echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - uses: mshick/add-pr-comment@v2
-        if: always()
+        if: steps.pmd_csv.outcome != 'success'
         with:
           message: |
             ${{steps.csv-table-output.outputs.markdown-table}}
