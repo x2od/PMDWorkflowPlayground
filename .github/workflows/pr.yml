@@ -52,36 +52,36 @@ jobs:
           name: pmd-cli-report
           compression-level: 0
 
-      # - name: 'Run PMD scan to CSV'
-      #   id: pmd_csv
-      #   run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false
+      - name: 'Run PMD scan to CSV'
+        id: pmd_csv
+        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false
 
-      # - name: Read CSV
-      #   if: always()
-      #   id: csv
-      #   uses: juliangruber/read-file-action@v1
-      #   with:
-      #     path: pmd.csv
+      - name: Read CSV
+        if: always()
+        id: csv
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: pmd.csv
 
-      # - name: Create MD
-      #   if: always()
-      #   uses: petems/csv-to-md-table-action@master
-      #   id: csv-table-output
-      #   with:
-      #     csvinput: ${{ steps.csv.outputs.content }}
-      # - name: Step Table
-      #   if: always()
-      #   id: md_to_output
-      #   run: |
-      #     echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+      - name: Create MD
+        if: always()
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-output
+        with:
+          csvinput: ${{ steps.csv.outputs.content }}
+      - name: Step Table
+        if: always()
+        id: md_to_output
+        run: |
+          echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
-      # - uses: mshick/add-pr-comment@v2
-      #   if: always()
-      #   with:
-      #     message: |
-      #       ${{steps.csv-table-output.outputs.markdown-table}}
-      #     repo-token: ${{ secrets.GITHUB_TOKEN }}
-      #     allow-repeats: false
+      - uses: mshick/add-pr-comment@v2
+        if: always()
+        with:
+          message: |
+            ${{steps.csv-table-output.outputs.markdown-table}}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          allow-repeats: false
 
   # sfdx-scanner:
   #   runs-on: ubuntu-latest
