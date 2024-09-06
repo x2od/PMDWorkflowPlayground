@@ -33,32 +33,26 @@ jobs:
           mv ~/pmd-bin-$PMD_VERSION ~/pmd
           ~/pmd/bin/pmd --version
 
-  pmd-sarif:
-    runs-on: ubuntu-latest
-    needs: install-pmd
-    steps:
       # Run PMD scan
       - name: 'Run PMD scan'
+        id: pmd_sarif
         run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress
 
       - name: Upload violations file in SARIF format
-        if: always()
+        if: steps.pmd_sarif.outcome != 'success'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: pmd-cli-report.sarif
           category: PMD analysis
 
       - name: Upload violations file
-        if: always()
+        if: steps.pmd_sarif.outcome != 'success'
         uses: actions/upload-artifact@v4
         with:
           path: pmd-cli-report.sarif
           name: pmd-cli-report
           compression-level: 0
-  pmd-csv:
-    runs-on: ubuntu-latest
-    needs: install-pmd
-    steps:
+
       - name: 'Run PMD scan to CSV'
         id: pmd_csv
         run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false
