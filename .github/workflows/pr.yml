@@ -38,6 +38,7 @@ jobs:
         run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress
 
       - name: Upload violations file in SARIF format
+        if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: pmd-cli-report.sarif
