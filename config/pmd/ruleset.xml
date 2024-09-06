@@ -571,10 +571,9 @@
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[ 
-					//(PermissionSet | Profile)/userPermissions[ name/text[@Text='ModifyAllData' or @Text='ViewAllData'] and enabled/text[@Text='true'] ] 
+					//(PermissionSet | Profile)/userPermissions[ name/text[@Text='ModifyAllData' or @Text='ViewAllData'] and enabled/text[@Text='true' and pmd:fileName() != 'Admin.profile-meta.xml'] ] 
 				]]></value>
 			</property>
-			<property name="violationSuppressXPath" value="pmd:fileName() != 'Admin.profile-meta.xml' or pmd:fileName() != 'Admin.profile'" />
 		</properties>
 	</rule>
 
@@ -632,7 +631,7 @@
 		name="ManageUsersByNonSysAdmins"
 		language="xml"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
-		message="Managing users need to be limited to System Administrator Profile only.">
+		message="Managing users needs to be limited to System Administrator Profile only.">
 		<description>This is a restricted permission</description>
 		<priority>1</priority>
 		<properties>
@@ -673,7 +672,7 @@
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[  
-					Flow/processType/text[@Text='Workflow']				
+					Flow/processType/text[@Text='Workflow']
 				]]> </value>
 			</property>
 		</properties>
