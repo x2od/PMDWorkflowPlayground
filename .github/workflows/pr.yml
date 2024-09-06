@@ -17,10 +17,6 @@ jobs:
       - name: 'Checkout source code'
         uses: actions/checkout@v4
 
-      - run: |
-          DIFF_OUTPUT=$(gh pr diff)
-          echo $DIFF_OUTPUT
-
       # Install PMD
       - name: 'Install PMD'
         id: pmd
