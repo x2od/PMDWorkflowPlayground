@@ -31,7 +31,7 @@ jobs:
         uses: pmd/pmd-github-action@v2
         with:
           rulesets: 'config/pmd/ruleset.xml'
-          analyzeModifiedFilesOnly: false
+          analyzeModifiedFilesOnly: true
           createGitHubAnnotations: true
           uploadSarifReport: false
       - name: Upload violations file in SARIF format
