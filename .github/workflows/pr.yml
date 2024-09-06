@@ -36,17 +36,15 @@ jobs:
       # Run PMD scan
       - name: 'Run PMD scan'
         id: pmd_sarif
-        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress
+        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation
 
       - name: Upload violations file in SARIF format
-        if: ${{ steps.pmd_sarif.outcome != 'success' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: pmd-cli-report.sarif
           category: PMD analysis
 
       - name: Upload violations file
-        if: ${{ steps.pmd_sarif.outcome != 'success' }}
         uses: actions/upload-artifact@v4
         with:
           path: pmd-cli-report.sarif
@@ -56,29 +54,25 @@ jobs:
       - name: 'Run PMD scan to CSV'
         id: pmd_csv
         if: always()
-        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false
+        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false --no-fail-on-violation
 
       - name: Read CSV
-        if: ${{ steps.pmd_csv.outcome != 'success' }}
         id: csv
         uses: juliangruber/read-file-action@v1
         with:
           path: ./pmd.csv
 
       - name: Create MD
-        if: ${{ steps.pmd_csv.outcome != 'success' }}
         uses: petems/csv-to-md-table-action@master
         id: csv-table-output
         with:
           csvinput: ${{ steps.csv.outputs.content }}
       - name: Step Table
-        if: ${{ steps.pmd_csv.outcome != 'success' }}
         id: md_to_output
         run: |
           echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - uses: mshick/add-pr-comment@v2
-        if: ${{ steps.pmd_csv.outcome != 'success' }}
         with:
           message: |
             ${{steps.csv-table-output.outputs.markdown-table}}
