@@ -631,7 +631,7 @@
 		name="ManageUsersByNonSysAdmins"
 		language="xml"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
-		message="Managing users need to be limited to System Administrator Profile only.">
+		message="Managing users needs to be limited to System Administrator Profile only.">
 		<description>This is a restricted permission</description>
 		<priority>1</priority>
 		<properties>

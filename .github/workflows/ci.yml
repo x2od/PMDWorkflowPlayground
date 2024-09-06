@@ -41,7 +41,7 @@ jobs:
       # Run PMD scan
       - name: 'Run PMD scan'
         id: pmd_sarif
-        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/deployRules.xml --format sarif --cache .pmdCache --minimum-priority "Medium High" --no-progress
+        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format sarif --cache .pmdCache --minimum-priority "Medium High" --no-progress
 
       - name: Upload violations file in SARIF format
         if: steps.pmd.outputs.violations != 0
