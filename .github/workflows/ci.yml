@@ -50,26 +50,26 @@ jobs:
           sarif_file: pmd-report.sarif
           category: PMD analysis
 
-  sfdx-scanner:
-    runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
-    steps:
-      # Checkout the source code
-      - name: 'Checkout source code'
-        uses: actions/checkout@v4
+  # sfdx-scanner:
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.actor != 'dependabot[bot]' }}
+  #   steps:
+  #     # Checkout the source code
+  #     - name: 'Checkout source code'
+  #       uses: actions/checkout@v4
 
-      - name: Install SFDX CLI and Scanner
-        run: |
-          npm install @salesforce/cli --global
-          sf plugins install @salesforce/sfdx-scanner
+  #     - name: Install SFDX CLI and Scanner
+  #       run: |
+  #         npm install @salesforce/cli --global
+  #         sf plugins install @salesforce/sfdx-scanner
 
-      - name: Run SFDX Scanner
-        uses: mitchspano/sfdx-scan-pull-request@main
-        with:
-          pmdconfig: 'config/pmd/ruleset.xml'
-          severity-threshold: 4
-          report-mode: 'check-runs'
-          target: 'force-app'
-          engine: 'pmd'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Run SFDX Scanner
+  #       uses: mitchspano/sfdx-scan-pull-request@main
+  #       with:
+  #         pmdconfig: 'config/pmd/ruleset.xml'
+  #         severity-threshold: 4
+  #         report-mode: 'check-runs'
+  #         target: 'force-app'
+  #         engine: 'pmd'
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
