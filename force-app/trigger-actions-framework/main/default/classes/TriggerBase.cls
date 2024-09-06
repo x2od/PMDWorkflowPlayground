@@ -393,5 +393,6 @@ public inherited sharing virtual class TriggerBase {
 
 	private void name() {
 		List<Contact> cons = [SELECT Id FROM Contact];
+		cons = null;
 	}
 }
