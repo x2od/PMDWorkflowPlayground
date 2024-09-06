@@ -603,25 +603,13 @@
 		</properties>
 	</rule>
 
-	<rule name="MetadataRequiresDescription2" language="xml" message="Add a description to explain metadata" class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
-		<description>Provide a description for custom metadata</description>
-		<priority>2</priority>
-		<properties>
-			<property name="xpath">
-				<value><![CDATA[
-					//CustomField[count(description)=0]
-				]]></value>
-			</property>
-		</properties>
-	</rule>
-
 	<rule name="MetadataNotDescription2" language="xml" message="Add a description to explain custom metadata" class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
 		<description>Provide a description for custom metadata</description>
 		<priority>2</priority>
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[
-				//CustomField/not(description)
+				//(CustomField|Profile)[description[count(*) = 0]]
 			]]></value>
 			</property>
 		</properties>
