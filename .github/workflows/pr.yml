@@ -74,6 +74,15 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           allow-repeats: false
 
+      - name: 'Run PMD scan to HTML'
+        id: pmd_html
+        if: always()
+        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format html --property linkPrefix=https://github.com/x2od/PMDWorkflowPlayground/blob/main/ --property linePrefix=L --report-file pmd.html --show-suppressed
+
+      - name: Step Table
+        id: html_to_output
+        run: |
+          echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
   # sfdx-scanner:
   #   runs-on: ubuntu-latest
   #   if: ${{ github.actor != 'dependabot[bot]' }}

@@ -54,3 +54,5 @@ testresults
 
 # temporary files
 tmp
+pmd.sarif
+pmd.html
