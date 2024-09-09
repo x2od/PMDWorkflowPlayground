@@ -82,7 +82,7 @@ jobs:
       - name: Step Table
         id: html_to_output
         run: |
-          echo "cat pmd.html" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat pmd.html)" >> $GITHUB_STEP_SUMMARY
   # sfdx-scanner:
   #   runs-on: ubuntu-latest
   #   if: ${{ github.actor != 'dependabot[bot]' }}
