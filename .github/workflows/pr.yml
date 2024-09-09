@@ -9,7 +9,7 @@ on:
 
 # Jobs to be executed
 jobs:
-  install-pmd:
+  run-pmd:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
@@ -46,38 +46,38 @@ jobs:
           name: pmd-cli-report
           compression-level: 0
 
-      - name: 'Run PMD scan to CSV'
-        id: pmd_csv
-        if: always()
-        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false --no-fail-on-violation --no-fail-on-error
+      # - name: 'Run PMD scan to CSV'
+      #   id: pmd_csv
+      #   if: always()
+      #   run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false --no-fail-on-violation --no-fail-on-error
 
-      - name: Read CSV
-        id: csv
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./pmd.csv
+      # - name: Read CSV
+      #   id: csv
+      #   uses: juliangruber/read-file-action@v1
+      #   with:
+      #     path: ./pmd.csv
 
-      - name: Create MD
-        uses: petems/csv-to-md-table-action@master
-        id: csv-table-output
-        with:
-          csvinput: ${{ steps.csv.outputs.content }}
-      - name: Step Table
-        id: md_to_output
-        run: |
-          echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+      # - name: Create MD
+      #   uses: petems/csv-to-md-table-action@master
+      #   id: csv-table-output
+      #   with:
+      #     csvinput: ${{ steps.csv.outputs.content }}
+      # - name: Step Table
+      #   id: md_to_output
+      #   run: |
+      #     echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
-      - uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            ${{steps.csv-table-output.outputs.markdown-table}}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          allow-repeats: false
+      # - uses: mshick/add-pr-comment@v2
+      #   with:
+      #     message: |
+      #       ${{steps.csv-table-output.outputs.markdown-table}}
+      #     repo-token: ${{ secrets.GITHUB_TOKEN }}
+      #     allow-repeats: false
 
       - name: 'Run PMD scan to HTML'
         id: pmd_html
         if: always()
-        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format html --property linkPrefix=https://github.com/x2od/PMDWorkflowPlayground/blob/main/ --property linePrefix=L --report-file pmd.html --show-suppressed
+        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format html --property linkPrefix=https://github.com/x2od/PMDWorkflowPlayground/blob/main/ --property linePrefix=L --report-file pmd.html --show-suppressed --no-fail-on-violation --no-fail-on-error
 
       - name: Step Table
         id: html_to_output
