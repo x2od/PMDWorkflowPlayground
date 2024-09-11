@@ -69,7 +69,7 @@
 		<priority>2</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //CustomField/description ]]></value>
+				<value><![CDATA[ //(PermissionSet|CustomField)/description ]]></value>
 			</property>
 		</properties>
 	</rule>
