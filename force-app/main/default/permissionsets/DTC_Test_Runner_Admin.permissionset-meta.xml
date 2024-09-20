@@ -52,6 +52,7 @@
         <apexClass>TestRunService</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <description>description</description>
     <fieldPermissions>
         <editable>true</editable>
         <field>CodeCoverage__c.ApexClassOrTriggerId__c</field>
@@ -318,7 +319,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>Test Runner - Admin</label>
+    <label>DTC Test Runner - Admin</label>
     <license>Salesforce</license>
     <objectPermissions>
         <allowCreate>true</allowCreate>
@@ -326,7 +327,7 @@
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
-        <object>CodeCoverage__c</object>
+        <object>CodeCoverage</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
     <objectPermissions>

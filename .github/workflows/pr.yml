@@ -18,7 +18,8 @@ jobs:
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
 
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    # outputs:
+    #   error_count: ${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS1 }}
     steps:
       # Checkout the source code
       - name: 'Checkout source code'
@@ -30,86 +31,106 @@ jobs:
         run: |
           PMD_VERSION=$(curl -s https://api.github.com/repos/pmd/pmd/releases/latest | grep '.tag_name' | sed 's:.*/::' | sed 's:",::')
           echo $PMD_VERSION
-          wget https://github.com/pmd/pmd/releases/download/pmd_releases%2F$PMD_VERSION/pmd-dist-$PMD_VERSION-bin.zip
-          unzip pmd-dist-$PMD_VERSION-bin.zip -d ~
+          wget -q https://github.com/pmd/pmd/releases/download/pmd_releases%2F$PMD_VERSION/pmd-dist-$PMD_VERSION-bin.zip
+          unzip -q pmd-dist-$PMD_VERSION-bin.zip -d ~
           mv ~/pmd-bin-$PMD_VERSION ~/pmd
           ~/pmd/bin/pmd --version
 
+      - name: Collect changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          echo "Files for this PR:"
+          gh pr diff "$BRANCH" --name-only > changed.txt
+          echo "--------------------"
+          cat changed.txt
+
       # Run PMD scan
-      - name: 'Run PMD scan'
+      - name: 'Run PMD scan to SARIF'
         id: pmd_sarif
-        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error
+        run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 2
 
       - name: Upload violations file in SARIF format
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: pmd-cli-report.sarif
-          category: PMD analysis
+          category: PMD
 
-      - name: Upload violations file
-        uses: actions/upload-artifact@v4
-        with:
-          path: pmd-cli-report.sarif
-          name: pmd-cli-report
-          compression-level: 0
-
-      - name: 'Run PMD scan to CSV'
+      - name: 'Run PMD scan to CSV - Blockers'
         id: pmd_csv
         if: always()
         run: |
-          ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file pmd.csv --cache .pmdCache --no-progress --property package=false --property ruleSet=false --property problem=false --no-fail-on-violation --no-fail-on-error --relativize-paths-with force-app --show-suppressed --property linePrefix=L
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-blockers.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false --ignore-list config/pmd/ignore.txt --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}} --minimum-priority 2
 
-      - name: Read CSV
+      - name: Read CSV - Blockers'
         id: csv
         uses: juliangruber/read-file-action@v1
         with:
-          path: ./pmd.csv
+          path: ./pmd-blockers.csv
 
-      - name: Create MD
+      - name: Create MD - Blockers'
         uses: petems/csv-to-md-table-action@master
-        id: csv-table-output
+        id: csv-table-output-blockers
         with:
           csvinput: ${{ steps.csv.outputs.content }}
-      - name: Step Table
-        id: md_to_output
-        run: |
-          echo "${{steps.csv-table-output.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
-      #  - uses: mshick/add-pr-comment@v2
-      #    with:
-      #      message: |
-      #        ${{steps.csv-table-output.outputs.markdown-table}}
-      #      repo-token: ${{ secrets.GITHUB_TOKEN }}
-      #      allow-repeats: false
-
-      - name: 'Run PMD scan to HTML'
-        id: pmd_html
+      - name: 'Run PMD scan to CSV - All violations'
+        id: pmd_csv_all
         if: always()
-        run: ~/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format html --property linkPrefix=https://github.com/x2od/PMDWorkflowPlayground/blob/main/ --property linePrefix=L --report-file pmd.html --show-suppressed --no-fail-on-violation --no-fail-on-error
-
-      - name: Step Table
-        id: html_to_output
         run: |
-          echo "$(cat pmd.html)" >> $GITHUB_STEP_SUMMARY
-  # sfdx-scanner:
-  #   runs-on: ubuntu-latest
-  #   if: ${{ github.actor != 'dependabot[bot]' }}
-  #   steps:
-  #     # Checkout the source code
-  #     - name: 'Checkout source code'
-  #       uses: actions/checkout@v4
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false --ignore-list config/pmd/ignore.txt --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}} --minimum-priority 5
 
-  #     - name: Install SFDX CLI and Scanner
-  #       run: |
-  #         npm install @salesforce/cli --global
-  #         sf plugins install @salesforce/sfdx-scanner
+      - name: Read CSV - All violations
+        id: csv-all
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-all.csv
 
-  #     - name: Run SFDX Scanner
-  #       uses: mitchspano/sfdx-scan-pull-request@main
-  #       with:
-  #         pmdconfig: 'config/pmd/ruleset.xml'
-  #         severity-threshold: 5
-  #         report-mode: 'comments'
-  #         engine: 'pmd'
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create MD - All violations
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-output-all
+        with:
+          csvinput: ${{ steps.csv-all.outputs.content }}
+
+      - name: Upload violations file in CSV format
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          path: pmd-all.csv
+          name: PullRequestPMDCSV
+          compression-level: 0
+
+      - name: Summary Table - Blockers & All
+        id: md_to_output-all
+        run: |
+          echo "# BLOCKERS" >> $GITHUB_STEP_SUMMARY  
+          echo "${{steps.csv-table-output-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+          echo "# ALL VIOLATIONS" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv-table-output-all.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+      # - name: 'Run PMD scan to HTML'
+      #   id: pmd_html
+      #   if: always()
+      #   run: |
+      #     ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format html --no-cache --report-file pmd.html --show-suppressed --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 5 --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --force-language xml  --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
+      #     sed -i 's|<title>PMD</title>||g' pmd.html
+      #     sed -i 's|<table |<table width="100%" |g' pmd.html
+      #     cat pmd.html | grep -B 1000000000 "<h3>Processing errors</h3>" > pmd-errors.html
+      #     sed -i 's|<center><h3>Processing errors</h3></center><table width="100%" align="center" cellspacing="0" cellpadding="3"><tr>||g' pmd-errors.html
+
+      # - name: Step Table
+      #   id: html_to_output
+      #   run: |
+      #     echo "$(cat pmd-errors.html)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Evaluate Errrors
+        id: evaluate_errors
+        run: |
+          ERROR_COUNT_PLUS1 = $(wc -l pmd-blockers.csv|awk '{print $1}')
+          echo $ERROR_COUNT_PLUS1
+          # echo "$ERROR_COUNT_PLUS1" >> "$GITHUB_OUTPUT"
+          # echo "ERRORS FOUND: $ERROR_COUNT_PLUS1"
+
+      # - name: Exit if error
+      #   if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS1 }} > 1
+      #   run: exit 1

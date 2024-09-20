@@ -9,7 +9,9 @@
 	<exclude-pattern>.*/.sf/.*</exclude-pattern>
 	<exclude-pattern>.*/node_modules/.*</exclude-pattern>
 	<exclude-pattern>.*/doc.*/.*</exclude-pattern>
-	<exclude-pattern>.*__.*</exclude-pattern>
+	<exclude-pattern>.*/permissionsets/DTC_.*meta.xml</exclude-pattern>
+	<exclude-pattern>.*/Admin.profile-meta.xml</exclude-pattern>
+	<exclude-pattern>.*/Admin.profile</exclude-pattern>
 
 	<!-- APEX SECURITY -->
 
@@ -71,14 +73,14 @@
 
 	<rule ref="category/apex/performance.xml/AvoidDebugStatements" message="Avoid debug statements since they impact performance.">
 		<priority>3</priority>
-		<properties>
+		<!-- <properties>
 			<property name="violationSuppressXPath">
 				<value><![CDATA[
 					//Method[descendant::ModifierNode/Annotation[@Image="IsTest"]]
 				]]>
 			</value>
 			</property>
-		</properties>
+		</properties> -->
 	</rule>
 
 	<rule ref="category/apex/performance.xml/AvoidNonRestrictiveQueries">
@@ -122,7 +124,7 @@
 	</rule>
 
 	<rule ref="category/apex/bestpractices.xml/ApexUnitTestClassShouldHaveRunAs">
-		<priority>3</priority>
+		<priority>2</priority>
 	</rule>
 
 	<rule ref="category/apex/bestpractices.xml/ApexUnitTestMethodShouldHaveIsTestAnnotation">
@@ -524,15 +526,14 @@
 
 	<!-- CUSTOM-->
 
-	<!-- Custom Objects / Fields Rules -->
-
+	<!-- APEX -->
 	<rule
 		name="DoNotUseWithoutSharing"
 		message="Use with/inherited sharing, or include an explanation in your code to mark this a false positive"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
 		language="apex">
 		<description>Do not use without sharing outside test classes</description>
-		<priority>3</priority>
+		<priority>2</priority>
 		<properties>
 			<property name="xpath">
 				<value>
@@ -545,6 +546,26 @@
 	</rule>
 
 	<rule
+		name="RequireExplicitSharing"
+		message="Explicitly use with/without/inherited sharing"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
+		language="apex">
+		<description>Avoid classes without explicit sharing</description>
+		<priority>1</priority>
+		<properties>
+			<property name="xpath">
+				<value>
+					<![CDATA[
+						(UserClass/ModifierNode[@WithoutSharing=false() and @WithSharing=false() and @InheritedSharing=false()])
+					]]>
+			</value>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Permissions>-->
+
+	<rule
 		name="ModifyOrViewAllData"
 		language="xml"
 		message="Allowing this user permission can give access and ability to modify sensitive data."
@@ -554,27 +575,121 @@
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[ 
-					//(PermissionSet | Profile)/userPermissions[ name/text[@Text='ModifyAllData' or @Text='ViewAllData'] and enabled/text[@Text='true' and pmd:fileName() != 'Admin.profile-meta.xml'] ] 
+					//(PermissionSet | Profile)/userPermissions[name/text[@Text='ModifyAllData' or @Text='ViewAllData'] and enabled/text[@Text='true'] ] 
 				]]></value>
 			</property>
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
 		</properties>
 	</rule>
 
 	<rule
-		name="ModifyOrViewAllRecords"
+		name="ModifyOrViewAllRecordsCustom"
 		language="xml"
-		message="We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+		message="Use sharing rules to grant record access rather than View All or Modify All even on module-specific objects."
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
 		<description>Profiles and Permission Sets should not have modify or view all records permission</description>
 		<priority>2</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[  //(Profile | PermissionSet)/objectPermissions/(modifyAllRecords | viewAllRecords)/text[matches(@Text, 'true')]  ]]> </value>
+				<value><![CDATA[  
+					//(Profile | PermissionSet)/objectPermissions[
+						(modifyAllRecords | viewAllRecords)/text[ @Text='true'] and 
+						object/text[matches(@Text, '^.*__[a-z]+$', 'i' ) ]]
+						]]> </value>
+			</property>
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
+		</properties>
+	</rule>
+
+	<rule
+		name="ModifyOrViewAllRecordsStandard"
+		language="xml"
+		message="View All or Modify All on standard objects is a blocker"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Profiles and Permission Sets must not have modify or view all records permission for standard objects</description>
+		<priority>1</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[  
+					//(Profile | PermissionSet)/objectPermissions[
+						(modifyAllRecords | viewAllRecords)/text[ matches(@Text, 'true')] and 
+						object/text[matches(@Text, '^[a-zA-Z0-9]+$' )]
+						]
+						]]> </value>
+			</property>
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
+		</properties>
+	</rule>
+
+	<rule
+		name="ManageUsers"
+		language="xml"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
+		message="Managing users needs to be limited to System Administrator Profile only">
+		<description>Manage Users is a restricted permission</description>
+		<priority>1</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ //(Profile | PermissionSet)/userPermissions[name/text[matches(@Text, 'Manage.*Users', 'i')] ] ]]> </value>
+			</property>
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
+		</properties>
+	</rule>
+
+	<rule
+		name="ViewSetupProfile"
+		language="xml"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
+		message="View Setup should be limited to System Administrator Profile only">
+		<description>ViewSetup is a restricted permission</description>
+		<priority>1</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ 
+					//Profile/userPermissions[name/text[@Text='ViewSetup'] and enabled/text[@Text='true'] ]
+					]]> </value>
+			</property>
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
+		</properties>
+	</rule>
+
+	<rule
+		name="ViewSetupPermissionSet"
+		language="xml"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
+		message="View Setup should not be in a Permission Set">
+		<description>ViewSetup is a restricted permission</description>
+		<priority>1</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ 
+				//PermissionSet/userPermissions[ name/text[@Text='ViewSetup'] and enabled/text[@Text='true'] ]
+				]]> </value>
 			</property>
 		</properties>
 	</rule>
 
-	<rule name="NonPrivateObjectSharing" language="xml" message="All objects should use Private sharing by default." class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+	<!-- Custom Objects / Fields Rules -->
+
+	<rule
+		name="NoUnderscoresInFieldNames"
+		language="xml"
+		message="Custom fields should not contain underscores."
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Stupid rule to check matches</description>
+		<priority>5</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[  //CustomField/fullName/text[matches(@Text, '.*_.*__c')]  ]]></value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule
+		name="NonPrivateObjectSharing"
+		language="xml"
+		message="All objects should use Private sharing by default."
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
 		<description>Require org-wide defaults to be Private for all objects</description>
 		<priority>1</priority>
 		<properties>
@@ -584,56 +699,57 @@
 		</properties>
 	</rule>
 
-	<rule name="MetadataNotDescription2" language="xml" message="Add a description to explain custom metadata" class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+	<rule
+		name="MetadataNoDescriptionObjectField"
+		language="xml"
+		message="Add a description to explain custom metadata"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
 		<description>Provide a description for custom metadata</description>
 		<priority>2</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //(CustomField | Profile | CustomObject)/description ]]></value>
+				<value><![CDATA[ //(CustomField | CustomObject)[count(description) = 0] ]]></value>
 			</property>
 		</properties>
 	</rule>
 
 	<rule
-		name="ManageUsersByNonSysAdmins"
+		name="MetadataNoDescriptionPermissionSet"
 		language="xml"
-		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
-		message="Managing users needs to be limited to System Administrator Profile only.">
-		<description>This is a restricted permission</description>
-		<priority>1</priority>
+		message="Add a description to explain custom permission sets"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Provide a description for permission sets</description>
+		<priority>2</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //(Profile | PermissionSet)/userPermissions[ pmd:fileName() != 'Admin.profile-meta.xml' and name/text[matches(@Text, 'Manage.*Users')] ] ]]> </value>
+				<value><![CDATA[ //(PermissionSet)[count(description) = 0] ]]></value>
 			</property>
 		</properties>
 	</rule>
 
 	<rule
-		name="ViewSetupByNonSysAdmins"
+		name="MetadataNoDescriptionFlow"
 		language="xml"
-		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
-		message="Viewing Setup should be limited to System Administrator Profile only.">
-		<description>This is a restricted permission</description>
-		<priority>1</priority>
+		message="Add a description to explain flows"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Provide a description for flows</description>
+		<priority>4</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //(Profile | PermissionSet)/userPermissions[ pmd:fileName() != 'Admin.profile-meta.xml' and name/text[@Text='ViewSetup'] ] ]]> </value>
-			</property>
-		</properties>
-	</rule>
-
-	<rule name="NoUnderscoresInFieldNames" language="xml" message="Custom fields should not contain underscores." class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
-		<description>Stupid rule to check matches</description>
-		<properties>
-			<property name="xpath">
-				<value><![CDATA[  //CustomField/fullName/text[matches(@Text, '.*_.*__c')]  ]]></value>
+				<value><![CDATA[ //(Flow)[count(description) = 0] ]]></value>
 			</property>
 		</properties>
 	</rule>
 
 	<!-- Metadata XML Rules -->
 
-	<rule name="BumpApiVersion" language="xml" message="Metadata should use the latest API version." class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+	<!-- General Metadata -->
+
+	<rule
+		name="BumpApiVersion"
+		language="xml"
+		message="Metadata should use the latest API version."
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
 		<description>check API version</description>
 		<priority>3</priority>
 		<properties>
@@ -643,8 +759,14 @@
 		</properties>
 	</rule>
 
-	<rule name="DoNotUseProcessBuilder" language="xml" message="Convert Process Builders to Flows" class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
-		<description>Salesforce is transitioning away from Process Builder in favor of Flow. Migrate automations to Flow.</description>
+	<!-- Process Builder -->
+
+	<rule
+		name="DoNotUseProcessBuilder"
+		language="xml"
+		message="Convert Process Builders to Flows"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Salesforce is transitioning away from Process Builder in favor of Flow</description>
 		<priority>1</priority>
 		<properties>
 			<property name="xpath">

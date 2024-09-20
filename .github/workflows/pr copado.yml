@@ -1,0 +1,157 @@
+# Unique name for this workflow
+name: On PR (metadata format)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+# Jobs to be executed
+jobs:
+  run-pmd-metadata-format:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      # Checkout the source code
+      - name: 'Checkout source code'
+        uses: actions/checkout@v4
+
+      # Install PMD
+      - name: 'Install PMD'
+        id: pmd
+        run: |
+          PMD_VERSION=$(curl -s https://api.github.com/repos/pmd/pmd/releases/latest | grep '.tag_name' | sed 's:.*/::' | sed 's:",::')
+          echo $PMD_VERSION
+          wget -q https://github.com/pmd/pmd/releases/download/pmd_releases%2F$PMD_VERSION/pmd-dist-$PMD_VERSION-bin.zip
+          unzip -q pmd-dist-$PMD_VERSION-bin.zip -d ~
+          mv ~/pmd-bin-$PMD_VERSION ~/pmd
+          ~/pmd/bin/pmd --version
+
+      - name: Collect changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          echo "Files for this PR:"
+          gh pr diff "$BRANCH" --name-only > changed.txt
+          cat changed.txt
+
+      # Run PMD scan - code
+      - name: 'Run PMD scan to SARIF - CODE'
+        id: pmd_sarif
+        run: ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report-code.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 2
+
+      - name: Upload violations file in SARIF format
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pmd-cli-report-code.sarif
+          category: PMD_code
+
+      # Run PMD scan - metadata
+      - name: 'Run PMD scan to SARIF - METADATA'
+        id: pmd_sarif_xml
+        run: ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report-xml.sarif  --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
+
+      - name: Upload violations file in SARIF format
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pmd-cli-report-xml.sarif
+          category: PMD_xml
+
+      - name: 'Run PMD scan to CSV - CODE'
+        id: pmd_csv
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-code.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
+
+      - name: Read CSV - CODE
+        id: csv_code
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-code.csv
+
+      - name: Create MD - CODE
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-output-code
+        with:
+          csvinput: ${{ steps.csv_code.outputs.content }}
+
+      - name: Step Table - CODE
+        id: md_to_output
+        run: |
+          echo "${{steps.csv-table-output-code.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 'Run PMD scan to CSV - Metadata'
+        id: pmd_csv_metadata
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-md.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
+
+      - name: Read CSV - Metadata
+        id: csv_metadata
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-md.csv
+
+      - name: Create MD - Metadata
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-output-metadata
+        with:
+          csvinput: ${{ steps.csv_metadata.outputs.content }}
+
+      - name: Step Table - Metadata
+        id: md_to_output_metadata
+        run: |
+          echo "${{steps.csv-table-output-metadata.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      # - name: Upload metadata violations file in CSV format
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     path: pmd-md.csv
+      #     name: PullRequestPMDMetadata
+      #     compression-level: 0
+
+      - name: 'Run PMD scan to HTML - CODE'
+        id: pmd_html_code
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format html --cache .pmdCache --property linePrefix=L --report-file pmd-code.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
+          sed -i 's|<title>PMD</title>|PMD CODE|g' pmd-code.html
+          sed -i 's|<table |<table width="100%" |g' pmd-code.html
+
+      - name: 'Run PMD scan to HTML - METADATA'
+        id: pmd_html_metadata
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format html --property linePrefix=L --report-file pmd-metadata.html --no-fail-on-violation --no-fail-on-error --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --force-language xml
+          sed -i 's|<title>PMD</title>||g' pmd-metadata.html
+          sed -i 's|<table |<table width="100%" |g' pmd-metadata.html
+          cat pmd-metadata.html | grep -B 1000000000 "<h3>Processing errors</h3>" > pmd-metadata-errors.html
+          sed -i 's|<center><h3>Processing errors</h3></center><table width="100%" align="center" cellspacing="0" cellpadding="3"><tr>||g' pmd-metadata-errors.html
+
+      - name: Step Table - ALL
+        run: |
+          echo "$(cat pmd-code.html)" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat pmd-metadata-errors.html)" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat pmd-metadata.html)"
+          echo "---------------------------------------------"
+          echo "$(cat pmd-metadata-errors.html)"
+
+      # - name: Evaluate Errrors
+      #   id: evaluate_errors
+      #   run: |
+      #     echo "ERROR_COUNT_PLUS_1_CODE=wc -l < pmd-code.csv" >> "$GITHUB_OUTPUT"
+      #     echo "ERROR_COUNT_PLUS_1_MD=wc -l < pmd-md.csv" >> "$GITHUB_OUTPUT"
+      #     echo "::debug::$ERROR_COUNT_PLUS_1_CODE Code Violations Detected"
+      #     echo "::debug::$ERROR_COUNT_PLUS_1_MD Metadata/Code Violations Detected"
+
+      # - name: Exit if error
+      #   if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS_1_CODE }} > 1 || ${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS_1_MD }} > 1
+      #   run: |
+      #     echo "::error::${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS_1_CODE }} Code Violations Detected"
+      #     echo "::error::${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS_1_MD }} Metadata/Code Violations Detected"
+      #     exit 1

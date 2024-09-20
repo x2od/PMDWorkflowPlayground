@@ -9,19 +9,25 @@
         <object>DTCModule__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>DTCModule</object>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
     <classAccesses>
-        <apexClass>UserDeactivationWhitelistSelector</apexClass>
-        <enabled>false</enabled>
+        <apexClass>CalloutRequestMock</apexClass>
+        <enabled>true</enabled>
     </classAccesses>
-    <custom>false</custom>
+    <custom>true</custom>
     <fieldPermissions>
         <editable>true</editable>
         <field>User_Deactivation_Configuration__mdt.Warning_Days__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    <layoutAssignments>
-        <layout>User_Deactivation_Whitelist__mdt-User Deactivation Whitelist Layout</layout>
-    </layoutAssignments>
     <pageAccesses>
         <apexPage>SandboxRefreshAdmin</apexPage>
         <enabled>true</enabled>
@@ -36,22 +42,11 @@
     </userPermissions>
     <userPermissions>
         <enabled>true</enabled>
-        <name>ManageUsers</name>
+        <name>ManageExternalUsers</name>
     </userPermissions>
     <userPermissions>
         <enabled>true</enabled>
         <name>ViewSetup</name>
     </userPermissions>
     <userLicense>Salesforce</userLicense>
-    <enableStreamingApi>false</enableStreamingApi>
-    <externalSharingModel>Read</externalSharingModel>
-    <label>Test Run</label>
-    <nameField>
-        <label>Test Run Name</label>
-        <type>Text</type>
-    </nameField>
-    <pluralLabel>Test Runs</pluralLabel>
-    <searchLayouts/>
-    <sharingModel>ReadWrite</sharingModel>
-    <visibility>Public</visibility>
 </Profile>

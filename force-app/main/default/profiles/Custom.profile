@@ -9,11 +9,24 @@
         <object>DTCModule__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <tabVisibilities>
+        <tab>vadtcaup__User_Application_Request__c</tab>
+        <visibility>DefaultOn</visibility>
+    </tabVisibilities>
+    <userLicense>Salesforce</userLicense>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ManageUsers</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ViewSetup</name>
+    </userPermissions>
     <classAccesses>
         <apexClass>UserDeactivationWhitelistSelector</apexClass>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
     </classAccesses>
-    <custom>false</custom>
+    <custom>true</custom>
     <fieldPermissions>
         <editable>true</editable>
         <field>User_Deactivation_Configuration__mdt.Warning_Days__c</field>
@@ -43,15 +56,4 @@
         <name>ViewSetup</name>
     </userPermissions>
     <userLicense>Salesforce</userLicense>
-    <enableStreamingApi>false</enableStreamingApi>
-    <externalSharingModel>Read</externalSharingModel>
-    <label>Test Run</label>
-    <nameField>
-        <label>Test Run Name</label>
-        <type>Text</type>
-    </nameField>
-    <pluralLabel>Test Runs</pluralLabel>
-    <searchLayouts/>
-    <sharingModel>ReadWrite</sharingModel>
-    <visibility>Public</visibility>
 </Profile>

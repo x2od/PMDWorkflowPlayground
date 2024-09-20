@@ -2,5 +2,6 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <hasActivationRequired>false</hasActivationRequired>
     <label>Change Me</label>
-    <fullName>abc_as__c</fullName>
+    <hasActivationRequired>false</hasActivationRequired>
+    <license>Salesforce</license>
 </PermissionSet>
