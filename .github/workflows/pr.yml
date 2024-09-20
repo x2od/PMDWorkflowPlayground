@@ -1,7 +1,6 @@
 # Unique name for this workflow
 name: On PR
 
-# Definition when the workflow should run
 on:
   workflow_dispatch:
   pull_request:
