@@ -4,8 +4,6 @@ name: On PR (metadata - for testing)
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - src
 
 permissions:
   contents: read
