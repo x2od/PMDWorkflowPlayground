@@ -46,7 +46,7 @@ jobs:
       - name: 'Run PMD scan to CSV - APEX'
         id: pmd_csv
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
+          ~/pmd/bin/pmd check --dir src/classes --dir src/triggers --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language apex
 
       - name: Read CSV - APEX
         id: csv_code
@@ -63,7 +63,31 @@ jobs:
       - name: Step Table - APEX
         id: md_to_output
         run: |
+          echo "# CSV - APEX" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv-table-output-apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 'Run PMD scan to CSV - VF'
+        id: pmd_csv_vf
+        run: |
+          ~/pmd/bin/pmd check --dir src/pages --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language visualforce
+
+      - name: Read CSV - VF
+        id: csv_code_vf
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-apex.csv
+
+      - name: Create MD - VF
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-output-vf
+        with:
+          csvinput: ${{ steps.csv_code.outputs.content }}
+
+      - name: Step Table - VF
+        id: md_to_output_vf
+        run: |
+          echo "# CSV - VF" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv-table-output-vf.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - name: 'Run PMD scan to CSV - XML'
         id: pmd_csv_metadata
@@ -92,15 +116,23 @@ jobs:
         id: pmd_html_code
         run: |
           ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format html --no-cache --report-file pmd-apex.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress 
-          sed -i 's|<title>PMD</title>|PMD APEX|g' pmd-apex.html
+          sed -i 's|<title>PMD</title>|# PMD APEX|g' pmd-apex.html
           sed -i 's|<table |<table width="100%" |g' pmd-apex.html
+        # --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
+
+      - name: 'Run PMD scan to HTML - VF'
+        id: pmd_html_vf
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format html --no-cache --report-file pmd-vf.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress 
+          sed -i 's|<title>PMD</title>|# PMD VF|g' pmd-vf.html
+          sed -i 's|<table |<table width="100%" |g' pmd-vf.html
         # --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
 
       - name: 'Run PMD scan to HTML - XML'
         id: pmd_html_metadata
         run: |
           ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format html --no-cache --report-file pmd-xml.html --show-suppressed --no-fail-on-violation --no-fail-on-error  --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --force-language xml
-          sed -i 's|<title>PMD</title>||g' pmd-xml.html
+          sed -i 's|<title>PMD</title>|# PMD XML|g' pmd-xml.html
           sed -i 's|<table |<table width="100%" |g' pmd-xml.html
           cat pmd-xml.html | grep -B 1000000000 "<h3>Processing errors</h3>" > pmd-xml-errors.html
           sed -i 's|<center><h3>Processing errors</h3></center><table width="100%" align="center" cellspacing="0" cellpadding="3"><tr>||g' pmd-xml-errors.html
