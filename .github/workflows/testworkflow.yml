@@ -125,7 +125,7 @@ jobs:
       - name: 'Run PMD scan to HTML - VF'
         id: pmd_html_vf
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format html --no-cache --report-file pmd-vf.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress 
+          ~/pmd/bin/pmd check --dir src/pages --rulesets config/pmd/ruleset.xml --format html --no-cache --report-file pmd-vf.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress 
           sed -i 's|<title>PMD</title>||g' pmd-vf.html
           sed -i 's|<table |<table width="100%" |g' pmd-vf.html
           cat pmd-vf.html | grep -B 1000000000 "<h3>Processing errors</h3>" > pmd-vf-errors.html
