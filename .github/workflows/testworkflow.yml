@@ -1,0 +1,138 @@
+# Unique name for this workflow
+name: On PR (metadata - for testing)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - src
+
+permissions:
+  contents: read
+
+# Jobs to be executed
+jobs:
+  run-pmd-metadata-format:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      # Checkout the source code
+      - name: 'Checkout source code'
+        uses: actions/checkout@v4
+
+      # Install PMD
+      - name: 'Install PMD'
+        id: pmd
+        run: |
+          PMD_VERSION=$(curl -s https://api.github.com/repos/pmd/pmd/releases/latest | grep '.tag_name' | sed 's:.*/::' | sed 's:",::')
+          echo $PMD_VERSION
+          wget -q https://github.com/pmd/pmd/releases/download/pmd_releases%2F$PMD_VERSION/pmd-dist-$PMD_VERSION-bin.zip
+          unzip -q pmd-dist-$PMD_VERSION-bin.zip -d ~
+          mv ~/pmd-bin-$PMD_VERSION ~/pmd
+          ~/pmd/bin/pmd --version
+
+      - name: Collect changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          echo "Files for this PR:"
+          gh pr diff "$BRANCH" --name-only > changed.txt
+          cat changed.txt
+
+      - name: 'Run PMD scan to CSV - APEX'
+        id: pmd_csv
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
+
+      - name: Read CSV - APEX
+        id: csv_code
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-apex.csv
+
+      - name: Create MD - APEX
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-output-apex
+        with:
+          csvinput: ${{ steps.csv_code.outputs.content }}
+
+      - name: Step Table - APEX
+        id: md_to_output
+        run: |
+          echo "${{steps.csv-table-output-apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 'Run PMD scan to CSV - XML'
+        id: pmd_csv_metadata
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-xml.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
+
+      - name: Read CSV - XML
+        id: csv_metadata
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-xml.csv
+
+      - name: Create MD - XML
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-output-xml
+        with:
+          csvinput: ${{ steps.csv_metadata.outputs.content }}
+
+      - name: Step Table - XML
+        id: md_to_output_metadata
+        run: |
+          echo "${{steps.csv-table-output-xml.outputs.markdown-table}}"
+          echo "${{steps.csv-table-output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      - name: 'Run PMD scan to HTML - APEX'
+        id: pmd_html_code
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format html --no-cache --report-file pmd-apex.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress 
+          sed -i 's|<title>PMD</title>|PMD APEX|g' pmd-apex.html
+          sed -i 's|<table |<table width="100%" |g' pmd-apex.html
+        # --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
+
+      - name: 'Run PMD scan to HTML - XML'
+        id: pmd_html_metadata
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format html --no-cache --report-file pmd-xml.html --show-suppressed --no-fail-on-violation --no-fail-on-error  --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --force-language xml
+          sed -i 's|<title>PMD</title>||g' pmd-xml.html
+          sed -i 's|<table |<table width="100%" |g' pmd-xml.html
+          cat pmd-xml.html | grep -B 1000000000 "<h3>Processing errors</h3>" > pmd-xml-errors.html
+          sed -i 's|<center><h3>Processing errors</h3></center><table width="100%" align="center" cellspacing="0" cellpadding="3"><tr>||g' pmd-xml-errors.html
+
+      - name: Step Table - ALL
+        run: |
+          echo "$(cat pmd-apex.html)" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat pmd-xml-errors.html)" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat pmd-xml.html)"
+          echo "---------------------------------------------"
+          echo "$(cat pmd-xml-errors.html)"
+      # - name: Upload violations file in CSV format
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     path: pmd-xml.csv
+      #     name: PullRequestPMD
+      #     compression-level: 0
+
+      # - name: Evaluate Errrors
+      #   id: evaluate_errors
+      #   run: |
+      #     echo "ERROR_COUNT_PLUS_1_CODE=wc -l < pmd-apex.csv" >> "$GITHUB_OUTPUT"
+      #     echo "ERROR_COUNT_PLUS_1_MD=wc -l < pmd-xml.csv" >> "$GITHUB_OUTPUT"
+      #     echo "::debug::$ERROR_COUNT_PLUS_1_CODE Apex Violations Detected"
+      #     echo "::debug::$ERROR_COUNT_PLUS_1_MD XML/Apex Violations Detected"
+
+      # - name: Exit if error
+      #   if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS_1_CODE }} > 1 || ${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS_1_MD }} > 1
+      #   run: |
+      #     echo "::error::${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS_1_CODE }} Code Violations Detected"
+      #     echo "::error::${{ steps.evaluate_errors.outputs.ERROR_COUNT_PLUS_1_MD }} XML/Code Violations Detected"
+      #     exit 1

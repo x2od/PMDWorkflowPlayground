@@ -32,7 +32,9 @@
  * To use the `TriggerBase` class, you must create a subclass that implements the `TriggerAction` interface.
  * The `TriggerAction` interface defines the methods that should be implemented by trigger actions.
  */
-@SuppressWarnings('PMD.StdCyclomaticComplexity, PMD.CyclomaticComplexity, PMD.cognitivecomplexity, PMD.PropertyNamingConventions')
+@SuppressWarnings(
+	'PMD.StdCyclomaticComplexity, PMD.CyclomaticComplexity, PMD.cognitivecomplexity, PMD.PropertyNamingConventions'
+)
 public inherited sharing virtual class TriggerBase {
 	@TestVisible
 	private static final String HANDLER_OUTSIDE_TRIGGER_MESSAGE = 'Trigger handler called outside of Trigger execution';
@@ -100,7 +102,9 @@ public inherited sharing virtual class TriggerBase {
 
 	private String inverseContext {
 		get {
-			return CONTEXT_TO_INVERSE.containsKey(this.context) ? this.sObjectName + '|' + CONTEXT_TO_INVERSE.get(this.context) : '';
+			return CONTEXT_TO_INVERSE.containsKey(this.context)
+				? this.sObjectName + '|' + CONTEXT_TO_INVERSE.get(this.context)
+				: '';
 		}
 	}
 	/**
@@ -393,6 +397,5 @@ public inherited sharing virtual class TriggerBase {
 
 	private void name() {
 		List<Contact> cons = [SELECT Id FROM Contact];
-		cons = null;
 	}
 }

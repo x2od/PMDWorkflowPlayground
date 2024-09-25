@@ -18,7 +18,7 @@
  * @group Trigger Actions Framework
  * @description This class contains constants used by the TriggerAction framework.
  */
-public class TriggerActionConstants {
+private class TriggerActionConstants {
 	public static final String APEX_STRING = 'Apex';
 	public static final String FLOW_STRING = 'Flow';
 	public static final String OBJECT_STRING = 'Object';

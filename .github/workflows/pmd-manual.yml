@@ -1,0 +1,60 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: PMD CSV
+
+run-name: Repository PMD scan by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      minimum_severity:
+        required: true
+        type: choice
+        description: Minimum Severity (defaults to 5 - show all violations)
+        default: '5'
+        options:
+          - 5
+          - 4
+          - 3
+          - 2
+          - 1
+
+jobs:
+  pmd-code-scan:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+    runs-on: ubuntu-latest
+    outputs:
+      filename: ${{ steps.set_filename.outputs.filename }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 'Set Filename'
+        id: set_filename
+        run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> "$GITHUB_OUTPUT"
+
+      # Install PMD
+      - name: 'Install PMD'
+        id: pmd
+        run: |
+          PMD_VERSION=$(curl -s https://api.github.com/repos/pmd/pmd/releases/latest | grep '.tag_name' | sed 's:.*/::' | sed 's:",::')
+          echo $PMD_VERSION
+          wget -q https://github.com/pmd/pmd/releases/download/pmd_releases%2F$PMD_VERSION/pmd-dist-$PMD_VERSION-bin.zip
+          unzip -q pmd-dist-$PMD_VERSION-bin.zip -d ~
+          mv ~/pmd-bin-$PMD_VERSION ~/pmd
+          ~/pmd/bin/pmd --version
+
+      # Run PMD scan
+      - name: 'Run PMD scan'
+        run: ~/pmd/bin/pmd check --rulesets config/dtc_pmd_ruleset.xml --format csv --no-cache --no-progress --report-file ${{ steps.set_filename.outputs.filename }}.csv --minimum-priority "${{ github.event.inputs.minimum_severity }}"
+
+      - name: Upload violations file in CSV format
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ steps.set_filename.outputs.filename }}.csv
+          name: ${{ steps.set_filename.outputs.filename }}_PMD
+          compression-level: 0

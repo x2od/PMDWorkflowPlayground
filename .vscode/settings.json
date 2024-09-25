@@ -8,6 +8,7 @@
   "salesforcedx-vscode-core.retrieve-test-code-coverage": true,
 	"apexPMD.enableCache": true,
 	"apexPMD.rulesets": [
+		"config/pmd/xml.xml",
 		"config/pmd/ruleset.xml"
 	],
 	"apexPMD.priorityErrorThreshold": 2,
@@ -32,5 +33,6 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"editor.formatOnSave": false
 	},
-	"git.autofetch": true
+	"git.autofetch": true,
+	"codeAnalyzer.pMD.customConfigFile": "config/pmd/xml.xml"
 }

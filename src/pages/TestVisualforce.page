@@ -1,0 +1,11 @@
+<apex:page controller="AcRestActionsController" action="{!csrfInitMethod}" >
+	<apex:outputText value="Potential XSS is {! here }" escape="false" />
+	<style>
+		div {
+				background: url('{!XSSHere}');
+		}
+		div {
+				background: url('{!URLENCODE(XSSHere)}');
+		}
+</style>
+</apex:page>

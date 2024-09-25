@@ -26,3 +26,5 @@ data/
 
 **/staticresources/**
 !**/staticresources/*.js
+
+trigger-actions-framework

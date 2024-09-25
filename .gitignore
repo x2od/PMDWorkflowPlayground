@@ -46,7 +46,6 @@ pmd/pmd.csv
 pmd.csv
 
 # metadata format files
-src
 mdconverted
 
 # Test results
@@ -54,3 +53,5 @@ testresults
 
 # temporary files
 tmp
+pmd.*
+results.*

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ruleset
+	name="test XML PMD Ruleset"
+	xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+	<description>David Schach default PMD ruleset</description>
+	<exclude-pattern>.*/.sfdx/.*</exclude-pattern>
+	<exclude-pattern>.*/.sf/.*</exclude-pattern>
+	<exclude-pattern>.*/node_modules/.*</exclude-pattern>
+	<exclude-pattern>.*/doc.*/.*</exclude-pattern>
+
+	<!-- Custom Objects / Fields Rules -->
+	<rule
+		name="NoUnderscoresInFieldNames"
+		language="xml"
+		message="Custom fields should not contain underscores."
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Stupid rule to check matches</description>
+		<priority>5</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[
+							//CustomField/fullName/text[matches(@Text,'.*_.*__c')]
+					]]></value>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

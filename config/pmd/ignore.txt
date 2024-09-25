@@ -1,0 +1,2 @@
+force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml
+force-app/main/default/permissionsets/Test_Runner_Viewer.permissionset-meta.xml
