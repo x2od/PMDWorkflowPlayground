@@ -2,10 +2,10 @@
 	<apex:outputText value="Potential XSS is {! here }" escape="false" />
 	<style>
 		div {
-				background: url('{!XSSHere}'); // Potential XSS
+				background: url('{!XSSHere}');
 		}
 		div {
-				background: url('{!URLENCODE(XSSHere)}'); // correct encoding
+				background: url('{!URLENCODE(XSSHere)}');
 		}
 </style>
 </apex:page>
