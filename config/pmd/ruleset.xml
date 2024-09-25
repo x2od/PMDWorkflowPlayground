@@ -405,15 +405,15 @@
 	<!-- VISUALFORCE-->
 
 	<rule ref="category/visualforce/security.xml/VfCsrf">
-		<priority>3</priority>
+		<priority>1</priority>
 	</rule>
 
 	<rule ref="category/visualforce/security.xml/VfHtmlStyleTagXss">
-		<priority>3</priority>
+		<priority>2</priority>
 	</rule>
 
 	<rule ref="category/visualforce/security.xml/VfUnescapeEl">
-		<priority>3</priority>
+		<priority>1</priority>
 	</rule>
 
 	<!-- XML -->
