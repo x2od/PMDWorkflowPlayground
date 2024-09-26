@@ -132,13 +132,18 @@ jobs:
           ERROR_COUNT=$((ERROR_COUNT - 1))
           # echo $ERROR_COUNT >> "$GITHUB_OUTPUT"
           echo "ERRORS FOUND:" $ERROR_COUNT  # Print to console
+          if [[ $ERROR_COUNT > 0 ]]; then
+            ERROR_STRING="$ERROR_COUNT Violations Detected"
+            echo "::error::$ERROR_STRING"
+            exit 1
+          fi
 
-      - name: Exit if error
-        if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }} > 0
-        env:
-          ERROR_COUNT: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }}
-        run: |
-          ERROR_STRING="$ERROR_COUNT Violations Detected"
-          echo $ERROR_COUNT
-          echo "::error::$ERROR_STRING"
-          exit 1
+      # - name: Exit if error
+      #   if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }} > 0
+      #   env:
+      #     ERROR_COUNT: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }}
+      #   run: |
+      #     ERROR_STRING="$ERROR_COUNT Violations Detected"
+      #     echo $ERROR_COUNT
+      #     echo "::error::$ERROR_STRING"
+      #     exit 1
