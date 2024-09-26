@@ -138,5 +138,6 @@ jobs:
         env:
           ERROR_COUNT: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }}
         run: |
-          echo "::error::$ERROR_COUNT Code Violations Detected"
+          ERROR_STRING="$ERROR_COUNT Violations Detected"
+          echo "::error::$ERROR_STRING"
           exit 1
