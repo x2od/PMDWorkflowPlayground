@@ -147,12 +147,12 @@ jobs:
           echo "## APEX" >> $GITHUB_STEP_SUMMARY
           echo "$(cat pmd-apex.html)"
           echo "$(cat pmd-apex.html)" >> $GITHUB_STEP_SUMMARY
-          echo "## VF"
-          echo "## VF" >> $GITHUB_STEP_SUMMARY
+          echo "-------------- VF"
+          echo "<h2>VF</h2>" >> $GITHUB_STEP_SUMMARY
           echo "$(cat pmd-vf.html)"
           echo "$(cat pmd-vf.html)" >> $GITHUB_STEP_SUMMARY
-          echo "## XML"
-          echo "## XML" >> $GITHUB_STEP_SUMMARY
+          echo "-------------- XML"
+          echo "<h2>XML</h2>" >> $GITHUB_STEP_SUMMARY
           echo "$(cat pmd-xml-errors.html)" >> $GITHUB_STEP_SUMMARY
           echo "---------------------------------------------"
           echo "$(cat pmd-xml.html)"
