@@ -142,9 +142,10 @@ jobs:
       - name: Step Table - ALL
         run: |
           echo "## APEX" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat pmd-apex.html)"
           echo "$(cat pmd-apex.html)" >> $GITHUB_STEP_SUMMARY
           echo "## VF" >> $GITHUB_STEP_SUMMARY
-          echo "$(cat pmd-vf-errors.html)" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat pmd-vf.html)" >> $GITHUB_STEP_SUMMARY
           echo "## XML" >> $GITHUB_STEP_SUMMARY
           echo "$(cat pmd-xml-errors.html)" >> $GITHUB_STEP_SUMMARY
           echo "---------------------------------------------"
