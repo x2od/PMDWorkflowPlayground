@@ -219,7 +219,7 @@
 	<!-- APEX DOCUMENTATION -->
 
 	<rule ref="category/apex/documentation.xml/ApexDoc">
-		<priority>3</priority>
+		<priority>5</priority>
 		<properties>
 			<property name="reportMissingDescription" value="false" />
 			<property name="reportPrivate" value="false" />
@@ -526,6 +526,26 @@
 
 	<!-- CUSTOM-->
 
+	<!-- VISUALFORCE -->
+
+	<rule
+		name="AltTextOnImages"
+		message="Always use an 'alt' attribute for images"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
+		language="visualforce">
+		<description>All images require alt text</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value>
+					<![CDATA[
+					//Element[matches(@Name,'^apex:image|img$')][count(alt)=0]
+					]]>
+			</value>
+			</property>
+		</properties>
+	</rule>
+
 	<!-- APEX -->
 	<rule
 		name="DoNotUseWithoutSharing"
@@ -680,7 +700,7 @@
 		<priority>5</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[  //CustomField/fullName/text[matches(@Text, '.*_.*__c')]  ]]></value>
+				<value><![CDATA[  //CustomField/fullName/text[matches(@Text, '^.*_.*__c$')]  ]]></value>
 			</property>
 		</properties>
 	</rule>
@@ -695,6 +715,24 @@
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[  //CustomObject/sharingModel/text[@Text='Read' or @Text='ReadWrite']  ]]> </value>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Metadata XML Rules -->
+
+	<!-- General Metadata -->
+
+	<rule
+		name="NoHardcodedWeblinkURLs"
+		language="xml"
+		message="Do not hardcode this URL - use a relative path instead"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>No hardcoded weblink URLs</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ //(CustomObject/webLinks/url/text)[matches(@Text, 'https://.*force.com')  ]  ]]></value>
 			</property>
 		</properties>
 	</rule>
@@ -740,10 +778,6 @@
 			</property>
 		</properties>
 	</rule>
-
-	<!-- Metadata XML Rules -->
-
-	<!-- General Metadata -->
 
 	<rule
 		name="BumpApiVersion"
