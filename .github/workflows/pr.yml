@@ -128,7 +128,7 @@ jobs:
         run: |
           ERROR_COUNT_PLUS1=$(wc -l pmd-blockers.csv|awk '{print $1}')
           echo $ERROR_COUNT_PLUS1
-          echo "$ERROR_COUNT_PLUS1" >> "$GITHUB_OUTPUT"
+          echo $ERROR_COUNT_PLUS1 >> "$GITHUB_OUTPUT"
           echo "ERRORS FOUND:" $ERROR_COUNT_PLUS1
 
       # - name: Exit if error
