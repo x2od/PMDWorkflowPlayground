@@ -133,6 +133,6 @@ jobs:
           # echo $ERROR_COUNT >> "$GITHUB_OUTPUT"
           echo "ERRORS FOUND:" $ERROR_COUNT  # Print to console
 
-      # - name: Exit if error
-      #   if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }} > 1
-      #   run: exit 1
+      - name: Exit if error
+        if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }} > 0
+        run: exit 1
