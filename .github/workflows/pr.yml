@@ -135,4 +135,6 @@ jobs:
 
       - name: Exit if error
         if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }} > 0
-        run: exit 1
+        run: |
+          echo "::error::${{ steps.evaluate_errors.outputs.ERROR_COUNT }} Code Violations Detected"
+          exit 1
