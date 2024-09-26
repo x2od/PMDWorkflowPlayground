@@ -145,13 +145,14 @@ jobs:
           echo "$(cat pmd-apex.html)"
           echo "$(cat pmd-apex.html)" >> $GITHUB_STEP_SUMMARY
           echo "## VF" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat pmd-vf.html)"
           echo "$(cat pmd-vf.html)" >> $GITHUB_STEP_SUMMARY
           echo "## XML" >> $GITHUB_STEP_SUMMARY
           echo "$(cat pmd-xml-errors.html)" >> $GITHUB_STEP_SUMMARY
           echo "---------------------------------------------"
           echo "$(cat pmd-xml.html)"
           echo "---------------------------------------------"
-          echo "$(cat pmd-xml-errors.html)"
+          echo "$GITHUB_STEP_SUMMARY"
       # - name: Upload violations file in CSV format
       #   if: always()
       #   uses: actions/upload-artifact@v4
