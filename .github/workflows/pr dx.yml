@@ -41,7 +41,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ github.head_ref }}
         run: |
-          echo "Files for this PR:"
+          echo "Changed files for this PR:"
           gh pr diff "$BRANCH" --name-only > changed.txt
           echo "--------------------"
           cat changed.txt
@@ -49,7 +49,7 @@ jobs:
       # Run PMD scan
       - name: 'Run PMD scan to SARIF'
         id: pmd_sarif
-        run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
+        run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
 
       - name: Upload violations file in SARIF format
         uses: github/codeql-action/upload-sarif@v3
@@ -59,7 +59,6 @@ jobs:
 
       - name: 'Run PMD scan to CSV - Blockers'
         id: pmd_csv
-        if: always()
         run: |
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-blockers.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false --minimum-priority 2
           # --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
@@ -84,12 +83,11 @@ jobs:
 
       - name: 'Run PMD scan to CSV - All violations'
         id: pmd_csv_all
-        if: always()
         run: |
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false
 
       - name: Upload all violations file in CSV format
-        if: always()
+
         uses: actions/upload-artifact@v4
         with:
           path: pmd-all.csv
@@ -98,7 +96,6 @@ jobs:
 
       - name: 'Run PMD scan to HTML'
         id: pmd_html
-        if: always()
         run: |
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format html --cache .pmdCache --report-file pmd.html --show-suppressed --no-fail-on-violation --no-fail-on-error --minimum-priority 5 --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/
           sed -i 's|<title>PMD</title>||g' pmd.html
