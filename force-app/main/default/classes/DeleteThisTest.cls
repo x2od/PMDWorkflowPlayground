@@ -18,6 +18,7 @@ public class DeleteThisTest {
 		User u;
 		System.runAs(u) {
 			System.debug('Foo');
+
 			Assert.isTrue(true, 'this');
 		}
 	}
