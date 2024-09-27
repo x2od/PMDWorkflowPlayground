@@ -16,3 +16,5 @@
 .sfdx
 .sf
 *.json
+docs/
+doc-assets/
