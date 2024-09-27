@@ -1,0 +1,1015 @@
+{
+	"$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+	"version": "2.1.0",
+	"runs": [
+		{
+			"tool": {
+				"driver": {
+					"name": "PMD",
+					"version": "7.5.0",
+					"informationUri": "https://docs.pmd-code.org/latest/",
+					"rules": [
+						{
+							"id": "DoNotUseProcessBuilder",
+							"shortDescription": {
+								"text": "Convert Process Builders to Flows"
+							},
+							"fullDescription": {
+								"text": "Salesforce is transitioning away from Process Builder in favor of Flow. Migrate automations to Flow."
+							},
+							"help": {
+								"text": "Salesforce is transitioning away from Process Builder in favor of Flow. Migrate automations to Flow."
+							},
+							"properties": {
+								"ruleset": "dschach PMD Ruleset",
+								"priority": 1,
+								"tags": [
+									"dschach PMD Ruleset"
+								]
+							}
+						},
+						{
+							"id": "ApexUnitTestClassShouldHaveRunAs",
+							"shortDescription": {
+								"text": "Apex unit test classes should have at least one System.runAs() call"
+							},
+							"fullDescription": {
+								"text": "\nApex unit tests should include at least one runAs method.  This makes the tests more robust, and independent from the \nuser running it.\n        "
+							},
+							"helpUri": "https://docs.pmd-code.org/pmd-doc-7.5.0/pmd_rules_apex_bestpractices.html#apexunittestclassshouldhaverunas",
+							"help": {
+								"text": "\nApex unit tests should include at least one runAs method.  This makes the tests more robust, and independent from the \nuser running it.\n        "
+							},
+							"properties": {
+								"ruleset": "Best Practices",
+								"priority": 3,
+								"tags": [
+									"Best Practices"
+								]
+							}
+						},
+						{
+							"id": "ModifyOrViewAllRecords",
+							"shortDescription": {
+								"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+							},
+							"fullDescription": {
+								"text": "Profiles and Permission Sets should not have modify or view all records permission"
+							},
+							"help": {
+								"text": "Profiles and Permission Sets should not have modify or view all records permission"
+							},
+							"properties": {
+								"ruleset": "dschach PMD Ruleset",
+								"priority": 2,
+								"tags": [
+									"dschach PMD Ruleset"
+								]
+							}
+						},
+						{
+							"id": "ModifyOrViewAllData",
+							"shortDescription": {
+								"text": "Allowing this user permission can give access and ability to modify sensitive data."
+							},
+							"fullDescription": {
+								"text": "Profiles and Permission Sets should not have MAD or VAD permission"
+							},
+							"help": {
+								"text": "Profiles and Permission Sets should not have MAD or VAD permission"
+							},
+							"properties": {
+								"ruleset": "dschach PMD Ruleset",
+								"priority": 1,
+								"tags": [
+									"dschach PMD Ruleset"
+								]
+							}
+						},
+						{
+							"id": "ViewSetupByNonSysAdmins",
+							"shortDescription": {
+								"text": "Viewing Setup should be limited to System Administrator Profile only."
+							},
+							"fullDescription": {
+								"text": "This is a restricted permission"
+							},
+							"help": {
+								"text": "This is a restricted permission"
+							},
+							"properties": {
+								"ruleset": "dschach PMD Ruleset",
+								"priority": 1,
+								"tags": [
+									"dschach PMD Ruleset"
+								]
+							}
+						},
+						{
+							"id": "ManageUsersByNonSysAdmins",
+							"shortDescription": {
+								"text": "Managing users needs to be limited to System Administrator Profile only."
+							},
+							"fullDescription": {
+								"text": "This is a restricted permission"
+							},
+							"help": {
+								"text": "This is a restricted permission"
+							},
+							"properties": {
+								"ruleset": "dschach PMD Ruleset",
+								"priority": 1,
+								"tags": [
+									"dschach PMD Ruleset"
+								]
+							}
+						},
+						{
+							"id": "ApexDoc",
+							"shortDescription": {
+								"text": "Missing ApexDoc comment"
+							},
+							"fullDescription": {
+								"text": "\nThis rule validates that:\n\n*   ApexDoc comments are present for classes, methods, and properties that are public or global, excluding\n    overrides and test classes (as well as the contents of test classes).\n*   ApexDoc comments are present for classes, methods, and properties that are protected or private, depending\n    on the properties `reportPrivate` and `reportProtected`.\n*   ApexDoc comments should contain @description depending on the property `reportMissingDescription`.\n*   ApexDoc comments on non-void, non-constructor methods should contain @return.\n*   ApexDoc comments on void or constructor methods should not contain @return.\n*   ApexDoc comments on methods with parameters should contain @param for each parameter, in the same\n    order as the method signature.\n*   ApexDoc comments are present on properties is only validated, if the property `reportProperty` is enabled.\n    By setting `reportProperty` to false, you can ignore missing comments on properties.\n\nMethod overrides and tests are both exempted from having ApexDoc.\n        "
+							},
+							"helpUri": "https://docs.pmd-code.org/pmd-doc-7.5.0/pmd_rules_apex_documentation.html#apexdoc",
+							"help": {
+								"text": "\nThis rule validates that:\n\n*   ApexDoc comments are present for classes, methods, and properties that are public or global, excluding\n    overrides and test classes (as well as the contents of test classes).\n*   ApexDoc comments are present for classes, methods, and properties that are protected or private, depending\n    on the properties `reportPrivate` and `reportProtected`.\n*   ApexDoc comments should contain @description depending on the property `reportMissingDescription`.\n*   ApexDoc comments on non-void, non-constructor methods should contain @return.\n*   ApexDoc comments on void or constructor methods should not contain @return.\n*   ApexDoc comments on methods with parameters should contain @param for each parameter, in the same\n    order as the method signature.\n*   ApexDoc comments are present on properties is only validated, if the property `reportProperty` is enabled.\n    By setting `reportProperty` to false, you can ignore missing comments on properties.\n\nMethod overrides and tests are both exempted from having ApexDoc.\n        "
+							},
+							"properties": {
+								"ruleset": "Documentation",
+								"priority": 3,
+								"tags": [
+									"Documentation"
+								]
+							}
+						},
+						{
+							"id": "AvoidNonRestrictiveQueries",
+							"shortDescription": {
+								"text": "Avoid SOQL queries without a where or limit statement"
+							},
+							"fullDescription": {
+								"text": "\n            When working with very large amounts of data, unfiltered SOQL or SOSL queries can quickly cause\n            [governor limit](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm)\n            exceptions.\n        "
+							},
+							"helpUri": "https://docs.pmd-code.org/pmd-doc-7.5.0/pmd_rules_apex_performance.html#avoidnonrestrictivequeries",
+							"help": {
+								"text": "\n            When working with very large amounts of data, unfiltered SOQL or SOSL queries can quickly cause\n            [governor limit](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm)\n            exceptions.\n        "
+							},
+							"properties": {
+								"ruleset": "Performance",
+								"priority": 3,
+								"tags": [
+									"Performance"
+								]
+							}
+						},
+						{
+							"id": "ApexCRUDViolation",
+							"shortDescription": {
+								"text": "Validate CRUD permission before SOQL/DML operation or enforce user mode"
+							},
+							"fullDescription": {
+								"text": "\nThe rule validates you are checking for access permissions before a SOQL/SOSL/DML operation.\nSince Apex runs by default in system mode not having proper permissions checks results in escalation of\nprivilege and may produce runtime errors. This check forces you to handle such scenarios.\n\nSince Winter '23 (API Version 56) you can enforce user mode for database operations by using\n`WITH USER_MODE` in SOQL. This makes Apex to respect Field-level security (FLS) and object\npermissions of the running user. When using user mode, no violation is reported by this rule.\n\nBy default, the rule allows access checks can be performed using system Apex provisions such as\n`DescribeSObjectResult.isAccessible/Createable/etc.`, the SOQL `WITH SECURITY_ENFORCED` clause,\nor using the open source [Force.com ESAPI](https://github.com/forcedotcom/force-dot-com-esapi)\nclass library. Because it is common to use authorization facades to assist with this task, the\nrule also allows configuration of regular expression-based patterns for the methods used to\nauthorize each type of CRUD operation. These pattern are configured via the following properties:\n\n* `createAuthMethodPattern`/`createAuthMethodTypeParamIndex` - a pattern for the method used\n  for create authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for create.\n* `readAuthMethodPattern`/`readAuthMethodTypeParamIndex` - a pattern for the method used\n  for read authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for read.\n* `updateAuthMethodPattern`/`updateAuthMethodTypeParamIndex` - a pattern for the method used\n  for update authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for update.\n* `deleteAuthMethodPattern`/`deleteAuthMethodTypeParamIndex` - a pattern for the method used\n  for delete authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for delete.\n* `undeleteAuthMethodPattern`/`undeleteAuthMethodTypeParamIndex` - a pattern for the method used\n  for undelete authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for undelete.\n* `mergeAuthMethodPattern`/`mergeAuthMethodTypeParamIndex` - a pattern for the method used\n  for merge authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for merge.\n\nThe following example shows how the rule can be configured for the\n[sirono-common](https://github.com/SCWells72/sirono-common)\n[`AuthorizationUtil`](https://github.com/SCWells72/sirono-common#authorization-utilities) class:\n\n```xml\n<rule ref=\"category/apex/security.xml/ApexCRUDViolation\" message=\"Validate CRUD permission before SOQL/DML operation\">\n    <priority>3</priority>\n    <properties>\n        <property name=\"createAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)(Createable|Upsertable)\"/>\n        <property name=\"readAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)Accessible\"/>\n        <property name=\"updateAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)(Updateable|Upsertable)\"/>\n        <property name=\"deleteAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)Deletable\"/>\n        <property name=\"undeleteAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)Undeletable\"/>\n        <property name=\"mergeAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)Mergeable\"/>\n    </properties>\n</rule>\n```\n\nNote: This rule will produce false positives for VF getter methods. In VF getters the access permission\ncheck happens automatically and is not needed explicitly. However, the rule can't reliably determine\nwhether a getter is a VF getter or not and reports a violation in any case. In such cases, the violation\nshould be [suppressed](pmd_userdocs_suppressing_warnings.html).\n\n        "
+							},
+							"helpUri": "https://docs.pmd-code.org/pmd-doc-7.5.0/pmd_rules_apex_security.html#apexcrudviolation",
+							"help": {
+								"text": "\nThe rule validates you are checking for access permissions before a SOQL/SOSL/DML operation.\nSince Apex runs by default in system mode not having proper permissions checks results in escalation of\nprivilege and may produce runtime errors. This check forces you to handle such scenarios.\n\nSince Winter '23 (API Version 56) you can enforce user mode for database operations by using\n`WITH USER_MODE` in SOQL. This makes Apex to respect Field-level security (FLS) and object\npermissions of the running user. When using user mode, no violation is reported by this rule.\n\nBy default, the rule allows access checks can be performed using system Apex provisions such as\n`DescribeSObjectResult.isAccessible/Createable/etc.`, the SOQL `WITH SECURITY_ENFORCED` clause,\nor using the open source [Force.com ESAPI](https://github.com/forcedotcom/force-dot-com-esapi)\nclass library. Because it is common to use authorization facades to assist with this task, the\nrule also allows configuration of regular expression-based patterns for the methods used to\nauthorize each type of CRUD operation. These pattern are configured via the following properties:\n\n* `createAuthMethodPattern`/`createAuthMethodTypeParamIndex` - a pattern for the method used\n  for create authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for create.\n* `readAuthMethodPattern`/`readAuthMethodTypeParamIndex` - a pattern for the method used\n  for read authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for read.\n* `updateAuthMethodPattern`/`updateAuthMethodTypeParamIndex` - a pattern for the method used\n  for update authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for update.\n* `deleteAuthMethodPattern`/`deleteAuthMethodTypeParamIndex` - a pattern for the method used\n  for delete authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for delete.\n* `undeleteAuthMethodPattern`/`undeleteAuthMethodTypeParamIndex` - a pattern for the method used\n  for undelete authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for undelete.\n* `mergeAuthMethodPattern`/`mergeAuthMethodTypeParamIndex` - a pattern for the method used\n  for merge authorization and an optional 0-based index of the parameter passed to that method\n  that denotes the `SObjectType` being authorized for merge.\n\nThe following example shows how the rule can be configured for the\n[sirono-common](https://github.com/SCWells72/sirono-common)\n[`AuthorizationUtil`](https://github.com/SCWells72/sirono-common#authorization-utilities) class:\n\n```xml\n<rule ref=\"category/apex/security.xml/ApexCRUDViolation\" message=\"Validate CRUD permission before SOQL/DML operation\">\n    <priority>3</priority>\n    <properties>\n        <property name=\"createAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)(Createable|Upsertable)\"/>\n        <property name=\"readAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)Accessible\"/>\n        <property name=\"updateAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)(Updateable|Upsertable)\"/>\n        <property name=\"deleteAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)Deletable\"/>\n        <property name=\"undeleteAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)Undeletable\"/>\n        <property name=\"mergeAuthMethodPattern\" value=\"AuthorizationUtil\\.(is|assert)Mergeable\"/>\n    </properties>\n</rule>\n```\n\nNote: This rule will produce false positives for VF getter methods. In VF getters the access permission\ncheck happens automatically and is not needed explicitly. However, the rule can't reliably determine\nwhether a getter is a VF getter or not and reports a violation in any case. In such cases, the violation\nshould be [suppressed](pmd_userdocs_suppressing_warnings.html).\n\n        "
+							},
+							"properties": {
+								"ruleset": "Security",
+								"priority": 3,
+								"tags": [
+									"Security"
+								]
+							}
+						}
+					]
+				}
+			},
+			"results": [
+				{
+					"ruleId": "DoNotUseProcessBuilder",
+					"ruleIndex": 0,
+					"message": {
+						"text": "Convert Process Builders to Flows"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/flows/Set_User_Reactivation_Date.flow-meta.xml"
+								},
+								"region": {
+									"startLine": 80,
+									"startColumn": 18,
+									"endLine": 80,
+									"endColumn": 25
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexUnitTestClassShouldHaveRunAs",
+					"ruleIndex": 1,
+					"message": {
+						"text": "Apex unit test classes should have at least one System.runAs() call"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/classes/DeleteThisTest.cls"
+								},
+								"region": {
+									"startLine": 10,
+									"startColumn": 17,
+									"endLine": 12,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 331,
+									"startColumn": 25,
+									"endLine": 331,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 340,
+									"startColumn": 25,
+									"endLine": 340,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 347,
+									"startColumn": 27,
+									"endLine": 347,
+									"endColumn": 30
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 349,
+									"startColumn": 25,
+									"endLine": 349,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 358,
+									"startColumn": 25,
+									"endLine": 358,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 367,
+									"startColumn": 25,
+									"endLine": 367,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllData",
+					"ruleIndex": 3,
+					"message": {
+						"text": "Allowing this user permission can give access and ability to modify sensitive data."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 393,
+									"startColumn": 5,
+									"endLine": 396,
+									"endColumn": 22
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ViewSetupByNonSysAdmins",
+					"ruleIndex": 4,
+					"message": {
+						"text": "Viewing Setup should be limited to System Administrator Profile only."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 397,
+									"startColumn": 5,
+									"endLine": 400,
+									"endColumn": 22
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ManageUsersByNonSysAdmins",
+					"ruleIndex": 5,
+					"message": {
+						"text": "Managing users needs to be limited to System Administrator Profile only."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 401,
+									"startColumn": 5,
+									"endLine": 404,
+									"endColumn": 22
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ManageUsersByNonSysAdmins",
+					"ruleIndex": 5,
+					"message": {
+						"text": "Managing users needs to be limited to System Administrator Profile only."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Admin.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 405,
+									"startColumn": 5,
+									"endLine": 408,
+									"endColumn": 22
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Viewer.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 282,
+									"startColumn": 25,
+									"endLine": 282,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Viewer.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 291,
+									"startColumn": 25,
+									"endLine": 291,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Viewer.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 300,
+									"startColumn": 25,
+									"endLine": 300,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Viewer.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 309,
+									"startColumn": 25,
+									"endLine": 309,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllRecords",
+					"ruleIndex": 2,
+					"message": {
+						"text": "We strongly recommend using sharing rules to grant record access rather than View All or Modify All."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/permissionsets/Test_Runner_Viewer.permissionset-meta.xml"
+								},
+								"region": {
+									"startLine": 318,
+									"startColumn": 25,
+									"endLine": 318,
+									"endColumn": 28
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ModifyOrViewAllData",
+					"ruleIndex": 3,
+					"message": {
+						"text": "Allowing this user permission can give access and ability to modify sensitive data."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/profiles/StandardUser.profile-meta.xml"
+								},
+								"region": {
+									"startLine": 211,
+									"startColumn": 5,
+									"endLine": 214,
+									"endColumn": 22
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ManageUsersByNonSysAdmins",
+					"ruleIndex": 5,
+					"message": {
+						"text": "Managing users needs to be limited to System Administrator Profile only."
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/main/default/profiles/StandardUser.profile-meta.xml"
+								},
+								"region": {
+									"startLine": 215,
+									"startColumn": 5,
+									"endLine": 218,
+									"endColumn": 22
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexUnitTestClassShouldHaveRunAs",
+					"ruleIndex": 1,
+					"message": {
+						"text": "Apex unit test classes should have at least one System.runAs() call"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/FlowChangeEventHeaderTest.cls"
+								},
+								"region": {
+									"startLine": 23,
+									"startColumn": 17,
+									"endLine": 25,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexUnitTestClassShouldHaveRunAs",
+					"ruleIndex": 1,
+					"message": {
+						"text": "Apex unit test classes should have at least one System.runAs() call"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/FlowChangeEventHeaderTest.cls"
+								},
+								"region": {
+									"startLine": 28,
+									"startColumn": 17,
+									"endLine": 30,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexUnitTestClassShouldHaveRunAs",
+					"ruleIndex": 1,
+					"message": {
+						"text": "Apex unit test classes should have at least one System.runAs() call"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/FlowChangeEventHeaderTest.cls"
+								},
+								"region": {
+									"startLine": 33,
+									"startColumn": 17,
+									"endLine": 40,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerActionFlow.cls"
+								},
+								"region": {
+									"startLine": 250,
+									"startColumn": 20,
+									"endLine": 256,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerActionFlowBypassProcessor.cls"
+								},
+								"region": {
+									"startLine": 46,
+									"startColumn": 21,
+									"endLine": 46,
+									"endColumn": 66
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerActionFlowBypassProcessor.cls"
+								},
+								"region": {
+									"startLine": 47,
+									"startColumn": 21,
+									"endLine": 47,
+									"endColumn": 66
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerActionFlowBypassProcessor.cls"
+								},
+								"region": {
+									"startLine": 48,
+									"startColumn": 21,
+									"endLine": 48,
+									"endColumn": 68
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerBase.cls"
+								},
+								"region": {
+									"startLine": 219,
+									"startColumn": 20,
+									"endLine": 220,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerBase.cls"
+								},
+								"region": {
+									"startLine": 265,
+									"startColumn": 12,
+									"endLine": 277,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerBase.cls"
+								},
+								"region": {
+									"startLine": 280,
+									"startColumn": 12,
+									"endLine": 288,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerBase.cls"
+								},
+								"region": {
+									"startLine": 291,
+									"startColumn": 12,
+									"endLine": 299,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerBase.cls"
+								},
+								"region": {
+									"startLine": 302,
+									"startColumn": 12,
+									"endLine": 310,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexDoc",
+					"ruleIndex": 6,
+					"message": {
+						"text": "Missing ApexDoc comment"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerBase.cls"
+								},
+								"region": {
+									"startLine": 313,
+									"startColumn": 12,
+									"endLine": 321,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "AvoidNonRestrictiveQueries",
+					"ruleIndex": 7,
+					"message": {
+						"text": "Avoid SOQL queries without a where or limit statement"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerBase.cls"
+								},
+								"region": {
+									"startLine": 395,
+									"startColumn": 24,
+									"endLine": 395,
+									"endColumn": 48
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexCRUDViolation",
+					"ruleIndex": 8,
+					"message": {
+						"text": "Validate CRUD permission before SOQL/DML operation or enforce user mode"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/TriggerBase.cls"
+								},
+								"region": {
+									"startLine": 395,
+									"startColumn": 24,
+									"endLine": 395,
+									"endColumn": 48
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexUnitTestClassShouldHaveRunAs",
+					"ruleIndex": 1,
+					"message": {
+						"text": "Apex unit test classes should have at least one System.runAs() call"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/tests/TriggerActionFlowChangeEventTest.cls"
+								},
+								"region": {
+									"startLine": 27,
+									"startColumn": 17,
+									"endLine": 35,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexUnitTestClassShouldHaveRunAs",
+					"ruleIndex": 1,
+					"message": {
+						"text": "Apex unit test classes should have at least one System.runAs() call"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/tests/TriggerActionFlowChangeEventTest.cls"
+								},
+								"region": {
+									"startLine": 38,
+									"startColumn": 17,
+									"endLine": 43,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				},
+				{
+					"ruleId": "ApexUnitTestClassShouldHaveRunAs",
+					"ruleIndex": 1,
+					"message": {
+						"text": "Apex unit test classes should have at least one System.runAs() call"
+					},
+					"locations": [
+						{
+							"physicalLocation": {
+								"artifactLocation": {
+									"uri": "file:///Users/dschach/Documents/VSCode/PMDWorkflowPlayground/force-app/trigger-actions-framework/main/default/classes/tests/TriggerActionFlowChangeEventTest.cls"
+								},
+								"region": {
+									"startLine": 46,
+									"startColumn": 17,
+									"endLine": 59,
+									"endColumn": 3
+								}
+							}
+						}
+					]
+				}
+			],
+			"invocations": [
+				{
+					"executionSuccessful": true,
+					"toolConfigurationNotifications": [],
+					"toolExecutionNotifications": []
+				}
+			]
+		}
+	]
+}

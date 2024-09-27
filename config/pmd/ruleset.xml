@@ -188,7 +188,7 @@
 		<priority>3</priority>
 		<properties>
 			<property name="reportEmptyPrivateNoArgConstructor" value="true" />
-			<property name="reportEmptyVirtualMethod" value="true" />
+			<property name="reportEmptyVirtualMethod" value="false" />
 		</properties>
 	</rule>
 
@@ -219,7 +219,7 @@
 	<!-- APEX DOCUMENTATION -->
 
 	<rule ref="category/apex/documentation.xml/ApexDoc">
-		<priority>3</priority>
+		<priority>5</priority>
 		<properties>
 			<property name="reportMissingDescription" value="false" />
 			<property name="reportPrivate" value="false" />
@@ -405,15 +405,15 @@
 	<!-- VISUALFORCE-->
 
 	<rule ref="category/visualforce/security.xml/VfCsrf">
-		<priority>3</priority>
+		<priority>1</priority>
 	</rule>
 
 	<rule ref="category/visualforce/security.xml/VfHtmlStyleTagXss">
-		<priority>3</priority>
+		<priority>2</priority>
 	</rule>
 
 	<rule ref="category/visualforce/security.xml/VfUnescapeEl">
-		<priority>3</priority>
+		<priority>1</priority>
 	</rule>
 
 	<!-- XML -->
@@ -525,6 +525,26 @@
 	</rule>
 
 	<!-- CUSTOM-->
+
+	<!-- VISUALFORCE -->
+
+	<rule
+		name="AltTextOnImages"
+		message="Always use an 'alt' attribute for images"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
+		language="visualforce">
+		<description>All images require alt text</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value>
+					<![CDATA[
+					//Element[matches(@Name,'^apex:image|img$')][count(alt)=0]
+					]]>
+			</value>
+			</property>
+		</properties>
+	</rule>
 
 	<!-- APEX -->
 	<rule
@@ -680,7 +700,7 @@
 		<priority>5</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[  //CustomField/fullName/text[matches(@Text, '.*_.*__c')]  ]]></value>
+				<value><![CDATA[  //CustomField/fullName/text[matches(@Text, '^.*_.*__c$')]  ]]></value>
 			</property>
 		</properties>
 	</rule>
@@ -699,6 +719,24 @@
 		</properties>
 	</rule>
 
+	<!-- Metadata XML Rules -->
+
+	<!-- General Metadata -->
+
+	<rule
+		name="NoHardcodedWeblinkURLs"
+		language="xml"
+		message="Do not hardcode this URL - use a relative path instead"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>No hardcoded weblink URLs</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ //(CustomObject/webLinks/url/text)[matches(@Text, 'https://.*force.com')  ]  ]]></value>
+			</property>
+		</properties>
+	</rule>
+
 	<rule
 		name="MetadataNoDescriptionObjectField"
 		language="xml"
@@ -708,7 +746,7 @@
 		<priority>2</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //(CustomField | CustomObject)[count(description) = 0] ]]></value>
+				<value><![CDATA[ //(CustomField | CustomObject | CustomObject/fields)[count(description) = 0] ]]></value>
 			</property>
 		</properties>
 	</rule>
@@ -740,10 +778,6 @@
 			</property>
 		</properties>
 	</rule>
-
-	<!-- Metadata XML Rules -->
-
-	<!-- General Metadata -->
 
 	<rule
 		name="BumpApiVersion"

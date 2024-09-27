@@ -8,4 +8,6 @@
 				background: url('{!URLENCODE(XSSHere)}');
 		}
 </style>
+<img src="house.jpeg"/>
+<apex:image url="house.jpg"/>
 </apex:page>

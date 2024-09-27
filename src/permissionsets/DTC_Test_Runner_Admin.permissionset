@@ -4,10 +4,6 @@
         <application>Test_Runner</application>
         <visible>true</visible>
     </applicationVisibilities>
-    <classAccesses>
-        <apexClass>ApexTestQueueItemSelector</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
     <fieldPermissions>
         <editable>false</editable>
         <field>Test_Run__c.Total_Tests__c</field>

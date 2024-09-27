@@ -34,5 +34,5 @@
 		"editor.formatOnSave": false
 	},
 	"git.autofetch": true,
-	"codeAnalyzer.pMD.customConfigFile": "config/pmd/xml.xml"
+	"codeAnalyzer.pMD.customConfigFile": "config/pmd/ruleset.xml"
 }

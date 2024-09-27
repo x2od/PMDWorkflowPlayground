@@ -20,6 +20,5 @@ public class DeleteThisTest {
 			System.debug('Foo');
 			Assert.isTrue(true, 'this');
 		}
-
 	}
 }
