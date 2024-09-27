@@ -70,10 +70,27 @@ jobs:
         run: |
           ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --verbose
 
+      - name: Read CSV - APEX
+        id: csv_code
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-apex.csv
+
+      - name: Create MD - APEX
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-output-apex
+        with:
+          csvinput: ${{ steps.csv_code.outputs.content }}
+
+      - name: Step Table - APEX
+        id: md_to_output
+        run: |
+          echo "${{steps.csv-table-output-apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
       - name: 'Run PMD scan to CSV - XML'
         id: pmd_csv_metadata
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-xml.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml --verbose
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-xml.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml --verbose
 
       - name: Read CSV - XML
         id: csv_metadata
