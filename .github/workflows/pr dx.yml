@@ -37,7 +37,7 @@ jobs:
             mv ~/pmd-bin-$PMD_VERSION ~/pmd
             ~/pmd/bin/pmd --version
           fi
-          rm .pmdCache
+          rm -f .pmdCache
 
       - name: Collect changed files
         env:
