@@ -47,7 +47,7 @@
  * To handle dynamic finalizers, you can call the `handleDynamicFinalizers` method of the `FinalizerHandler` class.
  * The `handleDynamicFinalizers` method will instantiate and execute all finalizers that are not bypassed.
  */
-public with sharing virtual class FinalizerHandler {
+public virtual class FinalizerHandler {
 	@TestVisible
 	private static final String DML_IN_FINALIZER_ERROR = 'DML is not allowed within the finalizer context.';
 	@TestVisible
