@@ -10,7 +10,7 @@ permissions:
 
 # Jobs to be executed
 jobs:
-  run-pmd:
+  scan-pmd:
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -119,4 +119,6 @@ jobs:
             ERROR_STRING="$ERROR_COUNT Blocking Violations Detected"
             echo "::error::$ERROR_STRING"
             exit 1
+          elif [[ $aaa -eq "ccc" ]]; then
+            echo "::notice::No Blocking Violations Detected"
           fi
