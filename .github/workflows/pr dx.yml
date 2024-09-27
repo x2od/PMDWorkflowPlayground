@@ -109,7 +109,7 @@ jobs:
       - name: Step Table
         id: html_to_output
         run: |
-          echo "$(cat pmd-errors.html)" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat pmd.html)" >> $GITHUB_STEP_SUMMARY
 
       - name: Evaluate Errrors
         id: evaluate_errors
