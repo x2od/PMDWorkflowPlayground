@@ -103,8 +103,6 @@ jobs:
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format html --cache .pmdCache --report-file pmd.html --show-suppressed --no-fail-on-violation --no-fail-on-error --minimum-priority 5 --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/
           sed -i 's|<title>PMD</title>||g' pmd.html
           sed -i 's|<table |<table width="100%" |g' pmd.html
-          cat pmd.html | grep -B 1000000000 "<h3>Processing errors</h3>" > pmd-errors.html
-          sed -i 's|<center><h3>Processing errors</h3></center><table width="100%" align="center" cellspacing="0" cellpadding="3"><tr>||g' pmd-errors.html
 
       - name: Step Table
         id: html_to_output
