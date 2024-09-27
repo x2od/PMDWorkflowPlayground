@@ -738,7 +738,7 @@
 	</rule>
 
 	<rule
-		name="MetadataNoDescriptionObjectField"
+		name="MetadataNoDescriptionObjectFieldDX"
 		language="xml"
 		message="Add a description to explain custom metadata"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
@@ -747,6 +747,20 @@
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[ //(CustomField | CustomObject)[count(description) = 0] ]]></value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule
+		name="MetadataNoDescriptionObjectFieldMetadata"
+		language="xml"
+		message="Add a description to explain custom metadata"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Provide a description for custom metadata</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ //(CustomField | CustomObject)/fields[count(description) = 0] ]]></value>
 			</property>
 		</properties>
 	</rule>
