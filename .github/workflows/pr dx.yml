@@ -1,11 +1,14 @@
-# Unique name for this workflow
+# This is a main workflow to trigger on pull requests for DX repositories
+
 name: On PR (DX)
 
+# Controls when the workflow will run
 on:
   pull_request:
+    branches:
+      - '**'
     types: [opened, synchronize, reopened]
 
-# Jobs to be executed
 jobs:
   scan-pmd:
     permissions:
