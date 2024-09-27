@@ -46,7 +46,7 @@ jobs:
       - name: 'Run PMD scan to CSV - APEX'
         id: pmd_csv
         run: |
-          ~/pmd/bin/pmd check --dir src/classes --dir src/triggers --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language apex
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
 
       - name: Read CSV - APEX
         id: csv_code
