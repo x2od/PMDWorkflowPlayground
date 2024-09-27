@@ -80,8 +80,14 @@ jobs:
       - name: Summary Table - Blockers
         id: md_to_output-all
         run: |
-          echo "## Blockers" >> $GITHUB_STEP_SUMMARY  
-          echo "${{steps.csv-table-output-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+          ERROR_COUNT=$(wc -l pmd-blockers.csv|awk '{print $1}')
+          echo $ERROR_COUNT
+          ERROR_COUNT=$((ERROR_COUNT - 1))
+          echo "BLOCKERS FOUND:" $ERROR_COUNT  # Print to console
+          if [[ $ERROR_COUNT > 0 ]]; then
+            echo "## Blockers" >> $GITHUB_STEP_SUMMARY  
+            echo "${{steps.csv-table-output-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: 'Run PMD scan to CSV - All violations'
         id: pmd_csv_all
@@ -102,7 +108,7 @@ jobs:
           echo $ERROR_COUNT
           ERROR_COUNT=$((ERROR_COUNT - 1))
           # echo $ERROR_COUNT >> "$GITHUB_OUTPUT"
-          echo "ERRORS FOUND:" $ERROR_COUNT  # Print to console
+          echo "BLOCKERS FOUND:" $ERROR_COUNT  # Print to console
           if [[ $ERROR_COUNT > 0 ]]; then
             ERROR_STRING="$ERROR_COUNT Blocking Violations Detected"
             echo "::error::$ERROR_STRING"
