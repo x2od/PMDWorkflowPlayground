@@ -10,7 +10,7 @@ permissions:
 
 # Jobs to be executed
 jobs:
-  run-pmd-metadata-format:
+  run-pmd-metadata-format-copado:
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -68,7 +68,7 @@ jobs:
       - name: 'Run PMD scan to CSV - APEX'
         id: pmd_csv
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
 
       - name: Read CSV - APEX
         id: csv_code
@@ -90,7 +90,7 @@ jobs:
       - name: 'Run PMD scan to CSV - XML'
         id: pmd_csv_metadata
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-xml.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-xml.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
 
       - name: Read CSV - XML
         id: csv_metadata
