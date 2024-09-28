@@ -39,14 +39,26 @@ jobs:
           fi
           rm -f .pmdCache
 
-      - name: Collect changed files
+      # - name: Collect changed files
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #     BRANCH: ${{ github.head_ref }}
+      #   run: |
+      #     echo "Changed files for this PR:"
+      #     gh pr diff "$BRANCH" --name-only > changed.txt
+      #     cat changed.txt
+
+      - name: Action to get changed files
+        id: changed-files
+        uses: tj-actions/changed-files
+
+      - name: Add changed files to changed.txt
         env:
-          GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ github.head_ref }}
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
-          echo "Changed files for this PR:"
-          gh pr diff "$BRANCH" --name-only > changed.txt
-          cat changed.txt
+          for file in ${ALL_CHANGED_FILES}; do
+            echo $file >> changed.txt
+          done
 
       # Run PMD scan
       - name: 'Run PMD scan to SARIF'
