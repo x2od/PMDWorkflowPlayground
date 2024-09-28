@@ -39,21 +39,19 @@ jobs:
           fi
           rm -f .pmdCache
 
-      - name: Collect changed files
-        env:
-          GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ github.head_ref }}
-        run: |
-          echo "Changed files for this PR:"
-          gh pr diff "$BRANCH" --name-only > list.txt
-          cat list.txt
+      # - name: Collect changed files
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #     BRANCH: ${{ github.head_ref }}
+      #   run: |
+      #     echo "Changed files for this PR:"
+      #     gh pr diff "$BRANCH" --name-only > list.txt
+      #     cat list.txt
 
       - name: Action to get changed files
         id: changed-files
         uses: tj-actions/changed-files@v45
         with:
-          files: |
-            !\s+
           output_renamed_files_as_deleted_and_added: true
           separator: ','
           old_new_separator: '\n'
