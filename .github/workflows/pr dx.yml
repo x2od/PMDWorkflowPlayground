@@ -51,6 +51,9 @@ jobs:
       - name: Action to get changed files
         id: changed-files
         uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            !\w+
 
       - name: Add changed files to changed.txt
         env:
