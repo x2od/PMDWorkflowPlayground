@@ -53,7 +53,7 @@ jobs:
         uses: tj-actions/changed-files@v45
         with:
           files: |
-            !\w+
+            !\s+
 
       - name: Add changed files to changed.txt
         env:
