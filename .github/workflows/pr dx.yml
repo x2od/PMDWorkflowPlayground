@@ -54,6 +54,7 @@ jobs:
         with:
           files: |
             !\s+
+          output_renamed_files_as_deleted_and_added: true
 
       - name: Add changed files to changed.txt
         env:
@@ -62,6 +63,7 @@ jobs:
           for file in ${ALL_CHANGED_FILES}; do
             echo $file >> changed.txt
           done
+          cat changed.txt
 
       # Run PMD scan
       - name: 'Run PMD scan to SARIF'
