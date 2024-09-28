@@ -55,6 +55,9 @@ jobs:
           files: |
             !\s+
           output_renamed_files_as_deleted_and_added: true
+          separator: '\n'
+          old_new_separator: '\n'
+          old_new_files_separator: '\n'
 
       - name: Add changed files to changed.txt
         env:
