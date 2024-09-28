@@ -39,14 +39,14 @@ jobs:
           fi
           rm -f .pmdCache
 
-      # - name: Collect changed files
-      #   env:
-      #     GH_TOKEN: ${{ github.token }}
-      #     BRANCH: ${{ github.head_ref }}
-      #   run: |
-      #     echo "Changed files for this PR:"
-      #     gh pr diff "$BRANCH" --name-only > changed.txt
-      #     cat changed.txt
+      - name: Collect changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          echo "Changed files for this PR:"
+          gh pr diff "$BRANCH" --name-only > list.txt
+          cat list.txt
 
       - name: Action to get changed files
         id: changed-files
@@ -55,17 +55,19 @@ jobs:
           files: |
             !\s+
           output_renamed_files_as_deleted_and_added: true
-          separator: '\n'
+          separator: ','
           old_new_separator: '\n'
           old_new_files_separator: '\n'
 
       - name: Add changed files to changed.txt
+        shell: bash
         env:
           ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
-          for file in ${ALL_CHANGED_FILES}; do
-            echo $file >> changed.txt
-          done
+          IFS=$',' read -a ALL_CHANGED_FILES <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+           for file in "${ALL_CHANGED_FILES[@]}"; do
+             echo $file >> changed.txt
+           done
           cat changed.txt
 
       # Run PMD scan
