@@ -111,12 +111,12 @@ jobs:
           blocker_count=$((blocker_count - 1))
           #echo "$blocker_count" >> "$GITHUB_OUTPUT"
           echo "BLOCKERS FOUND:" $blocker_count  # Print to console
-          #if [[ $blocker_count > 0 ]]; then
+          if [[ $blocker_count > 0 ]]; then
             echo "## Blockers" >> $GITHUB_STEP_SUMMARY  
             echo "${{steps.csv-table-output-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
-          #elif [[ $blocker_count == 0 ]]; then
+          elif [[ $blocker_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
-          #fi
+          fi
 
       ####################### ALL VIOLATIONS CHECK
 
