@@ -3,6 +3,18 @@ name: Monthly Scan (DX)
 
 on:
   workflow_dispatch:
+    inputs:
+      minimum_severity:
+        required: true
+        type: choice
+        description: Minimum Severity (defaults to 5 - show all violations)
+        default: '5'
+        options:
+          - 5
+          - 4
+          - 3
+          - 2
+          - 1
 
 permissions:
   contents: read
@@ -12,17 +24,18 @@ jobs:
   run-pmd:
     permissions:
       contents: read # for actions/checkout to fetch code
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
-
-    runs-on: ubuntu-latest
     outputs:
-      error_count: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }}
+      filename: ${{ steps.set_filename.outputs.filename }}
+    runs-on: ubuntu-latest
 
     steps:
       # Checkout the source code
       - name: 'Checkout source code'
         uses: actions/checkout@v4
+
+      - name: 'Set Filename'
+        id: set_filename
+        run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> "$GITHUB_OUTPUT"
 
       # Install PMD
       - name: 'Install PMD'
@@ -41,14 +54,14 @@ jobs:
       - name: 'Run PMD scan to CSV - All violations'
         id: pmd_csv_all
         run: |
-          ~/pmd/bin/pmd check --dir . --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false
+          ~/pmd/bin/pmd check --dir . --rulesets config/pmd/ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --minimum-priority "${{ github.event.inputs.minimum_severity }}"
 
       - name: Upload all violations file in CSV format
 
         uses: actions/upload-artifact@v4
         with:
-          path: pmd-all.csv
-          name: PMDViolations
+          path: ${{ steps.set_filename.outputs.filename }}.csv
+          name: ${{ steps.set_filename.outputs.filename }}_PMD
           compression-level: 0
 
       # - name: 'Run PMD scan to CSV - Blockers'
