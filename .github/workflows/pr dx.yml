@@ -142,9 +142,7 @@ jobs:
           echo "BLOCKERS FOUND:" $blocker_count  # Print to console
           if [[ $blocker_count > 0 ]]; then
             echo "## Blockers" >> $GITHUB_STEP_SUMMARY
-            blocker_markup="${{steps.csv-table-blockers.outputs.markdown-table}}
-            blocker_markup="${blocker_markup/ Priority /" Severity "}"
-            echo "blocker_markup" >> $GITHUB_STEP_SUMMARY
+            echo "${{steps.csv-table-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
             BLOCKER_STRING="$blocker_count Blocking Violations Detected"
             echo "::error::$BLOCKER_STRING"
             exit 1
