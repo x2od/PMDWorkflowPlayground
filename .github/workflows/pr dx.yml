@@ -96,7 +96,7 @@ jobs:
           echo "violation_count=$violation_count" >> $GITHUB_OUTPUT
           echo "VIOLATIONS FOUND:" $violation_count  # Print to console
            if [[ $violation_count > 0 ]]; then
-             VIOLATION_STRING="$violation_count Scanning Violations Detected"
+             VIOLATION_STRING="$violation_count Scanning Violations Detected (all severities) in changed files - download CSV to check"
              echo "::error::$VIOLATION_STRING"
            elif [[ $violation_count == 0 ]]; then
              echo "::notice::No Scanning Violations Detected"
@@ -136,15 +136,20 @@ jobs:
       - name: Evaluate Blocker Violations
         id: evaluate_violations_blockers
         run: |
-          blocker_count=$(wc -l pmd-blockers.csv|awk '{print $1}')
-          #echo $blocker_count
-          blocker_count=$((blocker_count - 1))
-          #echo "$blocker_count" >> $GITHUB_OUTPUT
+          csv_blocker_count=$(wc -l pmd-blockers.csv|awk '{print $1}')
+          blocker_count=$((csv_blocker_count - 1))
+          echo "blocker_count=$blocker_count" >> $GITHUB_OUTPUT
           echo "BLOCKERS FOUND:" $blocker_count  # Print to console
           if [[ $blocker_count > 0 ]]; then
             echo "## Blockers" >> $GITHUB_STEP_SUMMARY  
             echo "${{steps.csv-table-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+            BLOCKER_STRING="$blocker_count Blocking Violations Detected"
+            echo "::error::$BLOCKER_STRING"
             exit 1
           elif [[ $blocker_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
+
+      - name: Check Blocker Count for Exit Code
+        if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
+        run: exit 1
