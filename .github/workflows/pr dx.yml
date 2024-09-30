@@ -91,7 +91,7 @@ jobs:
         id: evaluate_violations_all
         run: |
           violation_count=$(wc -l pmd-all.csv|awk '{print $1}')
-          echo $violation_count
+          #echo $violation_count
           violation_count=$((violation_count - 1))
           echo $violation_count >> "$GITHUB_OUTPUT"
           echo "VIOLATIONS FOUND:" $violation_count  # Print to console
@@ -104,7 +104,7 @@ jobs:
           fi
 
       - name: Upload all violations file in CSV format
-        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
+        #if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
         uses: actions/upload-artifact@v4
         with:
           path: pmd-all.csv
@@ -138,7 +138,7 @@ jobs:
         id: evaluate_violations_blockers
         run: |
           blocker_count=$(wc -l pmd-blockers.csv|awk '{print $1}')
-          echo $blocker_count
+          #echo $blocker_count
           blocker_count=$((blocker_count - 1))
           #echo "$blocker_count" >> "$GITHUB_OUTPUT"
           echo "BLOCKERS FOUND:" $blocker_count  # Print to console
