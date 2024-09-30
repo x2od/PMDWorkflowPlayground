@@ -18,7 +18,7 @@ jobs:
 
     runs-on: ubuntu-latest
     outputs:
-      violation_count: ${{ steps.evaluate_errors.outputs.VIOLATION_COUNT }}
+      violation_count: ${{ steps.evaluate_errors.outputs.violation_count }}
 
     steps:
       # Check out the source code
@@ -117,22 +117,22 @@ jobs:
       - name: Evaluate All Violations
         id: evaluate_errors
         run: |
-          VIOLATION_COUNT=$(wc -l pmd-all.csv|awk '{print $1}')
-          echo $VIOLATION_COUNT
-          VIOLATION_COUNT=$((VIOLATION_COUNT - 1))
-          echo $VIOLATION_COUNT >> "$GITHUB_OUTPUT"
-          echo "VIOLATOINS FOUND:" $VIOLATION_COUNT  # Print to console
-          if [[ $VIOLATION_COUNT -gt 0 ]]; then
-            VIOLATION_STRING="$VIOLATION_COUNT Blocking Violations Detected"
+          violation_count=$(wc -l pmd-all.csv|awk '{print $1}')
+          # echo $violation_count
+          violation_count=$((violation_count - 1))
+          echo $violation_count >> "$GITHUB_OUTPUT"
+          echo "VIOLATIONS FOUND:" $violation_count  # Print to console
+          if [[ $violation_count -gt 0 ]]; then
+            VIOLATION_STRING="$violation_count Blocking Violations Detected"
             echo "::error::$VIOLATION_STRING"
             exit 1
-          elif [[ $VIOLATION_COUNT -eq 0 ]]; then
+          elif [[ $violation_count -eq 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
             exit 0
           fi
 
       - name: Upload all violations file in CSV format
-        if: ${{ steps.evaluate_errors.outputs.VIOLATION_COUNT }} > 0
+        if: steps.evaluate_errors.outputs.violation_count > 0
         uses: actions/upload-artifact@v4
         with:
           path: pmd-all.csv
