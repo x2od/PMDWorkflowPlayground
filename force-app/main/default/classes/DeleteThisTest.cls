@@ -4,9 +4,9 @@
  * @author      David Schach
  * @since       2022
  */
-@SuppressWarnings('PMD')
 @IsTest
-public class DeleteThisTest {
+public with sharing class DeleteThisTest {
+	@SuppressWarnings('PMD')
 	@IsTest
 	public static void assertMe() {
 		System.assertEquals(1, 1, 'Math is hard');
@@ -18,7 +18,7 @@ public class DeleteThisTest {
 		//cons = null;
 		User u;
 		System.runAs(u) {
-			System.debug('Foo');
+			System.debug('Foo'); //NOPMD
 
 			Assert.isTrue(true, 'this');
 		}
