@@ -17,8 +17,8 @@ jobs:
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
 
     runs-on: ubuntu-latest
-    #outputs:
-    #  violation_count: ${{ steps.evaluate_errors.outputs.VIOLATION_COUNT }}
+    outputs:
+      violation_count: ${{ steps.evaluate_errors.outputs.VIOLATION_COUNT }}
 
     steps:
       # Check out the source code
@@ -132,6 +132,7 @@ jobs:
           fi
 
       - name: Upload all violations file in CSV format
+        if: ${{ steps.evaluate_errors.outputs.VIOLATION_COUNT }} > 0
         uses: actions/upload-artifact@v4
         with:
           path: pmd-all.csv
