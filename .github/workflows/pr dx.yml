@@ -114,13 +114,6 @@ jobs:
         run: |
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false
 
-      - name: Upload all violations file in CSV format
-        uses: actions/upload-artifact@v4
-        with:
-          path: pmd-all.csv
-          name: PMDViolations
-          compression-level: 0
-
       - name: Evaluate Errrors
         id: evaluate_errors
         run: |
@@ -136,3 +129,11 @@ jobs:
           elif [[ $ERROR_COUNT -eq 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
+
+      - name: Upload all violations file in CSV format
+        if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }} > 0
+        uses: actions/upload-artifact@v4
+        with:
+          path: pmd-all.csv
+          name: PMDViolations
+          compression-level: 0
