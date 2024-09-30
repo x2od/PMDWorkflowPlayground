@@ -50,12 +50,11 @@
     "eslint-plugin-jest": "^28.8.3",
     "eslint-plugin-prettier": "^5.2.1",
     "highlightjs-apex": "^1.4.0",
-    "husky": "^9.1.5",
     "lint-staged": "^15.2.10",
     "marked": "^14.1.2",
     "prettier": "^3.3.3",
     "prettier-plugin-apex": "^2.1.4",
-    "release-please": "^16.12.0"
+    "release-please": "^16.14.0"
   },
   "lint-staged": {
     "force-app/**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,yaml,yml}": [
