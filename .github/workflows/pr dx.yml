@@ -17,9 +17,9 @@ jobs:
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
 
     runs-on: ubuntu-latest
-    outputs:
-      #blocker_count: ${{ steps.evaluate_violations_blockers.outputs.blocker_count }}
-      violation_count: ${{ steps.evaluate_violations_all.outputs.violation_count }}
+    #outputs:
+    #blocker_count: ${{ steps.evaluate_violations_blockers.outputs.blocker_count }}
+    #violation_count: ${{ steps.evaluate_violations_all.outputs.violation_count }}
 
     steps:
       # Check out the source code
@@ -80,6 +80,37 @@ jobs:
           sarif_file: pmd-cli-report.sarif
           category: PMD
 
+      ####################### ALL VIOLATIONS CHECK
+
+      - name: Run PMD scan to CSV - All violations
+        id: pmd_csv_all
+        run: |
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false
+
+      - name: Evaluate All Violations
+        id: evaluate_violations_all
+        run: |
+          violation_count=$(wc -l pmd-all.csv|awk '{print $1}')
+          # echo $violation_count
+          violation_count=$((violation_count - 1))
+          echo $violation_count >> "$GITHUB_OUTPUT"
+          echo "VIOLATIONS FOUND:" $violation_count  # Print to console
+          if [[ $violation_count > 0 ]]; then
+            VIOLATION_STRING="$violation_count Blocking Violations Detected"
+            echo "::error::$VIOLATION_STRING"
+            exit 1
+          elif [[ $violation_count == 0 ]]; then
+            echo "::notice::No Scanning Violations Detected"
+          fi
+
+      - name: Upload all violations file in CSV format
+        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: pmd-all.csv
+          name: PMDViolations
+          compression-level: 0
+
       ############################# BLOCKERS CHECK
 
       - name: Run PMD scan to CSV - Blockers
@@ -114,41 +145,7 @@ jobs:
           if [[ $blocker_count > 0 ]]; then
             echo "## Blockers" >> $GITHUB_STEP_SUMMARY  
             echo "${{steps.csv-table-output-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+            exit 1
           elif [[ $blocker_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
-
-      ####################### ALL VIOLATIONS CHECK
-
-      - name: Run PMD scan to CSV - All violations
-        id: pmd_csv_all
-        run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false
-
-      - name: Evaluate All Violations
-        id: evaluate_violations_all
-        run: |
-          violation_count=$(wc -l pmd-all.csv|awk '{print $1}')
-          # echo $violation_count
-          violation_count=$((violation_count - 1))
-          echo $violation_count >> "$GITHUB_OUTPUT"
-          echo "VIOLATIONS FOUND:" $violation_count  # Print to console
-          if [[ $violation_count > 0 ]]; then
-            VIOLATION_STRING="$violation_count Blocking Violations Detected"
-            echo "::error::$VIOLATION_STRING"
-            exit 1
-          elif [[ $violation_count == 0 ]]; then
-            echo "::notice::No Scanning Violations Detected"
-          fi
-
-      - name: Upload all violations file in CSV format
-        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
-        uses: actions/upload-artifact@v4
-        with:
-          path: pmd-all.csv
-          name: PMDViolations
-          compression-level: 0
-
-      # - name: Check exit code
-      #   if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
-      #   run: exit 1
