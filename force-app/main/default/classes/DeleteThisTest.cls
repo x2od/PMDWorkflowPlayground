@@ -4,6 +4,7 @@
  * @author      David Schach
  * @since       2022
  */
+@SuppressWarnings('PMD')
 @IsTest
 public class DeleteThisTest {
 	@IsTest
