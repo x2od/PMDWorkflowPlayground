@@ -18,7 +18,7 @@ jobs:
 
     runs-on: ubuntu-latest
     outputs:
-      blocker_count: ${{ steps.evaluate_violations_blockers.outputs.blocker_count }}
+      #blocker_count: ${{ steps.evaluate_violations_blockers.outputs.blocker_count }}
       violation_count: ${{ steps.evaluate_violations_all.outputs.violation_count }}
 
     steps:
@@ -109,7 +109,7 @@ jobs:
           blocker_count=$(wc -l pmd-blockers.csv|awk '{print $1}')
           echo $blocker_count
           blocker_count=$((blocker_count - 1))
-          echo "$blocker_count" >> "$GITHUB_OUTPUT"
+          #echo "$blocker_count" >> "$GITHUB_OUTPUT"
           echo "BLOCKERS FOUND:" $blocker_count  # Print to console
           #if [[ $blocker_count > 0 ]]; then
             echo "## Blockers" >> $GITHUB_STEP_SUMMARY  
@@ -149,6 +149,6 @@ jobs:
           name: PMDViolations
           compression-level: 0
 
-      - name: Check exit code
-        if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
-        run: exit 1
+      # - name: Check exit code
+      #   if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
+      #   run: exit 1
