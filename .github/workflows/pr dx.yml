@@ -18,15 +18,16 @@ jobs:
 
     runs-on: ubuntu-latest
     outputs:
-      violation_count: ${{ steps.evaluate_errors.outputs.violation_count }}
+      blocker_count: ${{ steps.evaluate_violations_blockers.outputs.blocker_count }}
+      violation_count: ${{ steps.evaluate_violations_all.outputs.violation_count }}
 
     steps:
       # Check out the source code
-      - name: 'Checkout source code'
+      - name: Checkout source code
         uses: actions/checkout@v4
 
       # Install PMD
-      - name: 'Install PMD'
+      - name: Install PMD
         id: pmd
         run: |
           PMD_VERSION=$(curl -s https://api.github.com/repos/pmd/pmd/releases/latest | grep '.tag_name' | sed 's:.*/::' | sed 's:",::')
@@ -69,7 +70,7 @@ jobs:
           cat changed.txt
 
       # Run PMD scan
-      - name: 'Run PMD scan to SARIF'
+      - name: Run PMD scan to SARIF
         id: pmd_sarif
         run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
 
@@ -79,14 +80,16 @@ jobs:
           sarif_file: pmd-cli-report.sarif
           category: PMD
 
-      - name: 'Run PMD scan to CSV - Blockers'
-        id: pmd_csv
+      ############################# BLOCKERS CHECK
+
+      - name: Run PMD scan to CSV - Blockers
+        id: pmd_csv_blockers
         run: |
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-blockers.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false --minimum-priority 2
           # --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
 
-      - name: Read CSV - Blockers'
-        id: csv
+      - name: Read CSV - Blockers
+        id: csv_blockers
         uses: juliangruber/read-file-action@v1
         with:
           path: ./pmd-blockers.csv
@@ -95,27 +98,35 @@ jobs:
         uses: petems/csv-to-md-table-action@master
         id: csv-table-output-blockers
         with:
-          csvinput: ${{ steps.csv.outputs.content }}
+          csvinput: ${{ steps.csv_blockers.outputs.content }}
 
-      - name: Summary Table - Blockers
-        id: md_to_output-all
+      # Check blocker count from CSV
+      # If has blockers, exit 1
+      # If no blockers, still upload the file with all violations
+      - name: Evaluate Blocker Violations
+        id: evaluate_violations_blockers
         run: |
-          BLOCKER_COUNT=$(wc -l pmd-blockers.csv|awk '{print $1}')
-          echo $BLOCKER_COUNT
-          BLOCKER_COUNT=$((BLOCKER_COUNT - 1))
-          echo "BLOCKERS FOUND:" $BLOCKER_COUNT  # Print to console
-          if [[ $BLOCKER_COUNT > 0 ]]; then
+          blocker_count=$(wc -l pmd-blockers.csv|awk '{print $1}')
+          echo $blocker_count
+          blocker_count=$((blocker_count - 1))
+          echo $blocker_count >> "$GITHUB_OUTPUT"
+          echo "BLOCKERS FOUND:" $blocker_count  # Print to console
+          if [[ $blocker_count > 0 ]]; then
             echo "## Blockers" >> $GITHUB_STEP_SUMMARY  
             echo "${{steps.csv-table-output-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+          elif [[ $blocker_count == 0 ]]; then
+            echo "::notice::No Blocking Violations Detected"
           fi
 
-      - name: 'Run PMD scan to CSV - All violations'
+      ####################### ALL VIOLATIONS CHECK
+
+      - name: Run PMD scan to CSV - All violations
         id: pmd_csv_all
         run: |
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false
 
       - name: Evaluate All Violations
-        id: evaluate_errors
+        id: evaluate_violations_all
         run: |
           violation_count=$(wc -l pmd-all.csv|awk '{print $1}')
           # echo $violation_count
@@ -127,13 +138,17 @@ jobs:
             echo "::error::$VIOLATION_STRING"
             exit 1
           elif [[ $violation_count == 0 ]]; then
-            echo "::notice::No Blocking Violations Detected"
+            echo "::notice::No Scanning Violations Detected"
           fi
 
       - name: Upload all violations file in CSV format
-        if: steps.evaluate_errors.outputs.violation_count > 0
+        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
         uses: actions/upload-artifact@v4
         with:
           path: pmd-all.csv
           name: PMDViolations
           compression-level: 0
+
+      - name: Check exit code
+        if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
+        run: exit 1
