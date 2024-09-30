@@ -122,11 +122,11 @@ jobs:
           violation_count=$((violation_count - 1))
           echo $violation_count >> "$GITHUB_OUTPUT"
           echo "VIOLATIONS FOUND:" $violation_count  # Print to console
-          if [[ $violation_count -gt 0 ]]; then
+          if [[ $violation_count > 0 ]]; then
             VIOLATION_STRING="$violation_count Blocking Violations Detected"
             echo "::error::$VIOLATION_STRING"
             exit 1
-          elif [[ $violation_count -eq 0 ]]; then
+          elif [[ $violation_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
             exit 0
           fi
