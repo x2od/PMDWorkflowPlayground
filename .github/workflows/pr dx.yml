@@ -133,6 +133,6 @@ jobs:
             ERROR_STRING="$ERROR_COUNT Blocking Violations Detected"
             echo "::error::$ERROR_STRING"
             exit 1
-          elif [[ $aaa -eq "ccc" ]]; then
+          elif [[ $ERROR_COUNT -eq 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
