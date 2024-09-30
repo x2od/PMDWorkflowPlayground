@@ -18,7 +18,7 @@ jobs:
 
     runs-on: ubuntu-latest
     outputs:
-      error_count: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }}
+      violation_count: ${{ steps.evaluate_errors.outputs.VIOLATION_COUNT }}
 
     steps:
       # Check out the source code
@@ -100,11 +100,11 @@ jobs:
       - name: Summary Table - Blockers
         id: md_to_output-all
         run: |
-          ERROR_COUNT=$(wc -l pmd-blockers.csv|awk '{print $1}')
-          echo $ERROR_COUNT
-          ERROR_COUNT=$((ERROR_COUNT - 1))
-          echo "BLOCKERS FOUND:" $ERROR_COUNT  # Print to console
-          if [[ $ERROR_COUNT > 0 ]]; then
+          BLOCKER_COUNT=$(wc -l pmd-blockers.csv|awk '{print $1}')
+          echo $BLOCKER_COUNT
+          BLOCKER_COUNT=$((BLOCKER_COUNT - 1))
+          echo "BLOCKERS FOUND:" $BLOCKER_COUNT  # Print to console
+          if [[ $BLOCKER_COUNT > 0 ]]; then
             echo "## Blockers" >> $GITHUB_STEP_SUMMARY  
             echo "${{steps.csv-table-output-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
           fi
@@ -114,24 +114,24 @@ jobs:
         run: |
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false
 
-      - name: Evaluate Errrors
+      - name: Evaluate All Violations
         id: evaluate_errors
         run: |
-          ERROR_COUNT=$(wc -l pmd-blockers.csv|awk '{print $1}')
-          echo $ERROR_COUNT
-          ERROR_COUNT=$((ERROR_COUNT - 1))
-          # echo $ERROR_COUNT >> "$GITHUB_OUTPUT"
-          echo "BLOCKERS FOUND:" $ERROR_COUNT  # Print to console
-          if [[ $ERROR_COUNT > 0 ]]; then
-            ERROR_STRING="$ERROR_COUNT Blocking Violations Detected"
-            echo "::error::$ERROR_STRING"
+          VIOLATION_COUNT=$(wc -l pmd-all.csv|awk '{print $1}')
+          echo $VIOLATION_COUNT
+          VIOLATION_COUNT=$((VIOLATION_COUNT - 1))
+          echo $VIOLATION_COUNT >> "$GITHUB_OUTPUT"
+          echo "VIOLATOINS FOUND:" $VIOLATION_COUNT  # Print to console
+          if [[ $VIOLATION_COUNT > 0 ]]; then
+            VIOLATION_STRING="$VIOLATION_COUNT Blocking Violations Detected"
+            echo "::error::$VIOLATION_STRING"
             exit 1
-          elif [[ $ERROR_COUNT -eq 0 ]]; then
+          elif [[ $VIOLATION_COUNT -eq 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
 
       - name: Upload all violations file in CSV format
-        if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }} -gt 0
+        if: ${{ steps.evaluate_errors.outputs.VIOLATION_COUNT }} -gt 0
         uses: actions/upload-artifact@v4
         with:
           path: pmd-all.csv
