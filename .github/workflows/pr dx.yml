@@ -131,7 +131,7 @@ jobs:
           fi
 
       - name: Upload all violations file in CSV format
-        if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }} > 0
+        if: ${{ steps.evaluate_errors.outputs.ERROR_COUNT }} -gt 0
         uses: actions/upload-artifact@v4
         with:
           path: pmd-all.csv
