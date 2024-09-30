@@ -109,7 +109,7 @@ jobs:
           blocker_count=$(wc -l pmd-blockers.csv|awk '{print $1}')
           echo $blocker_count
           blocker_count=$((blocker_count - 1))
-          echo $blocker_count >> "$GITHUB_OUTPUT"
+          echo "$blocker_count" >> "$GITHUB_OUTPUT"
           echo "BLOCKERS FOUND:" $blocker_count  # Print to console
           if [[ $blocker_count > 0 ]]; then
             echo "## Blockers" >> $GITHUB_STEP_SUMMARY  
