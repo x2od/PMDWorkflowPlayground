@@ -122,16 +122,16 @@ jobs:
           VIOLATION_COUNT=$((VIOLATION_COUNT - 1))
           echo $VIOLATION_COUNT >> "$GITHUB_OUTPUT"
           echo "VIOLATOINS FOUND:" $VIOLATION_COUNT  # Print to console
-          if [[ $VIOLATION_COUNT -gt "0" ]]; then
+          if [[ $VIOLATION_COUNT -gt 0 ]]; then
             VIOLATION_STRING="$VIOLATION_COUNT Blocking Violations Detected"
             echo "::error::$VIOLATION_STRING"
             exit 1
           elif [[ $VIOLATION_COUNT -eq 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
+            exit 0
           fi
 
       - name: Upload all violations file in CSV format
-        if: ${{ steps.evaluate_errors.outputs.VIOLATION_COUNT }} > 0
         uses: actions/upload-artifact@v4
         with:
           path: pmd-all.csv
