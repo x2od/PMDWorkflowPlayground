@@ -34,7 +34,7 @@ jobs:
 
       - name: 'Set Filename'
         id: set_filename
-        run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> "$GITHUB_OUTPUT"
+        run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> $GITHUB_OUTPUT
 
       # Install PMD
       - name: 'Install PMD'
