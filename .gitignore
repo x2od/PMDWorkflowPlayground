@@ -55,8 +55,5 @@ testresults
 tmp
 pmd.*
 results.*
-sca.html
-sca.csv
-src/aura
-src/lwc
+sca.*
 !pmd.sarif
