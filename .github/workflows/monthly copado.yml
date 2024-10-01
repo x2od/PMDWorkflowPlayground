@@ -49,6 +49,7 @@ jobs:
             ~/pmd/bin/pmd --version
           fi
           rm -f .pmdCache
+
       - name: 'Run PMD scan to CSV - ALL'
         id: pmd_csv
         run: |
