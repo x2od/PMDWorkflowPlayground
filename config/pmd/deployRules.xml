@@ -26,12 +26,6 @@
 	<rule ref="category/apex/bestpractices.xml/UnusedLocalVariable" message="Variable ''{0}'' defined but not used">
 		<priority>2</priority>
 	</rule>
-	<!-- <rule ref="category/apex/bestpractices.xml/ApexAssertionsShouldIncludeMessage">
-		<priority>5</priority>
-	</rule> -->
-	<!-- <rule ref="category/apex/bestpractices.xml/DebugsShouldUseLoggingLevel">
-<priority>4</priority>
-</rule> -->
 
 	<!-- CODE STYLE : NAMING -->
 	<rule ref="category/apex/codestyle.xml/ClassNamingConventions" message="Class name does not fit naming convention">
@@ -86,7 +80,9 @@
 	<rule ref="category/apex/errorprone.xml/AvoidNonExistentAnnotations">
 		<priority>1</priority>
 	</rule>
-	<rule ref="category/apex/errorprone.xml/MethodWithSameNameAsEnclosingClass" message="Classes should not have non-constructor methods with the same name as the class">
+	<rule
+		ref="category/apex/errorprone.xml/MethodWithSameNameAsEnclosingClass"
+		message="Classes should not have non-constructor methods with the same name as the class">
 		<priority>1</priority>
 	</rule>
 	<rule ref="category/apex/errorprone.xml/TestMethodsMustBeInTestClasses">
@@ -118,7 +114,9 @@
 	</rule>
 
 	<!-- VISUALFORCE RULES -->
-	<rule ref="category/visualforce/security.xml/VfHtmlStyleTagXss" message="Dynamic EL content within URL in style tag should be URLENCODED or JSINHTMLENCODED as appropriate">
+	<rule
+		ref="category/visualforce/security.xml/VfHtmlStyleTagXss"
+		message="Dynamic EL content within URL in style tag should be URLENCODED or JSINHTMLENCODED as appropriate">
 		<!--
 			<apex:page>
 				<style>
