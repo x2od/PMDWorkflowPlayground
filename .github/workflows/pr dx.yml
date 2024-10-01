@@ -148,7 +148,7 @@ jobs:
           echo "blocker_count=$blocker_count" >> $GITHUB_OUTPUT
           echo "BLOCKERS FOUND:" $blocker_count  # Print to console
           if [[ $blocker_count > 0 ]]; then
-            echo "## Blockers" >> $GITHUB_STEP_SUMMARY
+            echo "## Blockers in Changed Files" >> $GITHUB_STEP_SUMMARY
             echo "${{steps.csv-table-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
             BLOCKER_STRING="$blocker_count Blocking Violations Detected"
             echo "::error::$BLOCKER_STRING"

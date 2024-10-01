@@ -61,12 +61,12 @@ jobs:
           violation_count=$(wc -l ${{ steps.set_filename.outputs.filename }}.csv|awk '{print $1}')
           echo $violation_count
           violation_count=$((violation_count - 1))
-          echo $violation_count >> "$GITHUB_OUTPUT"
-          echo "ERRORS FOUND:" $violation_count  Print to console
+          echo "violation_count=$violation_count" >> $GITHUB_OUTPUT
+          echo "ERRORS FOUND: " $violation_count # Print to console
           if [[ $violation_count > 0 ]]; then
             ERROR_STRING="$violation_count Scanning Violations Detected"
             echo "::error::$ERROR_STRING"
-          elif [[ $violation_count -eq 0 ]]; then
+          elif [[ $violation_count == 0 ]]; then
             echo "::notice::No Violations Detected"
           fi
 
