@@ -69,7 +69,6 @@ jobs:
       - name: Step Table - APEX
         id: md_to_output
         run: |
-          #  echo "${{steps.csv-table-output-apex.outputs.markdown-table}}"
           echo "# CSV - APEX" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv-table-output-apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
@@ -93,6 +92,5 @@ jobs:
       - name: Step Table - XML
         id: md_to_output_xml
         run: |
-          # echo "${{steps.csv-table-output-xml.outputs.markdown-table}}"
           echo "# CSV - XML" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv-table-output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
