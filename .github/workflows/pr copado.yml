@@ -15,13 +15,18 @@ jobs:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
-
+    outputs:
+      filename: ${{ steps.set_filename.outputs.filename }}
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       # Checkout the source code
       - name: 'Checkout source code'
         uses: actions/checkout@v4
+
+      - name: 'Set Filename'
+        id: set_filename
+        run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> $GITHUB_OUTPUT
 
       # Install PMD
       - name: 'Install PMD'
@@ -111,7 +116,7 @@ jobs:
         id: md_to_output_metadata
         run: |
           echo "${{steps.csv-table-output-xml.outputs.markdown-table}}"
-          echo "# BLOCKERS" >> $GITHUB_STEP_SUMMARY
+          echo "# Blockers in Pull Request" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv-table-output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - name: Evaluate XML Violations (which includes Apex)
