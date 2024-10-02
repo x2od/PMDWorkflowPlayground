@@ -49,6 +49,7 @@ jobs:
             ~/pmd/bin/pmd --version
           fi
           rm -f .pmdCache
+
       - name: 'Run PMD scan to CSV - APEX'
         id: pmd_csv
         run: |
@@ -69,6 +70,58 @@ jobs:
       - name: Step Table - APEX
         id: md_to_output
         run: |
-          echo "${{steps.csv-table-output-apex.outputs.markdown-table}}"
+          # echo "${{steps.csv-table-output-apex.outputs.markdown-table}}"
           echo "# CSV - APEX" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv-table-output-apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      ########### CSV - XML
+
+      - name: 'Run PMD scan to CSV - XML'
+        id: pmd_csv_xml
+        run: |
+          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority "${{ github.event.inputs.minimum_severity }}" --force-language xml
+
+      # - name: Read CSV - XML
+      #   id: csv_xml
+      #   uses: juliangruber/read-file-action@v1
+      #   with:
+      #     path: ./${{ steps.set_filename.outputs.filename }}.csv
+
+      # - name: Create MD - XML
+      #   uses: petems/csv-to-md-table-action@master
+      #   id: csv-table-output-xml
+      #   with:
+      #     csvinput: ${{ steps.csv_xml.outputs.content }}
+
+      # - name: Step Table - XML
+      #   id: md_to_output_xml
+      #   run: |
+      #     echo "# CSV - XML" >> $GITHUB_STEP_SUMMARY
+      #     echo "${{steps.csv-table-output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Evaluate XML Violations (which includes Apex)
+        id: evaluate_violations_all
+        run: |
+          csv_line_count=$(wc -l ${{ steps.set_filename.outputs.filename }}.csv|awk '{print $1}')
+          #echo $csv_line_count
+          violation_count=$((csv_line_count - 1))
+          echo "violation_count=$violation_count" >> $GITHUB_OUTPUT
+          echo "VIOLATIONS FOUND:" $violation_count  # Print to console
+           if [[ $violation_count > 0 ]]; then
+             VIOLATION_STRING="$violation_count Scanning Violations Detected (all severities) - download CSV to check"
+             echo "::error::$VIOLATION_STRING"
+           elif [[ $violation_count == 0 ]]; then
+             echo "::notice::No Scanning Violations Detected"
+           fi
+
+      - name: Priority to Severity
+        id: priority_to_severity_all
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
+
+      - name: Upload all violations file in CSV format
+        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ steps.set_filename.outputs.filename }}.csv
+          name: ${{ steps.set_filename.outputs.filename }}_PMD
+          compression-level: 0
