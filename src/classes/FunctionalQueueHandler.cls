@@ -66,7 +66,7 @@ public class FunctionalQueueHandler {
 		updateFunctionalQueueWithUpdatedApplicationSupportedObjects(functionalQueue);
 	}
 
-	private void performDMLOperationsForAfterUpdate() {
+	public void performDMLOperationsForAfterUpdate() {
 		FunctionalQueueUtility.addSerializedSupportedObjectsToQueue(JSON.serialize(queueSobjectsToSave));
 		if (queueSObjectsToDelete != null && !queueSObjectsToDelete.isEmpty()) {
 			FunctionalQueueUtility.deleteSerializedSupportedQueueObjects(JSON.serialize(queueSObjectsToDelete));

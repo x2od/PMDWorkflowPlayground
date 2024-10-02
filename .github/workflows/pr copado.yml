@@ -82,7 +82,7 @@ jobs:
       # Run PMD scan - XML
       - name: 'Run PMD scan to SARIF - XML'
         id: pmd_sarif_xml
-        run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report-xml.sarif  --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
+        run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report-xml.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
 
       - name: Upload violations file in SARIF format
         uses: github/codeql-action/upload-sarif@v3
