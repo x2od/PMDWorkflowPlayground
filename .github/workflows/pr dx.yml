@@ -47,7 +47,7 @@ jobs:
           fi
           rm -f .pmdCache
 
-      - name: Action to get changed files
+      - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v45
         with:
@@ -67,7 +67,7 @@ jobs:
            done
           cat changed.txt
 
-      # Run PMD scan
+      # Run PMD SARIF can
       - name: Run PMD scan to SARIF
         id: pmd_sarif
         run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
@@ -83,9 +83,15 @@ jobs:
       - name: Run PMD scan to CSV - All violations
         id: pmd_csv_all
         run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false
 
-      - name: Evaluate All Violations
+      - name: Priority to Severity
+        id: priority_to_severity_all
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
+
+      ######## EVALUATE ALL VIOLATIONS
+
+      - name: Evaluate all violations
         id: evaluate_violations_all
         run: |
           csv_line_count=$(wc -l ${{ steps.set_filename.outputs.filename }}.csv|awk '{print $1}')
@@ -98,11 +104,8 @@ jobs:
              echo "::error::$VIOLATION_STRING"
            elif [[ $violation_count == 0 ]]; then
              echo "::notice::No Scanning Violations Detected"
+             exit 0
            fi
-
-      - name: Priority to Severity
-        id: priority_to_severity_all
-        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
 
       - name: Upload all violations file in CSV format
         if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
@@ -112,7 +115,7 @@ jobs:
           name: ${{ steps.set_filename.outputs.filename }}_PMD
           compression-level: 0
 
-      ############################# BLOCKERS CHECK
+      ##################### BLOCKERS CHECK
 
       # - name: Run PMD scan to CSV - Blockers
       #   id: pmd_csv_blockers
@@ -124,11 +127,9 @@ jobs:
           echo "blocking_severity " $blocking_severity
           block_sev=$(($blocking_severity))
           echo "block_sev " $block_sev
-          awk -F '","'  'BEGIN {OFS=","} { if (($2 <= 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv > pmd-blockers.csv
-
-      - name: Priority to Severity
-        id: priority_to_severity_blockers
-        run: sed -i 's|"Priority"|"Severity"|g' pmd-blockers.csv
+          head -n 1 ${{ steps.set_filename.outputs.filename }}.csv > pmd-blockers.csv
+          awk -F '","'  'BEGIN {OFS=","} { if (($2 <= 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-blockers.csv
+          cat pmd-blockers.csv
 
       - name: Read CSV - Blockers
         id: csv_blockers
@@ -141,10 +142,8 @@ jobs:
         id: csv-table-blockers
         with:
           csvinput: ${{ steps.csv_blockers.outputs.content }}
-
       # Check blocker count from CSV
       # If has blockers, exit 1
-      # If no blockers, still upload the file with all violations
       - name: Evaluate Blocker Violations
         id: evaluate_violations_blockers
         run: |
@@ -157,9 +156,49 @@ jobs:
             echo "${{steps.csv-table-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
             BLOCKER_STRING="$blocker_count Blocking Violations Detected"
             echo "::error::$BLOCKER_STRING"
-            exit 1
           elif [[ $blocker_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
+          fi
+
+      ############# OTHER VIOLATIONS CHECK
+
+      - name: Show non-Blockers from CSV
+        run: |
+          echo "blocking_severity " $blocking_severity
+          block_sev=$(($blocking_severity))
+          echo "block_sev " $block_sev
+          head -n 1 ${{ steps.set_filename.outputs.filename }}.csv > pmd-other.csv
+          awk -F '","'  'BEGIN {OFS=","} { if (($2 <= 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-other.csv
+          cat pmd-other.csv
+
+      - name: Priority to Severity
+        id: priority_to_severity_other
+        run: sed -i 's|"Priority"|"Severity"|g' pmd-other.csv
+
+      - name: Read CSV - other
+        id: csv_other
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-other.csv
+
+      - name: Create MD - other
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-other
+        with:
+          csvinput: ${{ steps.csv_other.outputs.content }}
+
+      - name: Evaluate Other Violations
+        id: evaluate_violations_other
+        run: |
+          csv_other_count=$(wc -l pmd-other.csv|awk '{print $1}')
+          other_count=$((csv_other_count - 1))
+          echo "other_count=$other_count" >> $GITHUB_OUTPUT
+          echo "OTHERS FOUND:" $other_count  # Print to console
+          if [[ $other_count > 0 ]]; then
+            echo "## Others in Changed Files" >> $GITHUB_STEP_SUMMARY
+            echo "${{steps.csv-table-other.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+            #OTHER_STRING="$other_count Non-Blocking Violations Detected"
+            #echo "::error::$OTHER_STRING"
           fi
 
       - name: Check Blocker Count for Exit Code
