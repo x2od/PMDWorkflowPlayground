@@ -170,28 +170,46 @@ jobs:
         run: |
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}_blockers.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority $BLOCKING_SEVERITY --force-language xml --use-version xml-1.0
 
-      - name: Priority to Severity
+      - name: Priority to Severity - XML BLOCKERS
         id: priority_to_severity_blockers
         run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}_blockers.csv
 
-      - name: Read CSV - XML
+      - name: Read CSV - XML BLOCKERS
         id: csv_blockers_metadata
         uses: juliangruber/read-file-action@v1
         with:
           path: ./${{ steps.set_filename.outputs.filename }}_blockers.csv
 
-      - name: Create MD - XML
+      - name: Create MD - XML BLOCKERS
         uses: petems/csv-to-md-table-action@master
         id: csv_table_output-blockers-xml
         with:
           csvinput: ${{ steps.csv_blockers_metadata.outputs.content }}
 
-      - name: Step Table - XML
+      - name: Step Table - XML BLOCKERS
         id: md_to_output_blockers_metadata
         run: |
           echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}"
           echo "# Blockers in Pull Request" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Read CSV - XML ALL
+        id: csv_metadata
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./${{ steps.set_filename.outputs.filename }}.csv
+      - name: Create MD - XML ALL
+        uses: petems/csv-to-md-table-action@master
+        id: csv_table_output-xml
+        with:
+          csvinput: ${{ steps.csv_metadata.outputs.content }}
+
+      - name: Step Table - XML ALL
+        id: md_to_output_metadata
+        run: |
+          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}"
+          echo "# All Violations in Pull Request" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - name: Evaluate Blocker Violations
         id: evaluate_violations_blocksers
@@ -208,21 +226,3 @@ jobs:
           elif [[ $violation_count == 0 ]]; then
            echo "::notice::No Blocking Violations Detected"
           fi
-
-      - name: Read CSV - XML
-        id: csv_metadata
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./${{ steps.set_filename.outputs.filename }}.csv
-      - name: Create MD - XML
-        uses: petems/csv-to-md-table-action@master
-        id: csv_table_output-xml
-        with:
-          csvinput: ${{ steps.csv_metadata.outputs.content }}
-
-      - name: Step Table - XML
-        id: md_to_output_metadata
-        run: |
-          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}"
-          echo "# All Violations in Pull Request" >> $GITHUB_STEP_SUMMARY
-          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
