@@ -34,7 +34,6 @@ jobs:
         run: |
           PMD_VERSION=$(curl -s https://api.github.com/repos/pmd/pmd/releases/latest | grep '.tag_name' | sed 's:.*/::' | sed 's:",::')
           echo $PMD_VERSION
-          PMD_VERSION=7.5.0
           wget -q https://github.com/pmd/pmd/releases/download/pmd_releases%2F$PMD_VERSION/pmd-dist-$PMD_VERSION-bin.zip
           unzip -q pmd-dist-$PMD_VERSION-bin.zip -d ~
           mv ~/pmd-bin-$PMD_VERSION ~/pmd
@@ -94,17 +93,17 @@ jobs:
       - name: 'Run PMD scan to CSV - XML'
         id: pmd_csv_metadata
         run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-xml.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml --use-version xml-1.0 --verbose
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml --use-version xml-1.0 --verbose
 
       - name: Priority to Severity
         id: priority_to_severity_all
-        run: sed -i 's|"Priority"|"Severity"|g' pmd-xml.csv
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
 
       - name: Read CSV - XML
         id: csv_metadata
         uses: juliangruber/read-file-action@v1
         with:
-          path: ./pmd-xml.csv
+          path: ./${{ steps.set_filename.outputs.filename }}.csv
 
       - name: Create MD - XML
         uses: petems/csv-to-md-table-action@master
