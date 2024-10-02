@@ -193,23 +193,27 @@ jobs:
           echo "# Blockers in Pull Request" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
+      ######## XML ALL
+      - name: Remove Blockers from CSV
+        run: awk -F '","'  'BEGIN {OFS=","} { if ($2 >= $blocking_severity)  print }' ${{ steps.set_filename.outputs.filename }}.csv > ${{ steps.set_filename.outputs.filename }}_nonsevere.csv
+
       - name: Read CSV - XML ALL
         id: csv_metadata
         uses: juliangruber/read-file-action@v1
         with:
-          path: ./${{ steps.set_filename.outputs.filename }}.csv
+          path: ./${{ steps.set_filename.outputs.filename }}_nonsevere.csv
       - name: Create MD - XML ALL
         uses: petems/csv-to-md-table-action@master
-        id: csv_table_output-xml
+        id: csv_table_output_xml
         with:
           csvinput: ${{ steps.csv_metadata.outputs.content }}
 
       - name: Step Table - XML ALL
         id: md_to_output_metadata
         run: |
-          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}"
-          echo "# All Violations in Pull Request" >> $GITHUB_STEP_SUMMARY
-          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv_table_output_xml.outputs.markdown-table}}"
+          echo "# Other Violations in Pull Request" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv_table_output_xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - name: Evaluate Blocker Violations
         id: evaluate_violations_blocksers
