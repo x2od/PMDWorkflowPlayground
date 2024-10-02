@@ -197,7 +197,8 @@ jobs:
       - name: Remove Blockers from CSV
         run: |
           #echo "File,Severity,Line,Description,Rule" > ${{ steps.set_filename.outputs.filename }}_nonsevere.csv
-          awk -F '","'  'BEGIN {OFS=","} { if ($2 > 2)  print }' ${{ steps.set_filename.outputs.filename }}.csv >> ${{ steps.set_filename.outputs.filename }}_nonsevere.csv
+          block_sev=$(($blocking_severity))
+          awk -F '","'  'BEGIN {OFS=","} { if ($2 > $block_sev)  print }' ${{ steps.set_filename.outputs.filename }}.csv >> ${{ steps.set_filename.outputs.filename }}_nonsevere.csv
 
       - name: Read CSV - XML NS
         id: csv_metadata
