@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  BLOCKING_SEVERITY: 2
+
 # Jobs to be executed
 jobs:
   run-pmd-metadata-format-copado:
@@ -40,7 +43,6 @@ jobs:
             mv ~/pmd-bin-$PMD_VERSION ~/pmd
             ~/pmd/bin/pmd --version
           fi
-          rm -f .pmdCache
 
       # - name: Collect changed files
       #   env:
@@ -71,91 +73,31 @@ jobs:
            done
           cat changed.txt
 
-      # Run PMD scan - apex
-      - name: 'Run PMD scan to SARIF - APEX'
-        id: pmd_sarif
-        run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report-apex.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 2
-
-      - name: Upload violations file in SARIF format
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: pmd-cli-report-apex.sarif
-          category: PMD_code
-
-      # Run PMD scan - XML
-      - name: 'Run PMD scan to SARIF - XML'
-        id: pmd_sarif_xml
-        run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report-xml.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
-          rm -f .pmdCache
-
-      - name: Upload violations file in SARIF format
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: pmd-cli-report-xml.sarif
-          category: PMD_xml
-
-      ########## RESCAN FOR BLOCKING VIOLATIONS
-
-      - name: 'Run PMD scan to CSV - APEX BLOCKERS'
-        id: pmd_csv_blockers_apex
-        run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
-
-      - name: 'Run PMD scan to CSV - XML BLOCKERS'
-        id: pmd_csv_blockers_metadata
-        run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --force-language xml --use-version xml-1.0 --minimum-priority 2
-
-      - name: Priority to Severity
-        id: priority_to_severity_blockers
-        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
-
-      - name: Read CSV - XML
-        id: csv_blockers_metadata
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./${{ steps.set_filename.outputs.filename }}.csv
-
-      - name: Create MD - XML
-        uses: petems/csv-to-md-table-action@master
-        id: csv_table_output-blockers-xml
-        with:
-          csvinput: ${{ steps.csv_blockers_metadata.outputs.content }}
-
-      - name: Step Table - XML
-        id: md_to_output_blockers_metadata
-        run: |
-          echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}"
-          echo "# Blockers in Pull Request" >> $GITHUB_STEP_SUMMARY
-          echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
-          rm -f .pmdCache
-
-      ############ RESCAN FOR ALL VIOLATIONS
+      ############ SCAN FOR ALL VIOLATIONS
 
       - name: 'Run PMD scan to CSV - APEX ALL'
         id: pmd_csv_apex
         run: |
+          rm -f .pmdCache
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file csv-apex-all.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 5
-      - name: Read CSV - APEX
-        id: csv_metadata_apex
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./csv-apex-all.csv
+      # - name: Read CSV - APEX
+      #   id: csv_metadata_apex
+      #   uses: juliangruber/read-file-action@v1
+      #   with:
+      #     path: ./csv-apex-all.csv
 
-      - name: Create MD - APEX
-        uses: petems/csv-to-md-table-action@master
-        id: csv_table_output-apex
-        with:
-          csvinput: ${{ steps.csv_metadata_apex.outputs.content }}
+      # - name: Create MD - APEX
+      #   uses: petems/csv-to-md-table-action@master
+      #   id: csv_table_output-apex
+      #   with:
+      #     csvinput: ${{ steps.csv_metadata_apex.outputs.content }}
 
-      - name: Step Table - APEX
-        id: md_to_output_metadata_apex
-        run: |
-          echo "${{steps.csv_table_output-apex.outputs.markdown-table}}"
-          echo "# APEX Violations in Pull Request" >> $GITHUB_STEP_SUMMARY
-          echo "${{steps.csv_table_output-apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+      # - name: Step Table - APEX
+      #   id: md_to_output_metadata_apex
+      #   run: |
+      #     echo "${{steps.csv_table_output-apex.outputs.markdown-table}}"
+      #     echo "# APEX Violations in Pull Request" >> $GITHUB_STEP_SUMMARY
+      #     echo "${{steps.csv_table_output-apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - name: 'Run PMD scan to CSV - XML ALL'
         id: pmd_csv_metadata
@@ -165,26 +107,6 @@ jobs:
       - name: Priority to Severity
         id: priority_to_severity_all
         run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
-
-      - name: Read CSV - XML
-        id: csv_metadata
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./${{ steps.set_filename.outputs.filename }}.csv
-
-      - name: Create MD - XML
-        uses: petems/csv-to-md-table-action@master
-        id: csv_table_output-xml
-        with:
-          csvinput: ${{ steps.csv_metadata.outputs.content }}
-
-      - name: Step Table - XML
-        id: md_to_output_metadata
-        run: |
-          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}"
-          echo "# All Violations in Pull Request" >> $GITHUB_STEP_SUMMARY
-          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
-          rm -f .pmdCache
 
       - name: Evaluate XML Violations (which includes Apex)
         id: evaluate_violations_all
@@ -208,3 +130,98 @@ jobs:
           path: ${{ steps.set_filename.outputs.filename }}.csv
           name: ${{ steps.set_filename.outputs.filename }}
           compression-level: 0
+
+      # Run PMD scan - apex
+      - name: 'Run PMD scan to SARIF - APEX'
+        id: pmd_sarif
+        run: |
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report-apex.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority $BLOCKING_SEVERITY
+
+      - name: Upload violations file in SARIF format
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pmd-cli-report-apex.sarif
+          category: PMD_code
+
+      # Run PMD scan - XML
+      - name: 'Run PMD scan to SARIF - XML'
+        id: pmd_sarif_xml
+        run: |
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report-xml.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority $BLOCKING_SEVERITY --force-language xml
+
+      - name: Upload violations file in SARIF format
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pmd-cli-report-xml.sarif
+          category: PMD_xml
+
+      ########## RESCAN FOR BLOCKING VIOLATIONS
+      # For future: better to parse existing CSV
+
+      - name: 'Run PMD scan to CSV - APEX BLOCKERS'
+        id: pmd_csv_blockers_apex
+        run: |
+          # rm -f .pmdCache
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}_blockers.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority $BLOCKING_SEVERITY
+
+      - name: 'Run PMD scan to CSV - XML BLOCKERS'
+        id: pmd_csv_blockers_metadata
+        run: |
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}_blockers.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority $BLOCKING_SEVERITY --force-language xml --use-version xml-1.0
+
+      - name: Priority to Severity
+        id: priority_to_severity_blockers
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}_blockers.csv
+
+      - name: Read CSV - XML
+        id: csv_blockers_metadata
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./${{ steps.set_filename.outputs.filename }}_blockers.csv
+
+      - name: Create MD - XML
+        uses: petems/csv-to-md-table-action@master
+        id: csv_table_output-blockers-xml
+        with:
+          csvinput: ${{ steps.csv_blockers_metadata.outputs.content }}
+
+      - name: Step Table - XML
+        id: md_to_output_blockers_metadata
+        run: |
+          echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}"
+          echo "# Blockers in Pull Request" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Evaluate Blocker Violations
+        id: evaluate_violations_blocksers
+        run: |
+          csv_line_count=$(wc -l ${{ steps.set_filename.outputs.filename }}_blockers.csv|awk '{print $1}')
+          #echo $csv_line_count
+          violation_count=$((csv_line_count - 1))
+          echo "violation_count=$violation_count" >> $GITHUB_OUTPUT
+          echo "BLOCKING VIOLATIONS FOUND:" $violation_count  # Print to console
+          if [[ $violation_count > 0 ]]; then
+           VIOLATION_STRING="$violation_count Blocker Violations Detected"
+           echo "::error::$VIOLATION_STRING"
+           exit 1
+          elif [[ $violation_count == 0 ]]; then
+           echo "::notice::No Blocking Violations Detected"
+          fi
+
+      - name: Read CSV - XML
+        id: csv_metadata
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./${{ steps.set_filename.outputs.filename }}.csv
+      - name: Create MD - XML
+        uses: petems/csv-to-md-table-action@master
+        id: csv_table_output-xml
+        with:
+          csvinput: ${{ steps.csv_metadata.outputs.content }}
+
+      - name: Step Table - XML
+        id: md_to_output_metadata
+        run: |
+          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}"
+          echo "# All Violations in Pull Request" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv_table_output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
