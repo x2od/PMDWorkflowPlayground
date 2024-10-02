@@ -93,7 +93,7 @@ jobs:
 
       - name: Priority to Severity
         id: priority_to_severity_all
-        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
+        run: sed -i 's|"Priority"|"Severity"|g' pmd-xml.csv
 
       - name: Read CSV - XML
         id: csv_metadata
