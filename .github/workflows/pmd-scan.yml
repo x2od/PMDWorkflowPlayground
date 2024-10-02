@@ -30,7 +30,7 @@ jobs:
         id: pmd-action
         uses: pmd/pmd-github-action@v2
         with:
-          rulesets: 'config/pmd/ruleset.xml'
+          rulesets: 'config/dtc_pmd_ruleset.xml'
           analyzeModifiedFilesOnly: true
           createGitHubAnnotations: true
           uploadSarifReport: false

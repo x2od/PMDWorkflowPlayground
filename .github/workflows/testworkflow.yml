@@ -46,7 +46,7 @@ jobs:
       - name: 'Run PMD scan to CSV - APEX'
         id: pmd_csv
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
+          ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
 
       - name: Read CSV - APEX
         id: csv_code
@@ -70,7 +70,7 @@ jobs:
       # - name: 'Run PMD scan to CSV - VF'
       #   id: pmd_csv_vf
       #   run: |
-      #     ~/pmd/bin/pmd check --dir src/pages --dir src/components --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-vf.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language visualforce
+      #     ~/pmd/bin/pmd check --dir src/pages --dir src/components --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-vf.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language visualforce
 
       # - name: Read CSV - VF
       #   id: csv_code_vf
@@ -93,7 +93,7 @@ jobs:
       - name: 'Run PMD scan to CSV - XML'
         id: pmd_csv_xml
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-xml.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
+          ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-xml.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml
 
       - name: Read CSV - XML
         id: csv_xml
@@ -117,7 +117,7 @@ jobs:
       - name: 'Run PMD scan to HTML - APEX'
         id: pmd_html_code
         run: |
-          ~/pmd/bin/pmd check --dir src/classes --dir src/triggers --rulesets config/pmd/ruleset.xml --format html --cache .pmdCache --report-file pmd-apex.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --relativize-paths-with src
+          ~/pmd/bin/pmd check --dir src/classes --dir src/triggers --rulesets config/dtc_pmd_ruleset.xml --format html --cache .pmdCache --report-file pmd-apex.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --relativize-paths-with src
           sed -i 's|<title>PMD</title>||g' pmd-apex.html
           sed -i 's|<table |<table width="100%" |g' pmd-apex.html
           sed -i 's|<h3>PMD report</h3>|<h3>Apex report</h3>|g' pmd-apex.html
@@ -126,7 +126,7 @@ jobs:
       - name: 'Run PMD scan to HTML - VF'
         id: pmd_html_vf
         run: |
-          ~/pmd/bin/pmd check --dir src/pages --rulesets config/pmd/ruleset.xml --format html --cache .pmdCache --report-file pmd-vf.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --relativize-paths-with src
+          ~/pmd/bin/pmd check --dir src/pages --rulesets config/dtc_pmd_ruleset.xml --format html --cache .pmdCache --report-file pmd-vf.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --relativize-paths-with src
           sed -i 's|<title>PMD</title>||g' pmd-vf.html
           sed -i 's|<h3>PMD report</h3>|<h3>VF report</h3>|g' pmd-vf.html
           sed -i 's|<table |<table width="100%" |g' pmd-vf.html
@@ -135,7 +135,7 @@ jobs:
       - name: 'Run PMD scan to HTML - XML'
         id: pmd_html_xml
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format html --cache .pmdCache --report-file pmd-xml.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --force-language xml --relativize-paths-with src
+          ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format html --cache .pmdCache --report-file pmd-xml.html --show-suppressed --no-fail-on-violation --no-fail-on-error --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --ignore-list config/pmd/ignore.txt --minimum-priority 2 --no-progress --force-language xml --relativize-paths-with src
           sed -i 's|<title>PMD</title>||g' pmd-xml.html
           sed -i 's|<table |<table width="100%" |g' pmd-xml.html
           sed -i 's|<h3>PMD report</h3>|<h3>XML report</h3>|g' pmd-xml.html

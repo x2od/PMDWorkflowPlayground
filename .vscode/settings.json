@@ -9,7 +9,7 @@
 	"apexPMD.enableCache": true,
 	"apexPMD.rulesets": [
 		"config/pmd/xml.xml",
-		"config/pmd/ruleset.xml"
+		"config/dtc_pmd_ruleset.xml"
 	],
 	"apexPMD.priorityErrorThreshold": 2,
 	"apexPMD.priorityWarnThreshold": 3,
@@ -34,5 +34,5 @@
 		"editor.formatOnSave": false
 	},
 	"git.autofetch": true,
-	"codeAnalyzer.pMD.customConfigFile": "config/pmd/ruleset.xml"
+	"codeAnalyzer.pMD.customConfigFile": "config/dtc_pmd_ruleset.xml"
 }
