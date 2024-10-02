@@ -91,6 +91,10 @@ jobs:
         run: |
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-xml.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority 2 --force-language xml --use-version xml-1.0 --verbose
 
+      - name: Priority to Severity
+        id: priority_to_severity_all
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
+
       - name: Read CSV - XML
         id: csv_metadata
         uses: juliangruber/read-file-action@v1
@@ -106,5 +110,29 @@ jobs:
       - name: Step Table - XML
         id: md_to_output_metadata
         run: |
-          echo "${{steps.csv-table-output-xml.outputs.markdown-table}}"
+          # echo "${{steps.csv-table-output-xml.outputs.markdown-table}}"
+          echo "# BLOCKERS" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv-table-output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Evaluate XML Violations (which includes Apex)
+        id: evaluate_violations_all
+        run: |
+          csv_line_count=$(wc -l ${{ steps.set_filename.outputs.filename }}.csv|awk '{print $1}')
+          #echo $csv_line_count
+          violation_count=$((csv_line_count - 1))
+          echo "violation_count=$violation_count" >> $GITHUB_OUTPUT
+          echo "VIOLATIONS FOUND:" $violation_count  # Print to console
+           if [[ $violation_count > 0 ]]; then
+             VIOLATION_STRING="$violation_count Scanning Violations Detected (all severities) - download CSV to check"
+             echo "::error::$VIOLATION_STRING"
+           elif [[ $violation_count == 0 ]]; then
+             echo "::notice::No Scanning Violations Detected"
+           fi
+
+      - name: Upload all violations file in CSV format
+        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{ steps.set_filename.outputs.filename }}.csv
+          name: ${{ steps.set_filename.outputs.filename }}_PMD
+          compression-level: 0
