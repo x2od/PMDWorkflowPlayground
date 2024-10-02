@@ -136,33 +136,8 @@ jobs:
         id: md_to_output_blockers_metadata
         run: |
           echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}"
-          echo "# Blockers in Pull Request" >> $GITHUB_STEP_SUMMARY
+          echo "# Blockers in Changed Files" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
-
-      ############# SARIF SCANS
-      - name: 'Run PMD scan to SARIF - APEX'
-        id: pmd_sarif
-        run: |
-          rm -f .pmdCache
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report-apex.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority $blocking_severity
-
-      - name: Upload violations file in SARIF format
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: pmd-cli-report-apex.sarif
-          category: PMD_code
-
-      # Run PMD scan - XML
-      - name: 'Run PMD scan to SARIF - XML'
-        id: pmd_sarif_xml
-        run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report-xml.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority $blocking_severity --force-language xml
-
-      - name: Upload violations file in SARIF format
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: pmd-cli-report-xml.sarif
-          category: PMD_xml
 
       ########## RESCAN FOR BLOCKING VIOLATIONS
       # For future: better to parse existing CSV
@@ -206,7 +181,6 @@ jobs:
           echo "blocking_severity " $blocking_severity
           block_sev=$(($blocking_severity))
           echo "block_sev " $block_sev
-          #echo '"File,Severity,Line,Description,Rule"' > ${{ steps.set_filename.outputs.filename }}_nonsevere.csv
           awk -F '","'  'BEGIN {OFS=","} { if (($2 > 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> ${{ steps.set_filename.outputs.filename }}_nonsevere.csv
 
       - name: Read CSV - XML NS
@@ -224,11 +198,38 @@ jobs:
         id: md_to_output_metadata
         run: |
           echo "${{steps.csv_table_output_ns.outputs.markdown-table}}"
-          echo "# Other Violations in Pull Request" >> $GITHUB_STEP_SUMMARY
+          echo "# Other Violations in Changed Files" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv_table_output_ns.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
+      ############# SARIF SCANS
+      - name: 'Run PMD scan to SARIF - APEX'
+        id: pmd_sarif
+        run: |
+          rm -f .pmdCache
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report-apex.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority $blocking_severity
+
+      - name: Upload violations file in SARIF format
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pmd-cli-report-apex.sarif
+          category: PMD_code
+
+      # Run PMD scan - XML
+      - name: 'Run PMD scan to SARIF - XML'
+        id: pmd_sarif_xml
+        run: |
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report-xml.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority $blocking_severity --force-language xml
+
+      - name: Upload violations file in SARIF format
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pmd-cli-report-xml.sarif
+          category: PMD_xml
+
+      ####### EVALUATE BLOCKER VIOLATION COUNT
+
       - name: Evaluate Blocker Violations
-        id: evaluate_violations_blocksers
+        id: evaluate_violations_blockers
         run: |
           csv_line_count=$(wc -l ${{ steps.set_filename.outputs.filename }}_blockers.csv|awk '{print $1}')
           #echo $csv_line_count
@@ -238,7 +239,10 @@ jobs:
           if [[ $violation_count > 0 ]]; then
            VIOLATION_STRING="$violation_count Blocker Violations Detected"
            echo "::error::$VIOLATION_STRING"
-           exit 1
           elif [[ $violation_count == 0 ]]; then
            echo "::notice::No Blocking Violations Detected"
           fi
+
+      - name: Check Blocker Count for Exit Code
+        if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
+        run: exit 1

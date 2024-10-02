@@ -325,7 +325,7 @@
         <allowDelete>true</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
-        <modifyAllRecords>false</modifyAllRecords>
+        <modifyAllRecords>true</modifyAllRecords>
         <object>CodeCoverage</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
@@ -334,7 +334,7 @@
         <allowDelete>true</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
-        <modifyAllRecords>false</modifyAllRecords>
+        <modifyAllRecords>true</modifyAllRecords>
         <object>DTCModule__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
@@ -387,7 +387,7 @@
     </tabSettings>
     <userPermissions>
         <enabled>true</enabled>
-        <name>ModifyAllData</name>
+        <name>ViewAllData</name>
     </userPermissions>
     <userPermissions>
         <enabled>true</enabled>
