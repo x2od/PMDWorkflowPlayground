@@ -5,7 +5,7 @@
  * @last modified on  : 10-27-2023
  * @last modified by  :
  **/
-public without sharing class FunctionalQueueHandler {
+public class FunctionalQueueHandler {
 	// Staged Properties
 	List<FunctionalQueue_Supported_Objects_By_App__mdt> functionalQueueSupportedObjectsSettings;
 
