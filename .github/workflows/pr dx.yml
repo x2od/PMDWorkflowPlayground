@@ -26,6 +26,10 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: 'Set Filename'
+        id: set_filename
+        run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> $GITHUB_OUTPUT
+
       # Install PMD
       - name: Install PMD
         id: pmd
@@ -102,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: pmd-all.csv
-          name: PMDViolations
+          name: ${{ steps.set_filename.outputs.filename }}\
           compression-level: 0
 
       ############################# BLOCKERS CHECK
