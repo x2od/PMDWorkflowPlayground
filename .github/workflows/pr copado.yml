@@ -110,7 +110,7 @@ jobs:
       - name: Step Table - XML
         id: md_to_output_metadata
         run: |
-          # echo "${{steps.csv-table-output-xml.outputs.markdown-table}}"
+          echo "${{steps.csv-table-output-xml.outputs.markdown-table}}"
           echo "# BLOCKERS" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv-table-output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
