@@ -168,7 +168,7 @@ jobs:
           block_sev=$(($blocking_severity))
           echo "block_sev " $block_sev
           head -n 1 ${{ steps.set_filename.outputs.filename }}.csv > pmd-other.csv
-          awk -F '","'  'BEGIN {OFS=","} { if (($2 <= 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-other.csv
+          awk -F '","'  'BEGIN {OFS=","} { if (($2 > 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-other.csv
           cat pmd-other.csv
 
       - name: Priority to Severity
@@ -193,9 +193,9 @@ jobs:
           csv_other_count=$(wc -l pmd-other.csv|awk '{print $1}')
           other_count=$((csv_other_count - 1))
           echo "other_count=$other_count" >> $GITHUB_OUTPUT
-          echo "OTHERS FOUND:" $other_count  # Print to console
+          echo "NON-BLOCKER FOUND:" $other_count  # Print to console
           if [[ $other_count > 0 ]]; then
-            echo "## Others in Changed Files" >> $GITHUB_STEP_SUMMARY
+            echo "## Non-Blockers in Changed Files" >> $GITHUB_STEP_SUMMARY
             echo "${{steps.csv-table-other.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
             #OTHER_STRING="$other_count Non-Blocking Violations Detected"
             #echo "::error::$OTHER_STRING"
