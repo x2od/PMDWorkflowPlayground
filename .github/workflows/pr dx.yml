@@ -40,15 +40,6 @@ jobs:
           fi
           rm -f .pmdCache
 
-      # - name: Collect changed files
-      #   env:
-      #     GH_TOKEN: ${{ github.token }}
-      #     BRANCH: ${{ github.head_ref }}
-      #   run: |
-      #     echo "Changed files for this PR:"
-      #     gh pr diff "$BRANCH" --name-only > list.txt
-      #     cat list.txt
-
       - name: Action to get changed files
         id: changed-files
         uses: tj-actions/changed-files@v45
@@ -85,7 +76,7 @@ jobs:
       - name: Run PMD scan to CSV - All violations
         id: pmd_csv_all
         run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property rule=false
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false
 
       - name: Evaluate All Violations
         id: evaluate_violations_all
@@ -105,6 +96,7 @@ jobs:
       - name: Priority to Severity
         id: priority_to_severity_all
         run: sed -i 's|"Priority"|"Severity"|g' pmd-all.csv
+
       - name: Upload all violations file in CSV format
         if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
         uses: actions/upload-artifact@v4
@@ -118,8 +110,7 @@ jobs:
       - name: Run PMD scan to CSV - Blockers
         id: pmd_csv_blockers
         run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-blockers.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false --minimum-priority 2
-          # --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-blockers.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --minimum-priority 2
 
       - name: Priority to Severity
         id: priority_to_severity_blockers
