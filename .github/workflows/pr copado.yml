@@ -135,6 +135,7 @@ jobs:
       - name: 'Run PMD scan to SARIF - APEX'
         id: pmd_sarif
         run: |
+          rm -f .pmdCache
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report-apex.sarif  --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority $BLOCKING_SEVERITY
 
       - name: Upload violations file in SARIF format
