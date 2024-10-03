@@ -72,26 +72,26 @@
 
 	<rule ref="category/apex/performance.xml/AvoidDebugStatements" message="Avoid debug statements since they impact performance.">
 		<priority>3</priority>
-		<!-- <properties>
+		<properties>
 			<property name="violationSuppressXPath">
 				<value><![CDATA[
-					//Method[descendant::ModifierNode/Annotation[@Image="IsTest"]]
+					//UserClass/ModifierNode[@Test=true()]
 				]]>
 			</value>
 			</property>
-		</properties> -->
+		</properties>
 	</rule>
 
 	<rule ref="category/apex/performance.xml/AvoidNonRestrictiveQueries">
 		<priority>3</priority>
-		<!-- <properties>
+		<properties>
 			<property name="violationSuppressXPath">
 				<value><![CDATA[
 							//UserClass/ModifierNode[@Test=true()]
 						]]>
 				</value>
 			</property>
-		</properties> -->
+		</properties>
 	</rule>
 
 	<rule ref="category/apex/performance.xml/EagerlyLoadedDescribeSObjectResult">
@@ -659,7 +659,7 @@
 		<priority>1</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //(PermissionSet | Profile)/userPermissions/name[text[@Text='ModifyAllData' or @Text='ViewAllData'] and ../enabled/text[@Text='true']] 	]]></value>
+				<value><![CDATA[ //(PermissionSet | Profile)/userPermissions/name[text[@Text=('ModifyAllData', 'ViewAllData')] and ../enabled/text[@Text='true']] 	]]></value>
 			</property>
 			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
 		</properties>
@@ -770,7 +770,7 @@
 		message="Add a description to explain custom metadata"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
 		<description>Provide a description for custom metadata</description>
-		<priority>5</priority>
+		<priority>2</priority>
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[ //(CustomField | CustomObject | CustomObject/fields)/fullName[text and ../count(description) = 0] ]]></value>
