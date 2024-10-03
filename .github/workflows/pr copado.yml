@@ -120,7 +120,7 @@ jobs:
           block_sev=$(($blocking_severity))
           echo "block_sev " $block_sev
           echo '"File","Severity","Line","Description","Rule"' > ${{ steps.set_filename.outputs.filename }}_blockers.csv
-          awk -F '","'  'BEGIN {OFS=","} { if (($2 <= 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> ${{ steps.set_filename.outputs.filename }}_blockers.csv
+          awk -v var="$blocking_severity" -F '","'  'BEGIN {OFS=","} { if (($2 <= var))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> ${{ steps.set_filename.outputs.filename }}_blockers.csv
 
       - name: Read CSV - XML BLOCKERS
         id: csv_blockers_metadata

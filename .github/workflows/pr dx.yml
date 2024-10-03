@@ -113,7 +113,7 @@ jobs:
           block_sev=$(($blocking_severity))
           echo "block_sev " $block_sev
           head -n 1 ${{ steps.set_filename.outputs.filename }}.csv > pmd-blockers.csv
-          awk -F '","'  'BEGIN {OFS=","} { if (($2 <= 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-blockers.csv
+          awk -v var="$blocking_severity" -F '","'  'BEGIN {OFS=","} { if (($2 <= var))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-blockers.csv
           cat pmd-blockers.csv
 
       - name: Read CSV - Blockers
@@ -153,7 +153,7 @@ jobs:
           block_sev=$(($blocking_severity))
           echo "block_sev " $block_sev
           #head -n 1 ${{ steps.set_filename.outputs.filename }}.csv > pmd-other.csv
-          awk -F '","'  'BEGIN {OFS=","} { if (($2 > 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-other.csv
+          awk -v var="$blocking_severity" -F '","'  'BEGIN {OFS=","} { if (($2 > var))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-other.csv
           cat pmd-other.csv
 
       - name: Priority to Severity
