@@ -770,7 +770,7 @@
 		message="Add a description to explain custom metadata"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
 		<description>Provide a description for custom metadata</description>
-		<priority>2</priority>
+		<priority>5</priority>
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[ //(CustomField | CustomObject | CustomObject/fields)/fullName[text and ../count(description) = 0] ]]></value>
