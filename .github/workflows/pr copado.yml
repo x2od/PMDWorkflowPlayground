@@ -176,12 +176,12 @@ jobs:
       #     echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       ######## XML ALL
-      - name: Remove Blockers from CSV
+      - name: Collect only non-blockers
         run: |
           echo "blocking_severity " $blocking_severity
           block_sev=$(($blocking_severity))
           echo "block_sev " $block_sev
-          awk -F '","'  'BEGIN {OFS=","} { if (($2 > 2))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> ${{ steps.set_filename.outputs.filename }}_nonsevere.csv
+          awk -v var="$blocking_severity" -F '","'  'BEGIN {OFS=","} { if (($2 > var ))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> ${{ steps.set_filename.outputs.filename }}_nonsevere.csv
 
       - name: Read CSV - XML NS
         id: csv_metadata
