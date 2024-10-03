@@ -53,7 +53,7 @@ jobs:
         id: pmd_csv
         run: |
           rm -f .pmdCache
-          ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --minimum-priority 2
+          ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --minimum-priority "${{ github.event.inputs.minimum_severity }}"
 
       - name: Priority to Severity
         run: sed -i 's|"Priority"|"Severity"|g' pmd-apex.csv
