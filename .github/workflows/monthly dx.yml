@@ -70,6 +70,26 @@ jobs:
             echo "::notice::No Violations Detected"
           fi
 
+      - name: Priority to Severity
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
+
+      - name: Read CSV
+        id: csv_code
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./${{ steps.set_filename.outputs.filename }}.csv
+
+      - name: Create MD
+        uses: petems/csv-to-md-table-action@master
+        id: csv_table_output_apex
+        with:
+          csvinput: ${{ steps.csv_code.outputs.content }}
+
+      - name: Show Table
+        run: |
+          echo "## All Violations" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv_table_output_apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
       - name: Upload all violations file in CSV format
         if: ${{ steps.evaluate_violations.outputs.violation_count > 0 }}
         uses: actions/upload-artifact@v4
