@@ -54,26 +54,24 @@ jobs:
         run: |
           rm -f .pmdCache
           ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --minimum-priority "${{ github.event.inputs.minimum_severity }}"
+          sed -i 's|"Priority"|"Severity"|g' pmd-apex.csv
 
-      - name: Priority to Severity
-        run: sed -i 's|"Priority"|"Severity"|g' pmd-apex.csv
+      # - name: Read CSV - APEX
+      #   id: csv_code
+      #   uses: juliangruber/read-file-action@v1
+      #   with:
+      #     path: ./pmd-apex.csv
 
-      - name: Read CSV - APEX
-        id: csv_code
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./pmd-apex.csv
+      # - name: Create MD - APEX
+      #   uses: petems/csv-to-md-table-action@master
+      #   id: csv_table_output_apex
+      #   with:
+      #     csvinput: ${{ steps.csv_code.outputs.content }}
 
-      - name: Create MD - APEX
-        uses: petems/csv-to-md-table-action@master
-        id: csv_table_output_apex
-        with:
-          csvinput: ${{ steps.csv_code.outputs.content }}
-
-      - name: Step Table - APEX
-        run: |
-          echo "# CSV - APEX" >> $GITHUB_STEP_SUMMARY
-          echo "${{steps.csv_table_output_apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+      # - name: Step Table - APEX
+      #   run: |
+      #     echo "# CSV - APEX" >> $GITHUB_STEP_SUMMARY
+      #     echo "${{steps.csv_table_output_apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       ########### CSV - XML
 
@@ -85,22 +83,22 @@ jobs:
       - name: Priority to Severity
         run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
 
-      - name: Read CSV - XML
-        id: csv_xml
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./${{ steps.set_filename.outputs.filename }}.csv
+      # - name: Read CSV - XML
+      #   id: csv_xml
+      #   uses: juliangruber/read-file-action@v1
+      #   with:
+      #     path: ./${{ steps.set_filename.outputs.filename }}.csv
 
-      - name: Create MD - XML
-        uses: petems/csv-to-md-table-action@master
-        id: csv_table_output_xml
-        with:
-          csvinput: ${{ steps.csv_xml.outputs.content }}
+      # - name: Create MD - XML
+      #   uses: petems/csv-to-md-table-action@master
+      #   id: csv_table_output_xml
+      #   with:
+      #     csvinput: ${{ steps.csv_xml.outputs.content }}
 
-      - name: Step Table - XML
-        run: |
-          echo "## CSV - XML" >> $GITHUB_STEP_SUMMARY
-          echo "${{steps.csv_table_output_xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+      # - name: Step Table - XML
+      #   run: |
+      #     echo "## CSV - XML" >> $GITHUB_STEP_SUMMARY
+      #     echo "${{steps.csv_table_output_xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - name: Evaluate XML Violations (which includes Apex)
         id: evaluate_violations_all
