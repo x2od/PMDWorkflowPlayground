@@ -48,11 +48,11 @@ jobs:
             mv ~/pmd-bin-$PMD_VERSION ~/pmd
             ~/pmd/bin/pmd --version
           fi
-          rm -f .pmdCache
 
       - name: 'Run PMD scan to CSV - All violations'
         id: pmd_csv_all
         run: |
+          rm -f .pmdCache 
           ~/pmd/bin/pmd check --dir . --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --minimum-priority "${{ github.event.inputs.minimum_severity }}"
 
       - name: Evaluate Errrors

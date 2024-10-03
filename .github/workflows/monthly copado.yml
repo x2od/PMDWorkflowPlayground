@@ -1,5 +1,5 @@
 # Unique name for this workflow
-name: Repository Scan (Copado)
+name: Repository Scan (metadata)
 
 run-name: Repository manual scan by @${{ github.actor }}
 
@@ -55,6 +55,9 @@ jobs:
           rm -f .pmdCache
           ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --minimum-priority 2
 
+      - name: Priority to Severity
+        run: sed -i 's|"Priority"|"Severity"|g' pmd-apex.csv
+
       - name: Read CSV - APEX
         id: csv_code
         uses: juliangruber/read-file-action@v1
@@ -63,16 +66,14 @@ jobs:
 
       - name: Create MD - APEX
         uses: petems/csv-to-md-table-action@master
-        id: csv-table-output-apex
+        id: csv_table_output_apex
         with:
           csvinput: ${{ steps.csv_code.outputs.content }}
 
       - name: Step Table - APEX
-        id: md_to_output
         run: |
-          # echo "${{steps.csv-table-output-apex.outputs.markdown-table}}"
           echo "# CSV - APEX" >> $GITHUB_STEP_SUMMARY
-          echo "${{steps.csv-table-output-apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv_table_output_apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       ########### CSV - XML
 
@@ -80,6 +81,9 @@ jobs:
         id: pmd_csv_xml
         run: |
           ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --minimum-priority "${{ github.event.inputs.minimum_severity }}" --force-language xml
+
+      - name: Priority to Severity
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
 
       - name: Read CSV - XML
         id: csv_xml
@@ -89,15 +93,14 @@ jobs:
 
       - name: Create MD - XML
         uses: petems/csv-to-md-table-action@master
-        id: csv-table-output-xml
+        id: csv_table_output_xml
         with:
           csvinput: ${{ steps.csv_xml.outputs.content }}
 
       - name: Step Table - XML
-        id: md_to_output_xml
         run: |
           echo "## CSV - XML" >> $GITHUB_STEP_SUMMARY
-          echo "${{steps.csv-table-output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv_table_output_xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - name: Evaluate XML Violations (which includes Apex)
         id: evaluate_violations_all
@@ -113,10 +116,6 @@ jobs:
            elif [[ $violation_count == 0 ]]; then
              echo "::notice::No Scanning Violations Detected"
            fi
-
-      - name: Priority to Severity
-        id: priority_to_severity_all
-        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
 
       - name: Upload all violations file in CSV format
         if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
