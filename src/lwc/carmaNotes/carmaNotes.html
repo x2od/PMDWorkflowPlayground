@@ -1,0 +1,60 @@
+<template>       
+   <lightning-card title={titleWithCount} icon-name="custom:custom83">
+       <lightning-button label="New CARMA Notes" slot="actions" onclick={createNew}></lightning-button>
+       <div class="slds-m-around_medium">   
+           <div if:true={listRecords}>   
+               <template for:each={listRecords} for:item="rec">    
+                   <div key={rec.Id} class="slds-box">                         
+                       <lightning-record-view-form record-id={rec.Id} object-api-name={objectName}>
+                        <div  class="slds-grid">
+                           <div class="display: grid; slds-col slds-size_1-of-2">
+                              <a  onclick={openCarmaNotes} data-value={rec.Id} tabindex="0" class="flex-wrap-ie11 slds-truncate">
+                                 <slot>
+                                    <slot><span data-value={rec.Id} >{rec.Name}</span></slot>
+                                 </slot>
+                              </a>
+                          </div>
+                            <div class="slds-col slds-size_2-of-2">                                
+                            </div>                                                         
+                        </div>
+                        
+                        <template if:true={rec.Cancellation_Status__c}>
+                            <div class="slds-grid">
+                                <div class="slds-col slds-size_1-of-2">
+                                    <label for="cancellationStatus">Cancellation Status:</label>
+                                </div>
+                                <div class="slds-col slds-size_2-of-2">
+                                    <lightning-output-field variant="label-hidden" field-name="Cancellation_Status__c"></lightning-output-field>
+                                </div>                               
+                            </div>                        
+                        </template>
+
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_1-of-2">
+                                <label for="createdDate">Created Date/Created By:</label>
+                            </div>
+                            <div class="slds-col slds-size_2-of-2">
+                                <lightning-output-field variant="label-hidden" field-name="CreatedDate"></lightning-output-field>
+                                   {rec.CreatedBy.Name}
+                            </div>                               
+                        </div>
+                        <div class="slds-grid wrapped-content">
+                            <div class="slds-col slds-size_1-of-2 ">
+                                <label for="summary">Summary:</label>
+                            </div>
+                            <div class="slds-col slds-size_2-of-2 wrapped-content">
+                                <lightning-output-field class="wrapped-content" variant="label-hidden" field-name="Note__c"></lightning-output-field>
+                            </div>                               
+                        </div>
+                       </lightning-record-view-form><br/><br/>
+                   </div>                       
+               </template>   
+           </div>   
+       </div>   
+   </lightning-card>
+   
+   <template if:true={isModalVisible}>
+        <c-carma-notes-popup record-id={recordId} onnotesadded={handleGridUpdate} onclose={handleModalClose} onsubmit={handleModalSubmit}>
+        </c-carma-notes-popup>
+    </template>
+</template>

@@ -24,7 +24,7 @@ jobs:
       contents: read # for actions/checkout to fetch code
     outputs:
       filename: ${{ steps.set_filename.outputs.filename }}
-      violation_count: ${{ steps.evaluate_errors.outputs.violation_count }}
+      violation_count: ${{ steps.evaluate_violations_all.outputs.violation_count }}
     runs-on: ubuntu-latest
 
     steps:
