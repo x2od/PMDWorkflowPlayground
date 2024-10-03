@@ -11,7 +11,7 @@
 	<exclude-pattern>.*/doc.*/.*</exclude-pattern>
 
 	<!-- Custom Objects / Fields Rules -->
-	<!-- <rule
+	<rule
 		name="NoUnderscoresInFieldNames"
 		language="xml"
 		message="Custom fields should not contain underscores."
@@ -25,5 +25,5 @@
 					]]></value>
 			</property>
 		</properties>
-	</rule> -->
+	</rule>
 </ruleset>
