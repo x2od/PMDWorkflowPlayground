@@ -1,5 +1,5 @@
 # Unique name for this workflow
-name: On PR (metadata format)
+name: Pull Request Scan (metadata)
 
 on:
   pull_request:
@@ -91,7 +91,7 @@ jobs:
         id: priority_to_severity_all
         run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
 
-      - name: Evaluate XML Violations (which includes Apex)
+      - name: Evaluate All Violations (which includes Apex and XML)
         id: evaluate_violations_all
         run: |
           csv_line_count=$(wc -l ${{ steps.set_filename.outputs.filename }}.csv|awk '{print $1}')
