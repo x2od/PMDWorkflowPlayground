@@ -1,0 +1,301 @@
+<template>
+
+    <template if:true={showSpinner}>
+    <lightning-spinner
+        alternative-text="Loading"
+        size="medium"
+    ></lightning-spinner>
+    </template>
+
+    <lightning-card>
+        <div class="slds-box slds-m-around--small slds-theme--default">
+
+            <lightning-record-edit-form
+            record-id={recordId}
+            object-api-name="Contact"
+            >
+
+            <lightning-messages></lightning-messages>
+
+            <div class="slds-text-heading_small">Contact Search</div>
+            
+         
+            <div class="slds-box slds-box_xxx-small slds-theme_info slds-m-top_x-small">
+                <lightning-icon
+                class="slds-float_left slds-m-top_xxx-small slds-m-right_small"
+                icon-name="utility:info"
+                variant="inverse"
+                size="xx-small"
+                ></lightning-icon>
+                <!-- TODO: custom labels -->
+                <p>{searchInfo}</p>
+                <!-- <p>{searchInfoLineTwo}</p> -->
+            </div>
+            <!-- <template if:true={showSearchCriteria}> -->
+                <div class="slds-box slds-m-around--medium slds-theme_default">
+                    <div class="slds-text-heading_small">Search Criteria</div>
+                    <div class="slds-form slds-grid slds-wrap">
+                        <lightning-input-field class="slds-size_1-of-2 slds-p-right--medium" field-name="FirstName"
+                            onchange={firstNameChange}></lightning-input-field>
+
+                        <lightning-input-field field-name="LastName" onchange={lastNameChange}
+                            class="slds-size_1-of-2"></lightning-input-field>
+                            <lightning-input class="slds-size_1-of-2 slds-p-left--xx-small slds-p-right--xx-small" type="date" date-style="short" value={dobInput}
+                            data-id="birthdate" message-when-bad-input="Date Format: MM/DD/YYYY" label="Birthdate"
+                            onkeydown={dobChange} onchange={dobChange} onkeyup={dobChange}>
+                        </lightning-input>
+                            <lightning-input class="slds-size_1-of-2 slds-p-left--xx-small slds-p-right--xx-small" min-length=11 max-length=11
+                            label="SSN" value={setSSN} data-id="ssn" message-when-too-short="SSN Format: XXX-XX-XXXX"
+                            message-when-bad-input="SSN Format: XXX-XX-XXXX" onchange={SSNcheck} onkeyup={SSNcheck}
+                            onclick={SSNclicked}> </lightning-input>
+                        
+                        <lightning-input-field class="slds-size_1-of-2" field-name="MiddleName" onchange={fieldCheck}></lightning-input-field>
+
+                        <lightning-input-field class="slds-size_1-of-2" field-name="Phone"
+                        onchange={phoneChange}></lightning-input-field>
+                        <div class="slds-col slds-size_1-of-2 slds-p-left--xx-small">
+
+                        
+                            <div class="slds-grid slds-p-bottom_xxx-small">
+                                <div class="slds-col slds-size_1-of-3">
+                                    <div class="slds-float_left">
+                                        <div class="slds-grid">
+                                            <div class="slds-col">
+                                                <div class="slds-text-body_small">Email
+                                                    <span style="position:relative; top:-3px; left:3px;">   <lightning-helptext
+                                                    content="Salesforce search only."></lightning-helptext></span>
+                                                 
+
+                                                </div>
+                                          
+                                            </div>
+                                            <!-- custom css -->
+                                            <!-- <div class="slds-col slds-p-left_xx-small">
+
+                                                <lightning-helptext class="helpIcon"
+                                                    content="Salesforce search only."></lightning-helptext>
+
+
+                                            </div> -->
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            
+
+
+                            </div>
+
+                            <lightning-input label="Email" class="slds-p-right--xx-small"
+                            onchange={emailChange} data-inputuid="email" value={emailTrimmed} type="email"
+                            variant="label-hidden"></lightning-input>
+                        <lightning-input-field field-name="Email" class="slds-hide"
+                            data-uid="email"></lightning-input-field>
+                </div>
+
+                    
+
+                      
+                        <lightning-input-field class="slds-size_1-of-2" 
+                            field-name="MailingPostalCode" onchange={fieldCheck}></lightning-input-field>
+                    </div>
+                    
+           
+                    <template if:true={showAdditional}>
+
+                        <div class="slds-box slds-m-around--small slds-theme_default">
+                            <lightning-accordion class="slds-theme_shade" allow-multiple-sections-open
+                                onsectiontoggle={handleToggleSection} active-section-name={activeSections}>
+                                <lightning-accordion-section name="Additional Traits Search"
+                                    label="Additional Traits Search">
+                                    <!-- <lightning-card> -->
+                                    <!-- <lightning-record-edit-form> TODO: only ops and ocr-->
+                                    <!-- <div class="slds-text-heading_small">Additional Traits Search</div> -->
+                                    <div class="
+                                        slds-box slds-box_xxx-small
+                                        slds-theme_info
+                                        ">
+                                        <lightning-icon class="slds-float_left slds-m-top_xxx-small slds-m-right_small"
+                                            icon-name="utility:info" variant="inverse" size="xx-small"></lightning-icon>
+                                        <!-- TODO: make custom label? -->
+                                        <p>Please add any additional search criteria below to enhance the Search</p>
+                                    </div>
+                                    <div class="slds-grid">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <!-- person-type-field -->
+                                            <!-- Middle name, gender, mther maiden name, home phone, street, city, state, zip, birth city, birth state -->
+                                            <!-- <lightning-input type="date" date-style="short" value={dobInput} data-id="birthdateAdditional" 
+                            message-when-bad-input="Date Format: MM/DD/YYYY" label="Birthdate" onkeydown={fieldCheck}
+                          onkeyup={dobChange}>
+                           </lightning-input>
+                           <lightning-input min-length=11 max-length=11 label="SSN" value={setSSN} data-id="ssn"
+                           message-when-too-short="SSN Format: XXX-XX-XXXX" message-when-bad-input="SSN Format: XXX-XX-XXXX"
+                           onchange={SSNcheck} onkeyup={SSNcheck} onclick={SSNclicked}> </lightning-input> -->
+                                            <lightning-input-field field-name="Views_Gender__c"></lightning-input-field>
+                                            <lightning-input type='text' class="slds-p-right_xx-small slds-p-left_xx-small" label="Mother's Maiden Name" onblur={handleMaidenName}
+                                            value={maidenName}></lightning-input>
+
+                                            <lightning-input-field field-name="HomePhone"
+                                                onchange={homePhoneChange}></lightning-input-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <lightning-input  class="slds-p-left_xx-small" type='text' label="Birth City" onblur={handleBirthCity} value={birthCity}>
+                                            </lightning-input>
+                                            <lightning-combobox class="slds-p-top_x-small slds-p-left_xx-small" name="birthStatePicklist" placeholder="--None--" label="Birth State"
+                                              value={birthState} options={birthStateOptions} onchange={handleBirthState}>
+                                            </lightning-combobox>
+                                            <lightning-input-field field-name="MailingStreet"></lightning-input-field>
+                                            <lightning-input-field field-name="MailingCity"></lightning-input-field>
+                                            <lightning-input-field field-name="MailingState"></lightning-input-field>
+
+                                        </div>
+                                    </div>
+                                    <!-- </lightning-record-edit-form> -->
+                                    <!-- </lightning-card> -->
+
+                                </lightning-accordion-section>
+                            </lightning-accordion>
+                        </div>
+                    </template>
+                    <!-- <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field
+                                            field-name="Birthdate"
+                                            onchange={DOBchange}
+                                        ></lightning-input-field>
+                                    </div> -->
+
+                    <!-- <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field
+                                            field-name="SSN__c"
+                                            onchange={SSNcheck}
+                                        ></lightning-input-field>
+                                        <template if:true={SSNerror}>
+                                            <div
+                                                class="slds-text-body_small slds-text-color_error"
+                                            >
+                                                Please enter a valid SSN.
+                                            </div>
+                                        </template>
+                                    </div> -->
+                <!-- </div> -->
+
+                <lightning-button
+                    class="slds-m-around_xx-small"
+                    label="Search"
+                    variant="brand"
+                    onclick={handleSearch}
+                    disabled={disableSearch}
+                ></lightning-button>
+                <!-- <lightning-button
+                    class="slds-m-around_xx-small"
+                    label="Search Appeals"
+                    onclick={handleSearch}
+                    disabled="true"
+                ></lightning-button> -->
+                <lightning-button
+                    class="slds-m-around_xx-small"
+                    label="Clear"
+                    onclick={handleClear}
+                ></lightning-button>
+                <lightning-button
+                    class="slds-m-around_xx-small"
+                    label="Create New Contact"
+                    onclick={handleNewContactButton}
+                    disabled={disableNewContact}
+                ></lightning-button>
+                
+                </div>
+
+                <!-- use event on edipi search form to send back to here
+        
+
+    const custEvt = new CustomEvent("mseover", {
+        composed: true,
+        bubbles: true,
+        cancelable: true,
+        detail: {
+            contact: contact,
+            left: event.clientX,
+            top: 400, //event.clientY
+        },
+        });
+        this.dispatchEvent(custEvt);
+    }-->
+            <c-whva-hotline-e-d-i-p-i-search-form oncleardata={handleClearEDIPI} onsenddata={receivedEDIPIdata} isveteran=false isocrmember={isOCRMember} isanon={isAnon} relationshiptype={relationshipType} ></c-whva-hotline-e-d-i-p-i-search-form>
+            <!-- </template> -->
+            </lightning-record-edit-form>
+        </div>
+        <div class="slds-hide">
+            <lightning-record-edit-form record-id={recordId} object-api-name="VACX_Case__c">
+                <!-- this is used to map the value from the Caller Type picklist to the lookup for Veterans -->
+      
+                <lightning-input-field field-name="VACX_Caller_Type__c" value={personTypeField}>
+                </lightning-input-field>
+      
+                <lightning-input-field field-name="VACX_Anonymous__c" value={anonymousCheckbox}></lightning-input-field>
+              </lightning-record-edit-form>
+        </div>
+    </lightning-card>
+     
+    <div class="slds-p-left_medium">
+        <template if:true={showMPIError}>
+        {errorMessage}
+        </template>
+    </div>
+    <template if:true={showResultsTable}>
+        <template if:false={exactMatch}>
+
+            <div class="slds-box slds-box_xxx-small slds-theme_warning slds-m-around_x-small">
+                <lightning-icon
+                class="slds-float_left slds-m-top_xxx-small slds-m-right_small"
+                icon-name="utility:warning"
+                variant="inverse"
+                size="xx-small"
+                ></lightning-icon>
+                <!-- TODO: custom labels -->
+                <p>{exactMatchLabel}</p>
+            </div>
+        </template>
+        <div style="height: 300px;">
+            <!-- use a custom data table with a custom case cell to display the hover on cases, otherwise, just use lighting-datatable with same attributes -->
+            <c-vacx-data-table
+                    class="slds-table_header-fixed_container slds-scrollable_x slds-border_top"
+                    key-field="RecordTypeName"
+                    data={searchResults}
+                    columns={columns}
+                    onrowaction={handleRowAction}
+                    onmseover={handleMouseOver}
+                    onmseout={handleMouseOut}
+                    hide-checkbox-column="true"
+                    >
+                    <!-- column-widths-mode="auto" -->
+                </c-vacx-data-table>
+        </div>
+        <c-whva-hotline-case-popover
+        show={showPopover}
+        topmargin={top}
+        leftmargin={left}
+        selectedcase={selectedCase}
+    ></c-whva-hotline-case-popover>
+    </template>
+    <div class="slds-p-left_medium">
+        <template if:true={noResults}>
+        {errorMessage}
+        </template>
+    </div>
+    <!-- can just reuse results on all componets...? started a refactor, change onsenddata to handleSearchEDIPI -->
+    <!-- <template if:true={showTable}>
+  
+      <c-whva-hotline-person-results results={data}></c-whva-hotline-person-results>
+      </template> -->
+  
+    <!-- <template if:true={selectStep}>
+   <c-whva-hotline-person-results ></c-whva-hotline-person-results>
+      </template> -->
+  
+    <!-- 
+          <c-whva-hotline-contact-cell oncontactselect={contactSelection}></c-whva-hotline-contact-cell> -->
+  </template>
+<!-- one - this be the parent and on a certail value, switch WHVATestContactSearchTemplates, or we just use a tempalte variable and render
+    based on that  -->

@@ -1,0 +1,318 @@
+<template>
+  <template if:true={showSpinner}>
+    <lightning-spinner
+        alternative-text="Loading"
+        size="medium"
+    ></lightning-spinner>
+    </template>
+
+    <lightning-card>
+        <div class="slds-box slds-var-m-around_small slds-theme_default">
+          <lightning-record-edit-form
+            object-api-name="Contact"
+            onsubmit={handleSubmit}
+            onerror={handleError}
+            onsuccess={handleSuccess}
+            onload={onVerifyLoad}
+            record-id={searchResultId}
+          >
+            <lightning-messages> </lightning-messages>
+            <div class="slds-text-heading_small">Contact Verification</div>
+            <!-- infor text and box -->
+            <div
+              class="
+                slds-box slds-box_xxx-small
+                slds-theme_info
+                slds-var-m-vertical_x-small
+              "
+            >
+              <lightning-icon
+                class="
+                  slds-float_left
+                  slds-var-m-top_xxx-small
+                  slds-var-m-right_small
+                "
+                icon-name="utility:info"
+                variant="inverse"
+                size="xx-small"
+              ></lightning-icon>
+              <p>{searchInfo}</p>
+            </div>
+
+            <template lwc:if={mohField}>
+              <div class="
+                      slds-box slds-box_xxx-small
+                      slds-theme_info
+                      slds-var-m-vertical_x-small
+                    ">
+                <lightning-icon class="
+                        slds-float_left
+                        slds-var-m-top_xxx-small
+                        slds-var-m-right_small
+                      " icon-name="utility:info" variant="inverse" size="xx-small"></lightning-icon>
+                <p><span style="font-size:14px"><strong>{MOHContact}</strong></span></p>
+              </div>
+            </template>
+            <lightning-input-field
+              field-name="Views_Unverified_Information__c"
+              value={unverifiedCheckbox}
+              class="slds-hide"
+            >
+            </lightning-input-field>
+            <template if:true={showVAPSpinner}>
+              <lightning-spinner
+                class="spins"
+                variant="base"
+                data-text="Retrieving your data..."
+                alternative-text="Loading"
+                size="medium"
+              ></lightning-spinner>
+            </template>
+    
+            <div class="slds-grid">
+              <div class="slds-col slds-size_1-of-3">
+                <!-- <div class="slds-text-body_small">Person Type:</div>
+                            <lightning-input-field
+                                field-name="RecordTypeId"
+                                variant="label-hidden"
+                                disabled="true"
+                            ></lightning-input-field>
+                        </div> -->
+              </div>
+            </div>
+            <!-- Contasct Informaiton -->
+    
+            <div class="slds-grid slds-var-p-bottom_small">
+              <div class="slds-col slds-size_1-of-3">
+                <lightning-input-field
+                  class="slds-hide"
+                  field-name="Relationship_Type__c"
+                  value={relationshipType}
+                ></lightning-input-field>
+                <lightning-input-field
+                  class="slds-hide"
+                  field-name="Caller_Type__c"
+                  value={callerTypeforPATSR}
+                >
+                </lightning-input-field>
+                <lightning-input-field
+                  class="slds-hide"
+                  field-name="RecordTypeId"
+                  data-id="RecordTypeId"
+                  value={recordtype}
+                >
+                </lightning-input-field>
+                <lightning-input-field
+                class="slds-hide"
+                field-name="WH_VA_Hotline_Special_Instructions__c"
+                data-id="specialInstructions"
+              >
+              </lightning-input-field>
+                <div
+                  class="
+                    slds-text-body_small
+                    slds-var-p-bottom_xx-small slds-var-p-bottom_xx-small
+                  "
+                >
+                  Person Type:
+                </div>
+                <lightning-input-field
+                  class="slds-var-p-bottom_xx-small"
+                  field-name="RecordTypeId"
+                  variant="label-hidden"
+                  disabled="true"
+                ></lightning-input-field>
+    
+                <lightning-input-field
+                  field-name="FirstName"
+                  disabled={disableVerified}
+                
+                >
+                </lightning-input-field>
+                <lightning-input-field
+                  field-name="MiddleName"
+                  disabled={disableVerified}
+                  value={middlename}
+                >
+                </lightning-input-field>
+                <lightning-input-field
+                  field-name="LastName"
+                  disabled={disableVerified}
+                  value={lastname}
+                >
+                </lightning-input-field>
+                <lightning-input-field
+                  field-name="Views_Suffix__c"
+                  disabled={disableVerified}
+                ></lightning-input-field>
+                <lightning-input-field
+                  field-name="Views_Gender__c"
+                  disabled={disableVerified}
+                  value={gender}
+                >
+                </lightning-input-field>
+              </div>
+    
+              <div class="slds-col slds-size_1-of-3">
+                <lightning-input-field
+                  field-name="SSN__c"
+                  onchange={SSNcheck}
+                  disabled={disableVerified}
+                  value={ssn}
+                  data-id="ssnV"
+                ></lightning-input-field>
+                <!-- might need similar one for DOB -->
+                <template if:true={SSNerror}>
+                  <div class="slds-text-body_small slds-text-color_error">
+                    Please enter a valid SSN.
+                  </div>
+                </template>
+                <lightning-input-field
+                  field-name="Phone"
+                  disabled={disableVerified}
+                ></lightning-input-field>
+                <lightning-input-field
+                  field-name="Secondary_Phone__c"
+                  disabled={disabled}
+                >
+                </lightning-input-field>
+                <!-- <lightning-input
+                  label="Email"
+                  onchange={trimfield}
+                  data-inputuid="email"
+                  value={verifyEmailTrimmed}
+                  disabled={disableVerified}
+                  type="email"
+                ></lightning-input> -->
+                <!-- why did these need to be trimmed -->
+                <lightning-input-field
+                  field-name="Email"
+                  disabled={disableVerified}
+                ></lightning-input-field>
+    
+                <!-- <lightning-input
+                  label="Preferred Email"
+                  data-inputuid="prefEmail"
+                  disabled={disabled}
+                  type="email"
+                ></lightning-input> -->
+                <lightning-input-field
+                  field-name="Secondary_Email__c"
+                  disabled={disabled}
+                ></lightning-input-field>
+                <lightning-input-field
+                  field-name="Caller_Did_Not_Provide_Email__c"
+                  disabled={disabled}
+                >
+                </lightning-input-field>
+    
+                <!-- <lightning-input-field
+                                field-name="MailingAddress"
+                                disabled={disableVerified}
+                            ></lightning-input-field> -->
+              </div>
+              <div class="slds-col slds-size_1-of-3">
+                <lightning-input-field
+                  field-name="Birthdate"
+                  disabled={disableVerified}
+                  value={birthdate}
+                >
+                </lightning-input-field>
+                <lightning-input-field
+                  field-name="Views_Date_of_Death__c"
+                  disabled={disableVerified}
+                >
+                </lightning-input-field>
+                <lightning-input-field
+                  field-name="WH_VA_Hotline_Special_Instructions__c"
+                  disabled={disableSpecial}
+                ></lightning-input-field>
+                <lightning-input-field
+                  field-name="WH_VA_Hotline_Preferences__c"
+                  disabled={disabled}
+                ></lightning-input-field>
+                <!-- <lightning-input-field
+                field-name="WHVA_EDIPI__c"
+                class="slds-hide"
+              ></lightning-input-field> -->
+                <!-- which address? -->
+              </div>
+            </div>
+
+            <template if:false={isAgent}>
+              <div class="slds-grid slds-var-p-bottom_small">
+                <div class="slds-col slds-size_1-of-3">
+                  <lightning-input-field field-name="Mother_Maiden_Name__c" disabled>
+                  </lightning-input-field>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                  <lightning-input-field field-name="Birth_City__c" disabled>
+                  </lightning-input-field>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                  <lightning-input-field field-name="Birth_State__c" disabled>
+                  </lightning-input-field>
+                </div>
+              </div>
+            </template>
+    
+            <!-- VA profile email,  address, phonme -->
+            <!-- only VAP permission and only verified records -->
+            <!-- <div class="slds-text-heading_small">VA Profile</div>
+            <lightning-button
+            class="slds-m-around_xx-small"
+            label="Add/Update VAP"
+            variant="brand"
+            onclick={addUpdateVAP}
+        ></lightning-button> -->
+        <!-- <lightning-flow
+        flow-api-name='VACX_Add_Update_VAP'
+        flow-input-variables={flowVariables}
+        if:true={isShowFlow}
+        onstatuschange={handleStatusChange}
+    >
+    </lightning-flow> -->
+            <template if:true={showVAP}>
+              
+              <c-whva-hotline-v-a-profile-form-vet
+                therecordid={searchResultId}
+              ></c-whva-hotline-v-a-profile-form-vet>
+            
+            </template>
+    
+            <div class="slds-clearfix">
+              <div class="slds-float_right">
+          
+                <!-- if its not saved yet, so the SAve and Add button, default -->
+                <template if:false={saved}>
+                  <lightning-button class="slds-var-m-horizontal_xx-small" label="Cancel" onclick={handleCancel}>
+                  </lightning-button>
+                  <!-- <lightning-button class="slds-var-m-horizontal_xx-small" label="Back To Search Results"
+                    variant="brand-outline" onclick={handleBack}></lightning-button> -->
+                 
+                  <template if:true={mpiTab}>
+                    <lightning-button label="Update Case" variant="brand" onclick={updateCase}></lightning-button>
+                  </template> 
+                  <template if:false={mpiTab}>
+                    <lightning-button label="Save and Add Contact" variant="brand" onclick={saveAndAddContact}></lightning-button>
+                   </template>
+                </template>
+                <!-- if its saved, show the edit button -->
+                <template if:true={saved}>
+                  <!-- <lightning-button
+                  class="slds-var-m-horizontal_xx-small"
+                  label="Back To Search Results"
+                  variant="brand-outline"
+                  onclick={handleBackToResults}
+                ></lightning-button> -->
+
+                  <lightning-button label="Remove Contact" onclick={handleRemove}></lightning-button>
+                  <lightning-button class="slds-var-m-horizontal_xx-small" label="Edit Contact" variant="brand"
+                    onclick={handleEdit}></lightning-button>
+                </template>
+              </div>
+            </div>
+          </lightning-record-edit-form>
+        </div>
+      </lightning-card>
+</template>
