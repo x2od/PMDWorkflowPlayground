@@ -50,7 +50,7 @@ jobs:
       # Run PMD scan
       - name: 'Run PMD scan to SARIF'
         id: pmd_sarif
-        run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 2
+        run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
 
       - name: Upload violations file in SARIF format
         uses: github/codeql-action/upload-sarif@v3
@@ -62,7 +62,7 @@ jobs:
         id: pmd_csv
         if: always()
         run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-blockers.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false --ignore-list config/pmd/ignore.txt --minimum-priority 2
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-blockers.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --minimum-priority 2
           # --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
 
       - name: Read CSV - Blockers'
@@ -81,7 +81,7 @@ jobs:
         id: pmd_csv_all
         if: always()
         run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false --ignore-list config/pmd/ignore.txt
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-all.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false
 
       - name: Read CSV - All violations
         id: csv-all
@@ -114,7 +114,7 @@ jobs:
       #   id: pmd_html
       #   if: always()
       #   run: |
-      #     ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format html --no-cache --report-file pmd.html --show-suppressed --no-fail-on-violation --no-fail-on-error --ignore-list config/pmd/ignore.txt --minimum-priority 5 --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --force-language xml  --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
+      #     ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format html --no-cache --report-file pmd.html --show-suppressed --no-fail-on-violation --no-fail-on-error --minimum-priority 5 --property linePrefix=L --property linkPrefix=https://github.com/${{github.repository}}/blob/${{github.head_ref}}/ --force-language xml  --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
       #     sed -i 's|<title>PMD</title>||g' pmd.html
       #     sed -i 's|<table |<table width="100%" |g' pmd.html
       #     cat pmd.html | grep -B 1000000000 "<h3>Processing errors</h3>" > pmd-errors.html

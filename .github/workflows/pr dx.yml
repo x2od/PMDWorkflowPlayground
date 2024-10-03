@@ -1,6 +1,6 @@
 # This is a main workflow to trigger on pull requests for DX repositories
 
-name: On PR (DX)
+name: Pull Request Scan (DX)
 
 # Controls when the workflow will run
 on:
@@ -9,22 +9,26 @@ on:
       - '**'
     types: [opened, synchronize, reopened]
 
+env:
+  blocking_severity: 2
+  csv_properties: --property package=false --property problem=false --property ruleSet=false
+
 jobs:
   scan-pmd:
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
-
     runs-on: ubuntu-latest
-    #outputs:
-    #blocker_count: ${{ steps.evaluate_violations_blockers.outputs.blocker_count }}
-    #violation_count: ${{ steps.evaluate_violations_all.outputs.violation_count }}
 
     steps:
       # Check out the source code
       - name: Checkout source code
         uses: actions/checkout@v4
+
+      - name: 'Set Filename'
+        id: set_filename
+        run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> $GITHUB_OUTPUT
 
       # Install PMD
       - name: Install PMD
@@ -38,18 +42,8 @@ jobs:
             mv ~/pmd-bin-$PMD_VERSION ~/pmd
             ~/pmd/bin/pmd --version
           fi
-          rm -f .pmdCache
 
-      # - name: Collect changed files
-      #   env:
-      #     GH_TOKEN: ${{ github.token }}
-      #     BRANCH: ${{ github.head_ref }}
-      #   run: |
-      #     echo "Changed files for this PR:"
-      #     gh pr diff "$BRANCH" --name-only > list.txt
-      #     cat list.txt
-
-      - name: Action to get changed files
+      - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v45
         with:
@@ -69,28 +63,24 @@ jobs:
            done
           cat changed.txt
 
-      # Run PMD scan
-      - name: Run PMD scan to SARIF
-        id: pmd_sarif
-        run: ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
-
-      - name: Upload violations file in SARIF format
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: pmd-cli-report.sarif
-          category: PMD
-
       ####################### ALL VIOLATIONS CHECK
 
       - name: Run PMD scan to CSV - All violations
         id: pmd_csv_all
         run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false
+          rm -f .pmdCache
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error $csv_properties
 
-      - name: Evaluate All Violations
+      - name: Priority to Severity
+        id: priority_to_severity_all
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
+
+      ######## EVALUATE ALL VIOLATIONS
+
+      - name: Evaluate all violations
         id: evaluate_violations_all
         run: |
-          csv_line_count=$(wc -l pmd-all.csv|awk '{print $1}')
+          csv_line_count=$(wc -l ${{ steps.set_filename.outputs.filename }}.csv|awk '{print $1}')
           #echo $csv_line_count
           violation_count=$((csv_line_count - 1))
           echo "violation_count=$violation_count" >> $GITHUB_OUTPUT
@@ -100,30 +90,26 @@ jobs:
              echo "::error::$VIOLATION_STRING"
            elif [[ $violation_count == 0 ]]; then
              echo "::notice::No Scanning Violations Detected"
+             exit 0
            fi
 
-      - name: Priority to Severity
-        id: priority_to_severity_all
-        run: sed -i 's|"Priority"|"Severity"|g' pmd-all.csv
       - name: Upload all violations file in CSV format
         if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}
         uses: actions/upload-artifact@v4
         with:
-          path: pmd-all.csv
-          name: PMDViolations
+          path: ${{ steps.set_filename.outputs.filename }}.csv
+          name: ${{ steps.set_filename.outputs.filename }}_PMD
           compression-level: 0
 
-      ############################# BLOCKERS CHECK
-
-      - name: Run PMD scan to CSV - Blockers
-        id: pmd_csv_blockers
+      ##################### BLOCKERS CHECK
+      - name: Show only Blockers from CSV
         run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-blockers.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --property rule=false --minimum-priority 2
-          # --relativize-paths-with ${{vars.SFDX_ROOT_DIRECTORY}}
-
-      - name: Priority to Severity
-        id: priority_to_severity_blockers
-        run: sed -i 's|"Priority"|"Severity"|g' pmd-blockers.csv
+          echo "blocking_severity " $blocking_severity
+          block_sev=$(($blocking_severity))
+          echo "block_sev " $block_sev
+          head -n 1 ${{ steps.set_filename.outputs.filename }}.csv > pmd-blockers.csv
+          awk -v var="$blocking_severity" -F '","'  'BEGIN {OFS=","} { if (($2 <= var))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-blockers.csv
+          cat pmd-blockers.csv
 
       - name: Read CSV - Blockers
         id: csv_blockers
@@ -139,7 +125,6 @@ jobs:
 
       # Check blocker count from CSV
       # If has blockers, exit 1
-      # If no blockers, still upload the file with all violations
       - name: Evaluate Blocker Violations
         id: evaluate_violations_blockers
         run: |
@@ -152,10 +137,61 @@ jobs:
             echo "${{steps.csv-table-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
             BLOCKER_STRING="$blocker_count Blocking Violations Detected"
             echo "::error::$BLOCKER_STRING"
-            exit 1
           elif [[ $blocker_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
+
+      ############# OTHER VIOLATIONS CHECK
+
+      - name: Show non-Blockers from CSV
+        run: |
+          echo "blocking_severity " $blocking_severity
+          block_sev=$(($blocking_severity))
+          echo "block_sev " $block_sev
+          #head -n 1 ${{ steps.set_filename.outputs.filename }}.csv > pmd-other.csv
+          awk -v var="$blocking_severity" -F '","'  'BEGIN {OFS=","} { if (($2 > var))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-other.csv
+          cat pmd-other.csv
+
+      - name: Priority to Severity
+        id: priority_to_severity_other
+        run: sed -i 's|"Priority"|"Severity"|g' pmd-other.csv
+
+      - name: Read CSV - other
+        id: csv_other
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-other.csv
+
+      - name: Create MD - other
+        uses: petems/csv-to-md-table-action@master
+        id: csv-table-other
+        with:
+          csvinput: ${{ steps.csv_other.outputs.content }}
+
+      - name: Evaluate Other Violations
+        id: evaluate_violations_other
+        run: |
+          csv_other_count=$(wc -l pmd-other.csv|awk '{print $1}')
+          other_count=$((csv_other_count - 1))
+          echo "other_count=$other_count" >> $GITHUB_OUTPUT
+          echo "NON-BLOCKER FOUND:" $other_count  # Print to console
+          if [[ $other_count > 0 ]]; then
+            echo "## Non-Blocking Violations in Changed Files" >> $GITHUB_STEP_SUMMARY
+            echo "${{steps.csv-table-other.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      # Run PMD SARIF can
+      - name: Run PMD scan to SARIF
+        id: pmd_sarif
+        run: |
+          #rm -f .pmdCache
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
+
+      - name: Upload violations file in SARIF format
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pmd-cli-report.sarif
+          category: PMD
 
       - name: Check Blocker Count for Exit Code
         if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}

@@ -1,5 +1,5 @@
 # Unique name for this workflow
-name: Repository Scan (Copado)
+name: Repository Scan (metadata)
 
 run-name: Repository manual scan by @${{ github.actor }}
 
@@ -48,35 +48,40 @@ jobs:
             mv ~/pmd-bin-$PMD_VERSION ~/pmd
             ~/pmd/bin/pmd --version
           fi
-          rm -f .pmdCache
 
-      - name: 'Run PMD scan to CSV - ALL'
+      - name: 'Run PMD scan to CSV - APEX'
         id: pmd_csv
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file pmd-all.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority "${{ github.event.inputs.minimum_severity }}"
+          rm -f .pmdCache
+          ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file pmd-apex.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --minimum-priority "${{ github.event.inputs.minimum_severity }}"
+          sed -i 's|"Priority"|"Severity"|g' pmd-apex.csv
 
-      # - name: Read CSV - ALL
+      # - name: Read CSV - APEX
       #   id: csv_code
       #   uses: juliangruber/read-file-action@v1
       #   with:
-      #     path: ./pmd-all.csv
+      #     path: ./pmd-apex.csv
 
-      # - name: Create MD - ALL
+      # - name: Create MD - APEX
       #   uses: petems/csv-to-md-table-action@master
-      #   id: csv-table-output-all
+      #   id: csv_table_output_apex
       #   with:
       #     csvinput: ${{ steps.csv_code.outputs.content }}
 
-      # - name: Step Table - ALL
-      #   id: md_to_output
+      # - name: Step Table - APEX
       #   run: |
-      #     echo "CSV - ALL" >> $GITHUB_STEP_SUMMARY
-      #     echo "${{steps.csv-table-output-all.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+      #     echo "# CSV - APEX" >> $GITHUB_STEP_SUMMARY
+      #     echo "${{steps.csv_table_output_apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
+      ########### CSV - XML
 
       - name: 'Run PMD scan to CSV - XML'
         id: pmd_csv_xml
         run: |
-          ~/pmd/bin/pmd check --dir src --rulesets config/pmd/ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --ignore-list config/pmd/ignore.txt --minimum-priority "${{ github.event.inputs.minimum_severity }}" --force-language xml
+          ~/pmd/bin/pmd check --dir src --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property problem=false --property ruleSet=false --minimum-priority "${{ github.event.inputs.minimum_severity }}" --force-language xml
+
+      - name: Priority to Severity
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
 
       # - name: Read CSV - XML
       #   id: csv_xml
@@ -86,15 +91,14 @@ jobs:
 
       # - name: Create MD - XML
       #   uses: petems/csv-to-md-table-action@master
-      #   id: csv-table-output-xml
+      #   id: csv_table_output_xml
       #   with:
       #     csvinput: ${{ steps.csv_xml.outputs.content }}
 
       # - name: Step Table - XML
-      #   id: md_to_output_xml
       #   run: |
-      #     echo "# CSV - XML" >> $GITHUB_STEP_SUMMARY
-      #     echo "${{steps.csv-table-output-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+      #     echo "## CSV - XML" >> $GITHUB_STEP_SUMMARY
+      #     echo "${{steps.csv_table_output_xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       - name: Evaluate XML Violations (which includes Apex)
         id: evaluate_violations_all
@@ -110,10 +114,6 @@ jobs:
            elif [[ $violation_count == 0 ]]; then
              echo "::notice::No Scanning Violations Detected"
            fi
-
-      - name: Priority to Severity
-        id: priority_to_severity_all
-        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
 
       - name: Upload all violations file in CSV format
         if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }}

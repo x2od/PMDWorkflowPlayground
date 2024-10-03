@@ -5,7 +5,7 @@
  * @last modified on  : 10-27-2023
  * @last modified by  :
  **/
-public without sharing class FunctionalQueueHandler {
+public class FunctionalQueueHandler {
 	// Staged Properties
 	List<FunctionalQueue_Supported_Objects_By_App__mdt> functionalQueueSupportedObjectsSettings;
 
@@ -66,7 +66,7 @@ public without sharing class FunctionalQueueHandler {
 		updateFunctionalQueueWithUpdatedApplicationSupportedObjects(functionalQueue);
 	}
 
-	private void performDMLOperationsForAfterUpdate() {
+	public void performDMLOperationsForAfterUpdate() {
 		FunctionalQueueUtility.addSerializedSupportedObjectsToQueue(JSON.serialize(queueSobjectsToSave));
 		if (queueSObjectsToDelete != null && !queueSObjectsToDelete.isEmpty()) {
 			FunctionalQueueUtility.deleteSerializedSupportedQueueObjects(JSON.serialize(queueSObjectsToDelete));

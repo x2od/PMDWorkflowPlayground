@@ -24,7 +24,7 @@ jobs:
       contents: read # for actions/checkout to fetch code
     outputs:
       filename: ${{ steps.set_filename.outputs.filename }}
-      violation_count: ${{ steps.evaluate_errors.outputs.violation_count }}
+      violation_count: ${{ steps.evaluate_violations.outputs.violation_count }}
     runs-on: ubuntu-latest
 
     steps:
@@ -48,30 +48,50 @@ jobs:
             mv ~/pmd-bin-$PMD_VERSION ~/pmd
             ~/pmd/bin/pmd --version
           fi
-          rm -f .pmdCache
 
       - name: 'Run PMD scan to CSV - All violations'
         id: pmd_csv_all
         run: |
-          ~/pmd/bin/pmd check --dir . --rulesets config/pmd/ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --minimum-priority "${{ github.event.inputs.minimum_severity }}"
+          rm -f .pmdCache 
+          ~/pmd/bin/pmd check --dir . --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --property package=false --property ruleSet=false --property problem=false --minimum-priority "${{ github.event.inputs.minimum_severity }}"
 
       - name: Evaluate Errrors
-        id: evaluate_errors
+        id: evaluate_violations
         run: |
           violation_count=$(wc -l ${{ steps.set_filename.outputs.filename }}.csv|awk '{print $1}')
           echo $violation_count
           violation_count=$((violation_count - 1))
           echo "violation_count=$violation_count" >> $GITHUB_OUTPUT
-          echo "ERRORS FOUND: " $violation_count # Print to console
+          echo "VIOLATIONS FOUND: " $violation_count # Print to console
           if [[ $violation_count > 0 ]]; then
-            ERROR_STRING="$violation_count Scanning Violations Detected"
-            echo "::error::$ERROR_STRING"
+            VIOLATIONS_STRING="$violation_count Scanning Violations Detected"
+            echo "::error::$VIOLATIONS_STRING"
           elif [[ $violation_count == 0 ]]; then
             echo "::notice::No Violations Detected"
           fi
 
+      - name: Priority to Severity
+        run: sed -i 's|"Priority"|"Severity"|g' ${{ steps.set_filename.outputs.filename }}.csv
+
+      - name: Read CSV
+        id: csv_code
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./${{ steps.set_filename.outputs.filename }}.csv
+
+      - name: Create MD
+        uses: petems/csv-to-md-table-action@master
+        id: csv_table_output_apex
+        with:
+          csvinput: ${{ steps.csv_code.outputs.content }}
+
+      - name: Show Table
+        run: |
+          echo "## All Violations" >> $GITHUB_STEP_SUMMARY
+          echo "${{steps.csv_table_output_apex.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
+
       - name: Upload all violations file in CSV format
-        if: ${{ steps.evaluate_errors.outputs.violation_count > 0 }}
+        if: ${{ steps.evaluate_violations.outputs.violation_count > 0 }}
         uses: actions/upload-artifact@v4
         with:
           path: ${{ steps.set_filename.outputs.filename }}.csv

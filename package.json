@@ -16,7 +16,7 @@
     "lint": "npm run lint:lwc && npm run lint:aura",
     "myinfo": "sf org display --verbose",
     "ncu": "ncu --interactive --format group",
-    "pmd:scan:csv": "$HOME/pmd/bin/pmd check --dir force-app --rulesets config/pmd/ruleset.xml --format csv --report-file config/pmd/pmd.csv --cache .pmdCache --short-names",
+    "pmd:scan:csv": "$HOME/pmd/bin/pmd check --dir force-app --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file config/pmd/pmd.csv --cache .pmdCache --short-names",
     "pmd:scan:deploy:csv": "$HOME/pmd/bin/pmd check --dir force-app --rulesets config/pmd/deployRules.xml --format csv --report-file config/pmd/deploy.csv --cache .pmdCache --short-names",
     "precommit": "lint-staged",
     "prepare": "husky",
