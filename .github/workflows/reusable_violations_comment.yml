@@ -45,6 +45,8 @@ jobs:
         if: ${{ inputs.blockers_count > 0 }}
         run: |
           echo "hello"
+          cat blockers_csv > blockers.csv
+          awk -F, '{ print "The 1st field is",$1,"the 2nd", $2,"and the 3rd", $3}' blockers.csv
 
       - name: Clean up other violations
         if: ${{ inputs.violations_count > 0 }}
