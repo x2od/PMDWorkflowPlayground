@@ -13,6 +13,7 @@ env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
   do_sarif_scan: true
+  hidden_comment_prefix: '<!--dtc-scanner-->'
 
 jobs:
   scan-pmd:
@@ -196,18 +197,47 @@ jobs:
           sarif_file: pmd-cli-report.sarif
           category: PMD
 
-      - name: Comment Violations
-        id: comment_violations
+      - name: Filter blocker columns
         run: |
-          while IFS="," read -r col1 col2 col3 col4 col5
-          do
-            echo "File $col1"
-            echo "Sev: $col2"
-            echo "Line: $col3"
-            echo "Description: $col4"
-            echo ""
-            echo "::error file=$col1,line=$col3,title=Blocker::$col4"
-          done < <(tail -n +2 pmd-blockers.csv)
+          cut -d "," -f 1,3,4 pmd-blockers.csv > pmd-blocker-comment.csv
+          echo "$hidden_comment_prefix" >> pmd-blocker-comment.csv
+          cat pmd-blocker-comment.csv
+
+      - name: Read CSV - other
+        id: csv_comment
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-blocker-comment.csv
+
+      - name: Create MD - other
+        uses: petems/csv-to-md-table-action@master
+        id: csv-comment-md
+        with:
+          csvinput: ${{ steps.csv_comment.outputs.content }}
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v3
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: ${{ env.hidden_comment_prefix }}
+
+      - name: Create comment
+        if: steps.fc.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            "${{steps.csv-comment-md.outputs.markdown-table}}"
+
+      - name: Update comment
+        if: steps.fc.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: 'replace'
+          body: |
+            "${{steps.csv-comment-md.outputs.markdown-table}}"
 
       - name: Check Blocker Count for Exit Code
         if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
