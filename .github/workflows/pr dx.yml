@@ -24,8 +24,8 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
 
-    outputs:
-      blockers_csv: ${{ steps.evaluate_violations_blockers.outputs.blockers_csv}}
+    # outputs:
+    #   blockers_csv: ${{ steps.evaluate_violations_blockers.outputs.blockers_csv}}
 
     steps:
       # Check out the source code
@@ -146,7 +146,6 @@ jobs:
           elif [[ $blocker_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
-          # echo "blockers_csv=${{ steps.csv_blockers.outputs.content }}" >> $GITHUB_OUTPUT
 
       ############# OTHER VIOLATIONS CHECK
 
@@ -207,6 +206,7 @@ jobs:
         with:
           hidden_comment_prefix: ${{ env.hidden_comment_prefix }}
           blockers_text: ${{ steps.csv_blockers.outputs.content }}
+          blockers_count: ${{ steps.evaluate_violations_blockers.outputs.blocker_count }}
 
       - name: Check Blocker Count for Exit Code
         if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
