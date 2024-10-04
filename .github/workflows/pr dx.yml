@@ -24,6 +24,9 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
 
+    outputs:
+      blockers_csv: ${{ steps.evaluate_violations_blockers.outputs.blockers_csv}}
+
     steps:
       # Check out the source code
       - name: Checkout source code
@@ -143,6 +146,7 @@ jobs:
           elif [[ $blocker_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
+          # echo "blockers_csv=${{ steps.csv_blockers.outputs.content }}" >> $GITHUB_OUTPUT
 
       ############# OTHER VIOLATIONS CHECK
 
@@ -198,52 +202,11 @@ jobs:
           sarif_file: pmd-cli-report.sarif
           category: PMD
 
-      - name: Filter blocker columns
-        run: |
-          #echo "${{env.hidden_comment_prefix }}" > pmd-blocker-comment.csv
-          cut -d "," -f 1,3,4 pmd-blockers.csv >> pmd-blocker-comment.csv
-          cat pmd-blocker-comment.csv
-      - name: Read CSV - other
-        id: csv_comment
-        uses: juliangruber/read-file-action@v1
+      - name: Call comment workflow
+        uses: ./.github/workflows/reusable_violations_comment.yml
         with:
-          path: ./pmd-blocker-comment.csv
-
-      - name: Create MD - other
-        uses: petems/csv-to-md-table-action@master
-        id: csv-comment-md
-        with:
-          csvinput: ${{ steps.csv_comment.outputs.content }}
-
-      - name: Find Comment
-        uses: peter-evans/find-comment@v3
-        id: find-comment
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body-includes: ${{ env.hidden_comment_prefix }}
-
-      - name: Create comment
-        if: steps.find-comment.outputs.comment-id == ''
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ${{ env.hidden_comment_prefix }}
-            ## Blockers
-            ${{steps.csv-comment-md.outputs.markdown-table}}
-            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
-
-      - name: Update comment
-        if: steps.find-comment.outputs.comment-id != ''
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          comment-id: ${{ steps.find-comment.outputs.comment-id }}
-          edit-mode: 'replace'
-          body: |
-            ${{ env.hidden_comment_prefix }}
-            ## Blockers
-            ${{steps.csv-comment-md.outputs.markdown-table}}
-            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+          hidden_comment_prefix: ${{ env.hidden_comment_prefix }}
+          blockers_text: ${{ steps.csv_blockers.outputs.content }}
 
       - name: Check Blocker Count for Exit Code
         if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
