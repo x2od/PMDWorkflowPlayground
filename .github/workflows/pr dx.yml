@@ -219,13 +219,13 @@ jobs:
 
       - name: Find Comment
         uses: peter-evans/find-comment@v3
-        id: fc
+        id: find-comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: ${{ env.hidden_comment_prefix }}
 
       - name: Create comment
-        if: steps.fc.outputs.comment-id == ''
+        if: steps.find-comment.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -233,10 +233,10 @@ jobs:
             "${{ env.hidden_comment_prefix }}${{steps.csv-comment-md.outputs.markdown-table}}"
 
       - name: Update comment
-        if: steps.fc.outputs.comment-id != ''
+        if: steps.find-comment.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v4
         with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
           edit-mode: 'replace'
           body: |
             "${{steps.csv-comment-md.outputs.markdown-table}}"
