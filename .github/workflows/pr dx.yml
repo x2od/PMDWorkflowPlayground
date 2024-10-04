@@ -202,7 +202,7 @@ jobs:
           category: PMD
 
       - name: Call comment workflow
-        uses: ./.github/workflows/reusable_violations_comment.yml
+        uses: ./.github/workflows/reusable_violations_comment.yml@annotations-or-comments
         with:
           hidden_comment_prefix: ${{ env.hidden_comment_prefix }}
           blockers_text: ${{ steps.csv_blockers.outputs.content }}
