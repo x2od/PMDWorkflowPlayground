@@ -38,7 +38,7 @@
         <listViewButtons>Mass_Update</listViewButtons>
         <listViewButtons>Mass_Edit</listViewButtons>
     </searchLayouts>
-    <sharingModel>ReadWrite</sharingModel>
+    <sharingModel>Private</sharingModel>
     <visibility>Public</visibility>
     <webLinks>
         <fullName>Mass_Update</fullName>

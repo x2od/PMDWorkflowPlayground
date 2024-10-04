@@ -200,8 +200,8 @@ jobs:
 
       - name: Filter blocker columns
         run: |
-          cut -d "," -f 1,3,4 pmd-blockers.csv > pmd-blocker-comment.csv
-          echo "${{env.hidden_comment_prefix }}" >> pmd-blocker-comment.csv
+          //echo "${{env.hidden_comment_prefix }}" > pmd-blocker-comment.csv
+          cut -d "," -f 1,3,4 pmd-blockers.csv >> pmd-blocker-comment.csv
           cat pmd-blocker-comment.csv
       - name: Read CSV - other
         id: csv_comment
@@ -229,6 +229,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ${{ env.hidden_comment_prefix }}
+            ## Blockers
             ${{steps.csv-comment-md.outputs.markdown-table}}
 
       - name: Update comment
@@ -238,7 +239,8 @@ jobs:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           edit-mode: 'replace'
           body: |
-            "$hidden_comment_prefix"
+            ${{ env.hidden_comment_prefix }}
+            ## Blockers
             ${{steps.csv-comment-md.outputs.markdown-table}}
 
       - name: Check Blocker Count for Exit Code
