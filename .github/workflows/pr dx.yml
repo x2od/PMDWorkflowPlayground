@@ -231,6 +231,7 @@ jobs:
             ${{ env.hidden_comment_prefix }}
             ## Blockers
             ${{steps.csv-comment-md.outputs.markdown-table}}
+            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
       - name: Update comment
         if: steps.find-comment.outputs.comment-id != ''
@@ -242,6 +243,7 @@ jobs:
             ${{ env.hidden_comment_prefix }}
             ## Blockers
             ${{steps.csv-comment-md.outputs.markdown-table}}
+            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
       - name: Check Blocker Count for Exit Code
         if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
