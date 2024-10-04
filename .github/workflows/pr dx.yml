@@ -206,6 +206,7 @@ jobs:
             echo "Line: $col3"
             echo "Description: $col4"
             echo ""
+            ::error file=$col1,line=$col3,title=$col4::
           done < <(tail -n +2 pmd-blockers.csv)
 
       - name: Check Blocker Count for Exit Code
