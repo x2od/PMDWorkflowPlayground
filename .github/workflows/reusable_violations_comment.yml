@@ -44,10 +44,12 @@ jobs:
       - name: Clean up blockers
         if: ${{ inputs.blockers_count > 0 }}
         run: |
+          echo "hello"
 
       - name: Clean up other violations
         if: ${{ inputs.violations_count > 0 }}
         run: |
+          echo "hello"
 
       - name: Combine tables
         id: assemble_comment

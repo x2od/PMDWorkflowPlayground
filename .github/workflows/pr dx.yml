@@ -195,7 +195,8 @@ jobs:
 
       - name: Comment Violations
         id: comment_violations
-        run:
+        run: |
+          echo "go"
 
       - name: Check Blocker Count for Exit Code
         if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
