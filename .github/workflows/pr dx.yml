@@ -4,7 +4,7 @@ name: Pull Request Scan (DX)
 
 # Controls when the workflow will run
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - '**'
     types: [opened, synchronize, reopened]
@@ -12,7 +12,6 @@ on:
 env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
-  # hidden_comment_prefix: '<!--dtc-scanner-->'
 
 jobs:
   scan-pmd:
@@ -20,8 +19,6 @@ jobs:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
-      issues: write
-      pull-requests: write
     runs-on: ubuntu-latest
 
     steps:
@@ -72,7 +69,7 @@ jobs:
         id: pmd_csv_all
         run: |
           rm -f .pmdCache
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error $csv_properties
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error $csv_properties
 
       - name: Priority to Severity
         id: priority_to_severity_all
@@ -188,8 +185,8 @@ jobs:
         id: pmd_sarif
         if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0}}
         run: |
-          rm -f .pmdCache
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
+          #rm -f .pmdCache
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
 
       - name: Upload violations file in SARIF format
         if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0}}
