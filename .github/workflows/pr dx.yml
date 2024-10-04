@@ -12,7 +12,7 @@ on:
 env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
-  hidden_comment_prefix: '<!--dtc-scanner-->'
+  # hidden_comment_prefix: '<!--dtc-scanner-->'
 
 jobs:
   scan-pmd:
