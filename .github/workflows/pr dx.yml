@@ -193,6 +193,10 @@ jobs:
           sarif_file: pmd-cli-report.sarif
           category: PMD
 
+      - name: Comment Violations
+        id: comment_violations
+        run:
+
       - name: Check Blocker Count for Exit Code
         if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
         run: exit 1

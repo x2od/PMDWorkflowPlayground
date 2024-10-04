@@ -1,0 +1,55 @@
+name: Scan Violations to Comment
+
+# Controls when the workflow will run
+on:
+  workflow_call:
+    inputs:
+      blockers_csv:
+        required: false
+        description: csv text of blockers table
+        default: ''
+        type: string
+      blockers_count:
+        required: false
+        description: number of blocker violations
+        default: 0
+        type: number
+      violations_csv:
+        required: false
+        description: csv text of all violations table
+        type: string
+        default: ''
+      violations_count:
+        required: false
+        description: number of all violations
+        default: 0
+        type: number
+
+jobs:
+  violations-to-comment:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+    outputs:
+      comment_markdown: ${{ steps.assemble_comment.outputs.markdown }}
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      # may be unnecessary
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up blockers
+        if: ${{ inputs.blockers_count > 0 }}
+        run: |
+
+      - name: Clean up other violations
+        if: ${{ inputs.violations_count > 0 }}
+        run: |
+
+      - name: Combine tables
+        id: assemble_comment
+        run: |
+          echo "markdown=hello" >> "$GITHUB_OUTPUT"
