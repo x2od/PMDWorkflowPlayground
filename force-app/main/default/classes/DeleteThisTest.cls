@@ -19,7 +19,6 @@ public with sharing class DeleteThisTest {
 		User u;
 		System.runAs(u) {
 			System.debug('Foo'); //NOPMD
-
 			Assert.isTrue(true, 'this');
 		}
 	}

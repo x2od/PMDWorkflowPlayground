@@ -53,7 +53,7 @@ testresults
 
 # temporary files
 tmp
-pmd.*
+/pmd*.*
 results.*
 sca.*
 !pmd.sarif

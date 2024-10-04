@@ -196,7 +196,14 @@ jobs:
       - name: Comment Violations
         id: comment_violations
         run: |
-          echo "go"
+          while IFS="," read -r col1 col2 col3 col4 col5
+          do
+            echo "File $col1"
+            echo "Sev: $col2"
+            echo "Line: $col3"
+            echo "Description: $col4"
+            echo ""
+          done < <(tail -n +2 pmd-blockers.csv)
 
       - name: Check Blocker Count for Exit Code
         if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
