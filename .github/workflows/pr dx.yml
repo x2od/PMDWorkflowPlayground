@@ -20,12 +20,12 @@ jobs:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
-      issues: write
-      pull-requests: write
+
     runs-on: ubuntu-latest
 
-    # outputs:
-    #   blockers_csv: ${{ steps.evaluate_violations_blockers.outputs.blockers_csv}}
+    outputs:
+      blockers_text: ${{ steps.csv_blockers.outputs.content }}
+      blockers_count: ${{ steps.evaluate_violations_blockers.outputs.blockers_count }}
 
     steps:
       # Check out the source code
@@ -135,15 +135,15 @@ jobs:
         id: evaluate_violations_blockers
         run: |
           csv_blocker_count=$(wc -l pmd-blockers.csv|awk '{print $1}')
-          blocker_count=$((csv_blocker_count - 1))
-          echo "blocker_count=$blocker_count" >> $GITHUB_OUTPUT
-          echo "BLOCKERS FOUND:" $blocker_count  # Print to console
-          if [[ $blocker_count > 0 ]]; then
+          blockers_count=$((csv_blocker_count - 1))
+          echo "blockers_count=$blockers_count" >> $GITHUB_OUTPUT
+          echo "BLOCKERS FOUND:" $blockers_count  # Print to console
+          if [[ $blockers_count > 0 ]]; then
             echo "## Blockers in Changed Files" >> $GITHUB_STEP_SUMMARY
             echo "${{steps.csv-table-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
-            BLOCKER_STRING="$blocker_count Blocking Violations Detected"
+            BLOCKER_STRING="$blockers_count Blocking Violations Detected"
             echo "::error::$BLOCKER_STRING"
-          elif [[ $blocker_count == 0 ]]; then
+          elif [[ $blockers_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
 
@@ -201,13 +201,22 @@ jobs:
           sarif_file: pmd-cli-report.sarif
           category: PMD
 
-      - name: Call comment workflow
-        uses: ./.github/workflows/reusable_violations_comment.yml@annotations-or-comments
-        with:
-          hidden_comment_prefix: ${{ env.hidden_comment_prefix }}
-          blockers_text: ${{ steps.csv_blockers.outputs.content }}
-          blockers_count: ${{ steps.evaluate_violations_blockers.outputs.blocker_count }}
+  write-blockers-comment:
+    permissions:
+      issues: write
+      pull-requests: write
+    # runs-on: ubuntu-latest
+    needs: scan-pmd
+    uses: ./.github/workflows/reusable_violations_comment.yml@annotations-or-comments
+    with:
+      hidden_comment_prefix: $hidden_comment_prefix
+      blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
+      blockers_count: ${{ needs.scan-pmd.outputs.blockers_count }}
 
+  evaluate-exit-code:
+    runs-on: ubuntu-latest
+    needs: scan-pmd
+    steps:
       - name: Check Blocker Count for Exit Code
-        if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
+        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }}
         run: exit 1
