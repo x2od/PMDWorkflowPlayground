@@ -207,7 +207,7 @@ jobs:
       pull-requests: write
     # runs-on: ubuntu-latest
     needs: scan-pmd
-    uses: ./.github/workflows/reusable_violations_comment.yml@annotations-or-comments
+    uses: ./.github/workflows/reusable_violations_comment.yml
     with:
       hidden_comment_prefix: $hidden_comment_prefix
       blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
