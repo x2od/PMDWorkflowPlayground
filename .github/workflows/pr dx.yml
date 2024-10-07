@@ -254,8 +254,7 @@ jobs:
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
       - name: Update comment
-        # if: ${{ steps.find-comment.outputs.comment-id != '' }}
-        if: !always()
+        if: ${{ steps.find-comment.outputs.comment-id != '' && false}}
         uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
