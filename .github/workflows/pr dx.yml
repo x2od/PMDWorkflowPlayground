@@ -13,7 +13,7 @@ env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
   hidden_comment_prefix: <!--dtc-scanner-->
-  run_sarif: 'false'
+  run_sarif: 'true'
 
 jobs:
   scan-pmd:
