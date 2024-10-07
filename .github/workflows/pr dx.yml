@@ -12,7 +12,8 @@ on:
 env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
-  hidden_comment_prefix: '<!--dtc-scanner-->'
+  hidden_comment_prefix: <!--dtc-scanner-->
+  run_sarif: 'false'
 
 jobs:
   scan-pmd:
@@ -191,13 +192,13 @@ jobs:
       # Run PMD SARIF can
       - name: Run PMD scan to SARIF
         id: pmd_sarif
-        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0}}
+        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }} && ${{ env.run_sarif == 'true' }}
         run: |
           #rm -f .pmdCache
           ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
 
       - name: Upload violations file in SARIF format
-        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0}}
+        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }} && ${{ env.run_sarif == 'true' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: pmd-cli-report.sarif
@@ -208,7 +209,7 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-    if: ${{ needs.scan-pmd.outputs.blockers_count > 0}}
+    if: ${{ needs.scan-pmd.outputs.blockers_count < 0 }}
     runs-on: ubuntu-latest
     steps:
       - name: Filter blocker columns
@@ -230,20 +231,13 @@ jobs:
 
       - name: Find Comment
         uses: peter-evans/find-comment@v3
-        id: find-comment
+        id: find_comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: ${{ env.hidden_comment_prefix }}
-      - name: Delete comment
-        if: steps.find-comment.outputs.comment-id != ''
-        run: |
-          gh api \
-          --method DELETE \
-          -H "Accept: application/vnd.github+json" \
-          /repos/${{github.repository}}/pulls/comments/${{ steps.find-comment.outputs.comment-id }}
 
       - name: Create comment
-        if: steps.find-comment.outputs.comment-id == ''
+        if: steps.find_comment.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -254,10 +248,10 @@ jobs:
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
       - name: Update comment
-        if: ${{ steps.find-comment.outputs.comment-id != '' && false}}
+        if: ${{ steps.find_comment.outputs.comment-id != '' }}
         uses: peter-evans/create-or-update-comment@v4
         with:
-          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
           edit-mode: 'replace'
           body: |
             ${{ env.hidden_comment_prefix }}
@@ -265,17 +259,20 @@ jobs:
             ${{steps.csv-comment-md.outputs.markdown-table}}
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
-  call-comment-update:
+  call-blockers-comment:
     needs: scan-pmd
     permissions:
+      # contents: read # for actions/checkout to fetch code
+      # security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      # actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
       issues: write
       pull-requests: write
-    if: ${{ needs.scan-pmd.outputs.blockers_count < 0}}
+    if: ${{ needs.scan-pmd.outputs.blockers_count > 0}}
     uses: ./.github/workflows/reusable_violations_comment.yml
     with:
-      hidden_comment_prefix: $hidden_comment_prefix
-      blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
-      blockers_count: ${{ needs.scan-pmd.outputs.blockers_count }}
+      hidden_comment_markdown: ${{ env.hidden_comment_prefix }}
+      input_blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
+      # blockers_count: $(( needs.scan-pmd.outputs.blockers_count ))
 
   evaluate-exit-code:
     runs-on: ubuntu-latest
