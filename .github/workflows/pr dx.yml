@@ -234,6 +234,13 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: ${{ env.hidden_comment_prefix }}
+      - name: Delete comment
+        if: steps.find-comment.outputs.comment-id != ''
+        run: |
+          gh api \
+          --method DELETE \
+          -H "Accept: application/vnd.github+json" \
+          /repos/${{github.repository}}/pulls/comments/${{ steps.find-comment.outputs.comment-id }}
 
       - name: Create comment
         if: steps.find-comment.outputs.comment-id == ''
@@ -245,15 +252,10 @@ jobs:
             ## Blockers
             ${{steps.csv-comment-md.outputs.markdown-table}}
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
-      - name: Delete comment
-        if: steps.find-comment.outputs.comment-id != ''
-        run: |
-          gh api \
-          --method DELETE \
-          -H "Accept: application/vnd.github+json" \
-          /repos/${{github.repository}}/pulls/comments/${{ steps.find-comment.outputs.comment-id }}
+
       - name: Update comment
-        if: ${{ steps.find-comment.outputs.comment-id != '' && false }}
+        # if: ${{ steps.find-comment.outputs.comment-id != '' }}
+        if: !always()
         uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
