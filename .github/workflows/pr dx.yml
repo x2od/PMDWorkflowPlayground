@@ -218,7 +218,7 @@ jobs:
     steps:
       - name: Filter blocker columns
         run: |
-          cat '${{ needs.scan-pmd.outputs.blockers_text}}' > pmd-blockers-input.csv  
+          printf '${{ needs.scan-pmd.outputs.blockers_text}}' > pmd-blockers-input.csv  
           cut -d "," -f 1,3,4 pmd-blockers-input.csv >> pmd-blocker-comment.csv
           cat pmd-blocker-comment.csv
       - name: Read CSV - other
