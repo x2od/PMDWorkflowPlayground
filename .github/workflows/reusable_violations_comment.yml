@@ -52,7 +52,7 @@ jobs:
           printf '${{ inputs.input_blockers_text}}' > pmd-blockers-input.csv  
           cut -d "," -f 1,3,4 pmd-blockers-input.csv >> pmd-blocker-comment.csv
           cat pmd-blocker-comment.csv
-          echo "Passed in the prefix " ${{ inputs.hidden_comment_markdown }}
+          echo "Passed in the prefix  ${{ inputs.hidden_comment_markdown }}"
 
       - name: Read CSV - blockers
         id: csv_comment
