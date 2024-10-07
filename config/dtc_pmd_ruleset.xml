@@ -778,6 +778,20 @@
 		</properties>
 	</rule>
 
+	<rule
+		name="MasterDetailReparentable"
+		language="xml"
+		message="Master-Detail fields must be reparentable"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Master-Detail fields must be reparentable</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ //CustomField/reparentableMasterDetail/text[@Text='false'] ]]></value>
+			</property>
+		</properties>
+	</rule>
+
 	<!-- Metadata XML Rules -->
 
 	<!-- General Metadata -->

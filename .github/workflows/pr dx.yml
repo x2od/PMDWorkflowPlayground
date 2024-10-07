@@ -20,6 +20,8 @@ jobs:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+      issues: write
+      pull-requests: write
 
     runs-on: ubuntu-latest
 
@@ -205,13 +207,60 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-    # runs-on: ubuntu-latest
+
     needs: scan-pmd
-    uses: ./.github/workflows/reusable_violations_comment.yml
-    with:
-      hidden_comment_prefix: $hidden_comment_prefix
-      blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
-      blockers_count: ${{ needs.scan-pmd.outputs.blockers_count }}
+    # uses: ./.github/workflows/reusable_violations_comment.yml
+    # with:
+    #   hidden_comment_prefix: $hidden_comment_prefix
+    #   blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
+    #   blockers_count: ${{ needs.scan-pmd.outputs.blockers_count }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Filter blocker columns
+        run: |
+          cut -d "," -f 1,3,4 pmd-blockers.csv >> pmd-blocker-comment.csv
+          cat pmd-blocker-comment.csv
+      - name: Read CSV - other
+        id: csv_comment
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-blocker-comment.csv
+
+      - name: Create MD - other
+        uses: petems/csv-to-md-table-action@master
+        id: csv-comment-md
+        with:
+          csvinput: ${{ steps.csv_comment.outputs.content }}
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: ${{ env.hidden_comment_prefix }}
+
+      - name: Create comment
+        if: steps.find-comment.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ${{ env.hidden_comment_prefix }}
+            ## Blockers
+            ${{steps.csv-comment-md.outputs.markdown-table}}
+            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+
+      - name: Update comment
+        if: steps.find-comment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          edit-mode: 'replace'
+          body: |
+            ${{ env.hidden_comment_prefix }}
+            ## Blockers
+            ${{steps.csv-comment-md.outputs.markdown-table}}
+            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
   evaluate-exit-code:
     runs-on: ubuntu-latest
