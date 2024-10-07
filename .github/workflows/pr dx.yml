@@ -204,11 +204,11 @@ jobs:
           category: PMD
 
   write-blockers-comment:
+    needs: scan-pmd
     permissions:
       issues: write
       pull-requests: write
-
-    needs: scan-pmd
+    if: ${{ needs.scan-pmd.outputs.blockers_count  > 0}}
     # uses: ./.github/workflows/reusable_violations_comment.yml
     # with:
     #   hidden_comment_prefix: $hidden_comment_prefix
