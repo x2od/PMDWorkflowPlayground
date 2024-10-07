@@ -117,7 +117,7 @@ jobs:
           echo "block_sev " $block_sev
           head -n 1 ${{ steps.set_filename.outputs.filename }}.csv > pmd-blockers.csv
           awk -v var="$blocking_severity" -F '","'  'BEGIN {OFS=","} { if (($2 <= var))  print }' ${{ steps.set_filename.outputs.filename }}.csv >> pmd-blockers.csv
-          cat pmd-blockers.csv > $GITHUB_ENV
+          cat pmd-blockers.csv
 
       - name: Read CSV - Blockers
         id: csv_blockers
