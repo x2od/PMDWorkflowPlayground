@@ -25,12 +25,13 @@ on:
       #   default: 0
       #   type: number
       hidden_comment_markdown:
-        required: true
+        required: false
         type: string
         description: hidden text to find for updating comments
+        default: <!--dtc-scanner-->
 
-env:
-  env_hidden_comment_prefix: '<!--dtc-scanner-->'
+# env:
+#   env_hidden_comment_prefix: '<!--dtc-scanner-->'
 permissions:
   # contents: read # for actions/checkout to fetch code
   # security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
