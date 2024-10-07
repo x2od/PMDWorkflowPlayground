@@ -98,7 +98,6 @@ jobs:
         id: evaluate_violations_all
         run: |
           csv_line_count=$(wc -l ${{ steps.set_filename.outputs.filename }}.csv|awk '{print $1}')
-          #echo $csv_line_count
           violation_count=$((csv_line_count - 1))
           echo "violation_count=$violation_count" >> $GITHUB_OUTPUT
           echo "VIOLATIONS FOUND:" $violation_count  # Print to console
@@ -235,7 +234,6 @@ jobs:
         id: evaluate_violations_blockers
         run: |
           csv_line_count=$(wc -l ${{ steps.set_filename.outputs.filename }}_blockers.csv|awk '{print $1}')
-          #echo $csv_line_count
           blockers_count=$((csv_line_count - 1))
           echo "blockers_count=$blockers_count" >> $GITHUB_OUTPUT
           echo "BLOCKING VIOLATIONS FOUND:" $blockers_count  # Print to console
@@ -311,7 +309,7 @@ jobs:
   #   with:
   #     input_blockers_text: ${{ needs.scan-pmd-metadata-format.outputs.blockers_text }}
 
-  evaluate-exit-code:
+  fail-for-scan-blockers:
     runs-on: ubuntu-latest
     needs: scan-pmd-metadata-format
     steps:
