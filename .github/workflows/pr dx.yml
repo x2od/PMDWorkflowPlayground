@@ -208,7 +208,7 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-    if: ${{ needs.scan-pmd.outputs.blockers_count  > 0}}
+    if: ${{ needs.scan-pmd.outputs.blockers_count > 0}}
     # uses: ./.github/workflows/reusable_violations_comment.yml
     # with:
     #   hidden_comment_prefix: $hidden_comment_prefix
@@ -250,9 +250,15 @@ jobs:
             ## Blockers
             ${{steps.csv-comment-md.outputs.markdown-table}}
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
-
-      - name: Update comment
+      - name: Delete comment
         if: steps.find-comment.outputs.comment-id != ''
+        run: |
+          gh api \
+          --method DELETE \
+          -H "Accept: application/vnd.github+json" \
+          /repos/${{github.repository}}/pulls/comments/${{ steps.find-comment.outputs.comment-id }}
+      - name: Update comment
+        if: steps.find-comment.outputs.comment-id != '' && false
         uses: peter-evans/create-or-update-comment@v4
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
@@ -262,6 +268,17 @@ jobs:
             ## Blockers
             ${{steps.csv-comment-md.outputs.markdown-table}}
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+  call-comment-update:
+    needs: scan-pmd
+    permissions:
+      issues: write
+      pull-requests: write
+    if: ${{ needs.scan-pmd.outputs.blockers_count < 0}}
+    uses: ./.github/workflows/reusable_violations_comment.yml
+    with:
+      hidden_comment_prefix: $hidden_comment_prefix
+      blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
+      blockers_count: ${{ needs.scan-pmd.outputs.blockers_count }}
 
   evaluate-exit-code:
     runs-on: ubuntu-latest
