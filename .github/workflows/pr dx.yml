@@ -259,15 +259,15 @@ jobs:
             ${{steps.csv-comment-md.outputs.markdown-table}}
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
-  call-blockers-comment:
-    needs: scan-pmd
-    permissions:
-      issues: write
-      pull-requests: write
-    if: ${{ needs.scan-pmd.outputs.blockers_count < 0}}
-    uses: ./.github/workflows/reusable_violations_comment.yml
-    with:
-      input_blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
+  # call-blockers-comment:
+  #   needs: scan-pmd
+  #   permissions:
+  #     issues: write
+  #     pull-requests: write
+  #   if: ${{ needs.scan-pmd.outputs.blockers_count < 0}}
+  #   uses: ./.github/workflows/rollout-ci_violations_comment_call.yml
+  #   with:
+  #     input_blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
 
   evaluate-exit-code:
     runs-on: ubuntu-latest
