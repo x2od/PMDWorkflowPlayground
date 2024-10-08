@@ -6,6 +6,14 @@
  */
 @IsTest
 public with sharing class DeleteThisTest {
+	@TestSetup
+	private static void createData() {
+		// should not give PMD error
+		System.runAs(new User(Id = UserInfo.getUserId())) {
+			Assert.isTrue(true, 'that');
+		}
+	}
+
 	//@SuppressWarnings('PMD')
 	@IsTest
 	public static void assertMe() {
@@ -16,8 +24,7 @@ public with sharing class DeleteThisTest {
 	private static void name() {
 		List<Contact> cons = [SELECT Id FROM Contact];
 		//cons = null;
-		User u;
-		System.runAs(u) {
+		System.runAs(new User(Id = UserInfo.getUserId())) {
 			System.debug('Foo'); //NOPMD
 			Assert.isTrue(true, 'this');
 		}

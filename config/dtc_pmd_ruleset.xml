@@ -546,6 +546,7 @@
 	</rule>
 
 	<!-- APEX -->
+
 	<rule
 		name="DoNotUseWithoutSharing"
 		message="Use with/inherited sharing, or include an explanation in your code to mark this a false positive"
@@ -557,7 +558,7 @@
 			<property name="xpath">
 				<value>
 					<![CDATA[
-						(UserClass/ModifierNode[@WithoutSharing=true() and @Test=false()])
+						//UserClass/ModifierNode[@WithoutSharing=true() and @Test=false()]
 					]]>
 			</value>
 			</property>
@@ -575,7 +576,65 @@
 			<property name="xpath">
 				<value>
 					<![CDATA[
-						(UserClass/ModifierNode[@WithoutSharing=false() and @WithSharing=false() and @InheritedSharing=false()])
+						//UserClass[ModifierNode[@WithoutSharing=false() and @WithSharing=false() and @InheritedSharing=false() and @Nested = false()]]
+					]]>
+			</value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule
+		name="RequireOuterClassAccess"
+		message="Specify private/public/global on outer Apex classes"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
+		language="apex">
+		<description>Avoid outer classes without explicit access modifier</description>
+		<priority>1</priority>
+		<properties>
+			<property name="xpath">
+				<value>
+				<![CDATA[
+					//ApexFile/UserClass[ModifierNode[@Public = false() and @Private = false() and @Global = false()] and @Nested = false()]
+				]]>
+		</value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule
+		name="DeclareAccessOnMethods"
+		message="Explicitly use public/private/protected/global on Apex methods"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
+		language="apex">
+		<description>Declare Access Modifier on All Non-Test Methods</description>
+		<priority>1</priority>
+		<properties>
+			<property name="xpath">
+				<value>
+					<![CDATA[
+						//Method[ModifierNode[@Public = false() and @Private = false() and @Protected = false() and @Global = false() and @Test = false()]]
+					]]>
+			</value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule
+		name="DoNotRunAsCurrentUser"
+		message="Do not execute test methods as the running user"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule"
+		language="apex">
+		<description>Do not run as current user</description>
+		<priority>1</priority>
+		<properties>
+			<property name="xpath">
+				<value>
+					<![CDATA[
+						//RunAsBlockStatement[
+							.//MethodCallExpression[@FullMethodName='UserInfo.getUserId'] 
+							and 
+							ancestor::Method/ModifierNode[count(Annotation[lower-case(@Name) = 'testsetup']) = 0]
+						]
 					]]>
 			</value>
 			</property>
@@ -661,7 +720,7 @@
 			<property name="xpath">
 				<value><![CDATA[ //(PermissionSet | Profile)/userPermissions/name[text[@Text=('ModifyAllData', 'ViewAllData')] and ../enabled/text[@Text='true']] 	]]></value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -680,7 +739,7 @@
 						../object/text[matches(@Text, '^.*__[a-z]+$', 'i' ) ]]
 						]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -700,7 +759,7 @@
 						
 						]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -715,7 +774,7 @@
 			<property name="xpath">
 				<value><![CDATA[ //(Profile | PermissionSet)/userPermissions/name[text[matches(@Text, 'Manage.*Users', 'i')]  and ../enabled/text[@Text='true']] ]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -730,7 +789,7 @@
 			<property name="xpath">
 				<value><![CDATA[ //Profile/userPermissions/name[text[@Text='ViewSetup'] and ../enabled/text[@Text='true']] ]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
+			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -765,7 +824,7 @@
 	</rule>
 
 	<rule
-		name="MetadataNoDescriptionObjectField"
+		name="MetadataDescriptionObjectField"
 		language="xml"
 		message="Add a description to explain custom metadata"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
@@ -787,7 +846,7 @@
 		<priority>2</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //CustomField/reparentableMasterDetail/text[@Text='false'] ]]></value>
+				<value><![CDATA[ //CustomField/reparentableMasterDetail/text[@Text=false()] ]]></value>
 			</property>
 		</properties>
 	</rule>
@@ -811,7 +870,7 @@
 	</rule>
 
 	<rule
-		name="MetadataNoDescriptionPermissionSet"
+		name="MetadataDescriptionPermissionSet"
 		language="xml"
 		message="Add a description to explain custom permission sets"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
@@ -825,7 +884,7 @@
 	</rule>
 
 	<rule
-		name="MetadataNoDescriptionFlow"
+		name="MetadataDescriptionFlow"
 		language="xml"
 		message="Add a description to explain flows"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
