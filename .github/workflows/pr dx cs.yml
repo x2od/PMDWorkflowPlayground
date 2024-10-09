@@ -16,7 +16,7 @@ env:
   run_sarif: 'true'
 
 jobs:
-  scan-pmd:
+  scan-codescan-pull-request:
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -45,6 +45,7 @@ jobs:
 
       - name: Run CodeScan scan action
         id: codescan
+        if: github.event_name == 'pull_request'
         uses: codescan-io/codescan-scanner-action@1.5
         with:
           login: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
@@ -53,6 +54,8 @@ jobs:
           codeScanUrl: https://gov-va.codescan.io
           scanChangedFilesOnly: true
           failOnRedQualityGate: true
+          generateReportFile: true
+          generateSarifFile: false
           args: |
             sonar.pullrequest.branch=${{github.head_ref}}
             sonar.pullrequest.base=${{github.base_ref}}
@@ -61,7 +64,8 @@ jobs:
       #   sonar.verbose=true
       #   sonar.projectName=${{ github.event.repository.name }}
       - name: Upload violations file in SARIF format
+        if: github.event_name == 'pull_request'
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: odescan.sarif
-          category: PMD
+          sarif_file: codescan.sarif
+          category: CodeScan
