@@ -915,7 +915,7 @@
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[  
-					Flow/processType/text[@Text='Workflow']
+					Flow/processType/text[@Text='Workflow' and //Flow//status/text[@Text='Active'] ]
 				]]> </value>
 			</property>
 		</properties>

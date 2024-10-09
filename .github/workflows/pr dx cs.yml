@@ -13,7 +13,6 @@ env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
   hidden_comment_prefix: <!--dtc-scanner-->
-  run_sarif: 'true'
 
 jobs:
   scan-codescan-pull-request:
@@ -49,8 +48,8 @@ jobs:
         uses: codescan-io/codescan-scanner-action@1.5
         with:
           login: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
-          organization: ${{ secrets.AUTORABIT_CODESCAN_ORGANIZATION }}
-          projectKey: ${{ secrets.AUTORABIT_CODESCAN_PROJECT_KEY }}
+          organization: ${{ vars.AUTORABIT_CODESCAN_ORGANIZATION }}
+          projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
           codeScanUrl: https://gov-va.codescan.io
           scanChangedFilesOnly: true
           failOnRedQualityGate: true

@@ -26,7 +26,7 @@
             <connector>
                 <targetReference>myRule_1_A1</targetReference>
             </connector>
-            <label>User IsActive set to True</label>
+            <label>User.IsActive set to True</label>
         </rules>
     </decisions>
     <formulas>
