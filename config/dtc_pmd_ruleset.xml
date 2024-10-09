@@ -612,7 +612,10 @@
 			<property name="xpath">
 				<value>
 					<![CDATA[
-						//Method[ModifierNode[@Public = false() and @Private = false() and @Protected = false() and @Global = false() and @Test = false()]]
+						//Method[ModifierNode[@Public = false() and @Private = false() and @Protected = false() and @Global = false() and @Static=false()]
+						and 
+							ancestor::UserClass/ModifierNode[@Test=false()]
+						]
 					]]>
 			</value>
 			</property>
@@ -653,10 +656,9 @@
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[ 
-					(PermissionSet | Profile)/userPermissions/name[text()="ViewAllData" and ../enabled/text()="true"]
+					(PermissionSet | Profile)/userPermissions/name[text()="ViewAllData" and ../enabled/text()="true" and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0)]
 				]]></value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
 			<property name="defaultNsUri">
 				<value>http://soap.sforce.com/2006/04/metadata</value>
 			</property>
@@ -676,10 +678,10 @@
 					(Profile | PermissionSet)/objectPermissions/
 						(modifyAllRecords | viewAllRecords)[ text()='true' 
 						and ../object[matches(text(), '^.*__[a-z]+$', 'i' ) ]
+						 and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0)
 						]
 						]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
 			<property name="defaultNsUri">
 				<value>http://soap.sforce.com/2006/04/metadata</value>
 			</property>
@@ -699,10 +701,10 @@
 					(Profile | PermissionSet)/objectPermissions/
 						(modifyAllRecords | viewAllRecords)[ text()='true' 
 						and ../object[matches(text(), '^[a-zA-Z0-9]+$', 'i' ) ]
+						 and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0)
 						]
 						]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text='false']" />
 			<property name="defaultNsUri">
 				<value>http://soap.sforce.com/2006/04/metadata</value>
 			</property>
@@ -718,9 +720,15 @@
 		<priority>1</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //(PermissionSet | Profile)/userPermissions/name[text[@Text=('ModifyAllData', 'ViewAllData')] and ../enabled/text[@Text='true']] 	]]></value>
+				<!-- XPath 2.0 -->
+				<!-- 				
+				<value><![CDATA[ 
+				//(PermissionSet | Profile)/userPermissions/name[text[@Image='ModifyAllData' or @Image='ViewAllData'] and ../enabled/text[@Image='true']  and ( //Profile/custom/text[@Image='true']  or  //(PermissionSet | Profile)[count(custom) = 0]) ] 
+					]]></value> -->
+				<value><![CDATA[ 
+					//(PermissionSet | Profile)/userPermissions/name[text[@Text='ModifyAllData' or @Text='ViewAllData'] and ../enabled/text[@Text='true']  and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0) ] 
+					]]></value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -735,11 +743,12 @@
 			<property name="xpath">
 				<value><![CDATA[  
 					//(Profile | PermissionSet)/objectPermissions/(modifyAllRecords | viewAllRecords)
-					[text[ @Text='true'] and 
-						../object/text[matches(@Text, '^.*__[a-z]+$', 'i' ) ]]
-						]]> </value>
+					[
+						text[ @Text='true'] and 
+						../object/text[matches(@Text, '^.*__[a-z]+$', 'i' ) ]   and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0) 
+					]
+					]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -755,11 +764,10 @@
 				<value><![CDATA[  
 					//(Profile | PermissionSet)/objectPermissions/(modifyAllRecords | viewAllRecords)
 					[text[ @Text='true'] and 
-						../object/text[matches(@Text, '^[a-zA-Z0-9]+$'  ) ]]
-						
+						../object/text[matches(@Text, '^[a-zA-Z0-9]+$'  ) ]
+						 and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0) ]
 						]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -772,9 +780,8 @@
 		<priority>1</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //(Profile | PermissionSet)/userPermissions/name[text[matches(@Text, 'Manage.*Users', 'i')]  and ../enabled/text[@Text='true']] ]]> </value>
+				<value><![CDATA[ //(Profile | PermissionSet)/userPermissions/name[text[matches(@Text, 'Manage.*Users', 'i')]  and ../enabled/text[@Text='true']  and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0) ] ]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -787,9 +794,8 @@
 		<priority>1</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //Profile/userPermissions/name[text[@Text='ViewSetup'] and ../enabled/text[@Text='true']] ]]> </value>
+				<value><![CDATA[ //Profile/userPermissions/name[text[@Text='ViewSetup'] and ../enabled/text[@Text='true']  and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0)] ]]> </value>
 			</property>
-			<property name="violationSuppressXPath" value="//Profile/custom/text[@Text=false()]" />
 		</properties>
 	</rule>
 
@@ -838,24 +844,6 @@
 	</rule>
 
 	<rule
-		name="MasterDetailReparentable"
-		language="xml"
-		message="Master-Detail fields must be reparentable"
-		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
-		<description>Master-Detail fields must be reparentable</description>
-		<priority>2</priority>
-		<properties>
-			<property name="xpath">
-				<value><![CDATA[ //CustomField/reparentableMasterDetail/text[@Text=false()] ]]></value>
-			</property>
-		</properties>
-	</rule>
-
-	<!-- Metadata XML Rules -->
-
-	<!-- General Metadata -->
-
-	<rule
 		name="NoHardcodedWeblinkURLs"
 		language="xml"
 		message="Do not hardcode this URL - use a relative path instead"
@@ -868,6 +856,24 @@
 			</property>
 		</properties>
 	</rule>
+
+	<rule
+		name="MasterDetailReparentable"
+		language="xml"
+		message="Master-Detail fields must be reparentable"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Master-Detail fields must be reparentable</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ //CustomField/reparentableMasterDetail/text[@Text='false'] ]]></value>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Metadata XML Rules -->
+
+	<!-- General Metadata -->
 
 	<rule
 		name="MetadataDescriptionPermissionSet"
@@ -893,20 +899,6 @@
 		<properties>
 			<property name="xpath">
 				<value><![CDATA[ //Flow/label[text and ../count(description) = 0] ]]></value>
-			</property>
-		</properties>
-	</rule>
-
-	<rule
-		name="BumpApiVersion"
-		language="xml"
-		message="Metadata should use the latest API version."
-		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
-		<description>check API version</description>
-		<priority>5</priority>
-		<properties>
-			<property name="xpath">
-				<value><![CDATA[ //apiVersion/text[number(@Image) < 50] ]]></value>
 			</property>
 		</properties>
 	</rule>
