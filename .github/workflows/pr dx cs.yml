@@ -40,17 +40,23 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
+      - name: SETUP JAVA
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+
       ####################### ALL VIOLATIONS CHECK
 
       - name: Run CodeScan scan action
         id: codescan
         if: github.event_name == 'pull_request'
-        uses: codescan-io/codescan-scanner-action@1.5
+        uses: codescan-io/codescan-scanner-action@master
         with:
           login: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
           projectKey: x2od-PMDWorkflowPlayground
-          organization: gov-va-preview
-          codeScanUrl: https://gov-va-preview.codescan.io/
+          organization: david-schach1-va-gov
+          codeScanUrl: https://gov-va.codescan.io
           scanChangedFilesOnly: true
           failOnRedQualityGate: true
           generateReportFile: true
@@ -59,6 +65,7 @@ jobs:
             sonar.pullrequest.branch=${{github.head_ref}}
             sonar.pullrequest.base=${{github.base_ref}}
             sonar.pullrequest.key=${{github.event.number}}
+            sonar.projectName=${{ github.event.repository.name }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JAVA_TOOL_OPTIONS: '-Xmx8g'
