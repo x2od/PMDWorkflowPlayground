@@ -20,7 +20,7 @@
     </objectPermissions>
     <classAccesses>
         <apexClass>CalloutRequestMock</apexClass>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
     </classAccesses>
     <custom>true</custom>
     <fieldPermissions>
