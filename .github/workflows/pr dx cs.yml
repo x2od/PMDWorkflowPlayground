@@ -48,9 +48,9 @@ jobs:
         uses: codescan-io/codescan-scanner-action@1.5
         with:
           login: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
-          organization: david-schach1-va-gov
           projectKey: x2od-PMDWorkflowPlayground
-          codeScanUrl: https://gov-va.codescan.io
+          organization: gov-va-preview
+          codeScanUrl: https://gov-va-preview.codescan.io/
           scanChangedFilesOnly: true
           failOnRedQualityGate: true
           generateReportFile: true
