@@ -1,0 +1,61 @@
+# This is a main workflow to trigger on pull requests for DX repositories
+
+name: Pull Request Scan (DX)
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches:
+      - '**'
+    types: [opened, synchronize, reopened]
+
+env:
+  blocking_severity: 2
+  csv_properties: --property package=false --property problem=false --property ruleSet=false
+  hidden_comment_prefix: <!--dtc-scanner-->
+  run_sarif: 'true'
+
+jobs:
+  scan-pmd:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    runs-on: ubuntu-latest
+
+    # outputs:
+    #   blockers_text: ${{ steps.csv_blockers.outputs.content }}
+    #   blockers_count: ${{ steps.evaluate_violations_blockers.outputs.blockers_count }}
+
+    steps:
+      # Check out the source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      ####################### ALL VIOLATIONS CHECK
+
+      - name: Run CodeScan scan to CSV - All violations
+        id: codescan
+        uses: codescan-io/codescan-scanner-action@1.5
+        with:
+          login: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          organization: ${{ secrets.AUTORABIT_CODESCAN_ORGANIZATION }}
+          projectKey: ${{ secrets.AUTORABIT_CODESCAN_PROJECT_KEY }}
+          codeScanUrl: https://gov-va.codescan.io
+          scanChangedFilesOnly: true
+          failOnRedQualityGate: true
+          args: |
+            sonar.verbose=true
+            sonar.java.binaries=target
+            sonar.projectName=${{ github.event.repository.name }}
+            sonar.pullrequest.branch=${{github.head_ref}}
+            sonar.pullrequest.base=${{github.base_ref}}
+            sonar.pullrequest.key=${{github.event.number}}
+            sonar.exclusions=scripts/**,**/aura/**/*.css,**/lwc/**/*.css,**/analyticscc__*,**/skuid__*,**/agf__*,**/ExAM__*,**/dupcheck__*,**/rh2__*,**/rhx__*,**/cnx*,**/SDOC*,**/rhx*,**/contentassets/**,**/dashboards/**,**/documents/**,**/eclair/**,**/email/**,**/emailservices/**,**/networkBranding/**,**/reports/**,**/wave/**,**/staticresources/*,**/ADM*,**/usf*,**/welkins_table*,**/sortablegrid*,**/CMTD*,**/DynPro*,**/LIMITMON*,**/ca_only*,**/flowmagic*,**/ear*,**/followrpt*,**/MPM4*,**/copado*,**/emptracing*,**/HealthCloudGA
+
+      - name: Upload violations file in SARIF format
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: odescan.sarif
+          category: PMD
