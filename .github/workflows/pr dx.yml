@@ -140,7 +140,7 @@ jobs:
           echo "blockers_count=$blockers_count" >> $GITHUB_OUTPUT
           echo "BLOCKERS FOUND:" $blockers_count  # Print to console
           if [[ $blockers_count > 0 ]]; then
-            echo "## Blockers in Changed Files" >> $GITHUB_STEP_SUMMARY
+            echo "## Blockers in Changed Files (Severity 1 & 2)" >> $GITHUB_STEP_SUMMARY
             echo "${{steps.csv-table-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
             BLOCKER_STRING="$blockers_count Blocking Violations Detected"
             echo "::error::$BLOCKER_STRING"
@@ -183,7 +183,7 @@ jobs:
           echo "other_count=$other_count" >> $GITHUB_OUTPUT
           echo "NON-BLOCKER FOUND:" $other_count  # Print to console
           if [[ $other_count > 0 ]]; then
-            echo "## Non-Blocking Violations in Changed Files" >> $GITHUB_STEP_SUMMARY
+            echo "## Non-Blocking Violations in Changed Files (Severity 3-5)" >> $GITHUB_STEP_SUMMARY
             echo "${{steps.csv-table-other.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
           fi
 

@@ -138,7 +138,7 @@ jobs:
         id: md_to_output_blockers_metadata
         run: |
           echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}"
-          echo "# Blockers in Changed Files" >> $GITHUB_STEP_SUMMARY
+          echo "# Blockers in Changed Files (Severity 1 & 2)" >> $GITHUB_STEP_SUMMARY
           echo "${{steps.csv_table_output-blockers-xml.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
 
       ########## RESCAN FOR BLOCKING VIOLATIONS
