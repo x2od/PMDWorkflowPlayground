@@ -240,7 +240,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ${{ env.hidden_comment_prefix }}
-            ## Blockers
+            ## Blockers in Most Recent Commit
             ${{steps.csv-comment-md.outputs.markdown-table}}
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
@@ -252,7 +252,7 @@ jobs:
           edit-mode: 'replace'
           body: |
             ${{ env.hidden_comment_prefix }}
-            ## Blockers
+            ## Blockers in Most Recent Commit (Last update $(date --utc +%Y%m%d_%H%M%S) UTC)
             ${{steps.csv-comment-md.outputs.markdown-table}}
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
 
