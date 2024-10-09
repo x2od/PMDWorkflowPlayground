@@ -33,9 +33,17 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Cache files
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.sonar
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
       ####################### ALL VIOLATIONS CHECK
 
-      - name: Run CodeScan scan to CSV - All violations
+      - name: Run CodeScan scan action
         id: codescan
         uses: codescan-io/codescan-scanner-action@1.5
         with:
