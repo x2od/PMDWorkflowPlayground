@@ -12,6 +12,8 @@ on:
 env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
+  hidden_comment_prefix: <!--dtc-scanner-->
+  run_sarif: 'true'
 
 jobs:
   scan-pmd:
@@ -19,7 +21,12 @@ jobs:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
     runs-on: ubuntu-latest
+
+    outputs:
+      blockers_text: ${{ steps.csv_blockers.outputs.content }}
+      blockers_count: ${{ steps.evaluate_violations_blockers.outputs.blockers_count }}
 
     steps:
       # Check out the source code
@@ -69,7 +76,7 @@ jobs:
         id: pmd_csv_all
         run: |
           rm -f .pmdCache
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error $csv_properties
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format csv --report-file ${{ steps.set_filename.outputs.filename }}.csv --no-cache --no-progress --no-fail-on-violation --no-fail-on-error $csv_properties
 
       - name: Priority to Severity
         id: priority_to_severity_all
@@ -129,15 +136,15 @@ jobs:
         id: evaluate_violations_blockers
         run: |
           csv_blocker_count=$(wc -l pmd-blockers.csv|awk '{print $1}')
-          blocker_count=$((csv_blocker_count - 1))
-          echo "blocker_count=$blocker_count" >> $GITHUB_OUTPUT
-          echo "BLOCKERS FOUND:" $blocker_count  # Print to console
-          if [[ $blocker_count > 0 ]]; then
-            echo "## Blockers in Changed Files" >> $GITHUB_STEP_SUMMARY
+          blockers_count=$((csv_blocker_count - 1))
+          echo "blockers_count=$blockers_count" >> $GITHUB_OUTPUT
+          echo "BLOCKERS FOUND:" $blockers_count  # Print to console
+          if [[ $blockers_count > 0 ]]; then
+            echo "## Blockers in Changed Files (Severity 1 & 2)" >> $GITHUB_STEP_SUMMARY
             echo "${{steps.csv-table-blockers.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
-            BLOCKER_STRING="$blocker_count Blocking Violations Detected"
+            BLOCKER_STRING="$blockers_count Blocking Violations Detected"
             echo "::error::$BLOCKER_STRING"
-          elif [[ $blocker_count == 0 ]]; then
+          elif [[ $blockers_count == 0 ]]; then
             echo "::notice::No Blocking Violations Detected"
           fi
 
@@ -176,23 +183,93 @@ jobs:
           echo "other_count=$other_count" >> $GITHUB_OUTPUT
           echo "NON-BLOCKER FOUND:" $other_count  # Print to console
           if [[ $other_count > 0 ]]; then
-            echo "## Non-Blocking Violations in Changed Files" >> $GITHUB_STEP_SUMMARY
+            echo "## Non-Blocking Violations in Changed Files (Severity 3-5)" >> $GITHUB_STEP_SUMMARY
             echo "${{steps.csv-table-other.outputs.markdown-table}}" >> $GITHUB_STEP_SUMMARY
           fi
 
       # Run PMD SARIF can
       - name: Run PMD scan to SARIF
         id: pmd_sarif
+        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }} && $run_sarif == 'true'
         run: |
-          #rm -f .pmdCache
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --cache .pmdCache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
 
       - name: Upload violations file in SARIF format
+        if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }} && $run_sarif == 'true'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: pmd-cli-report.sarif
           category: PMD
 
+  write-blockers-comment:
+    needs: scan-pmd
+    permissions:
+      issues: write
+      pull-requests: write
+    if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Filter blocker columns
+        run: |
+          printf '${{ needs.scan-pmd.outputs.blockers_text}}' > pmd-blockers-input.csv  
+          cut -d "," -f 1,3,4 pmd-blockers-input.csv >> pmd-blocker-comment.csv
+          cat pmd-blocker-comment.csv
+      - name: Read CSV - other
+        id: csv_comment
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-blocker-comment.csv
+
+      - name: Create MD - other
+        uses: petems/csv-to-md-table-action@master
+        id: csv-comment-md
+        with:
+          csvinput: ${{ steps.csv_comment.outputs.content }}
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v3
+        id: find_comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: ${{ env.hidden_comment_prefix }}
+
+      - name: Create comment
+        if: steps.find_comment.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ${{ env.hidden_comment_prefix }}
+            ## Blockers
+            ${{steps.csv-comment-md.outputs.markdown-table}}
+            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+
+      - name: Update comment
+        if: ${{ steps.find_comment.outputs.comment-id != '' }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          edit-mode: 'replace'
+          body: |
+            ${{ env.hidden_comment_prefix }}
+            ## Blockers
+            ${{steps.csv-comment-md.outputs.markdown-table}}
+            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+
+  # call-blockers-comment:
+  #   needs: scan-pmd
+  #   permissions:
+  #     issues: write
+  #     pull-requests: write
+  #   if: ${{ needs.scan-pmd.outputs.blockers_count > 0}}
+  #   uses: ./.github/workflows/rollout-ci_violations_comment_call.yml
+  #   with:
+  #     input_blockers_text: ${{ needs.scan-pmd.outputs.blockers_text }}
+
+  fail-for-scan-blockers:
+    runs-on: ubuntu-latest
+    needs: scan-pmd
+    steps:
       - name: Check Blocker Count for Exit Code
-        if: ${{ steps.evaluate_violations_blockers.outputs.blocker_count > 0 }}
+        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }}
         run: exit 1

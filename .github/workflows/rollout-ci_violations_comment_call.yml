@@ -1,0 +1,99 @@
+name: Scan Violations to Comment
+
+# Controls when the workflow will run
+on:
+  workflow_call:
+    inputs:
+      input_blockers_text:
+        required: false
+        description: csv text of blockers table
+        default: ''
+        type: string
+      # blockers_count:
+      #   required: false
+      #   description: number of blocker violations
+      #   default: 0
+      #   type: number
+      # violations_text:
+      #   required: false
+      #   description: csv text of all violations table
+      #   type: string
+      #   default: ''
+      # violations_count:
+      #   required: false
+      #   description: number of all violations
+      #   default: 0
+      #   type: number
+      hidden_comment_markdown:
+        required: false
+        type: string
+        description: hidden text to find for updating comments
+        default: <!--dtc-scanner-->
+
+# env:
+#   env_hidden_comment_prefix: '<!--dtc-scanner-->'
+permissions:
+  # contents: read # for actions/checkout to fetch code
+  # security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+  # actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+  issues: write
+  pull-requests: write
+
+jobs:
+  violations-to-comment:
+    # outputs:
+    #   comment_markdown: ${{ steps.assemble_comment.outputs.markdown }}
+    # env:
+    #   GH_TOKEN: ${{ github.token }}
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      - name: Filter blocker columns
+        run: |
+          printf '${{ inputs.input_blockers_text}}' > pmd-blockers-input.csv  
+          cut -d "," -f 1,3,4 pmd-blockers-input.csv >> pmd-blocker-comment.csv
+          cat pmd-blocker-comment.csv
+          echo "Passed in the prefix  ${{ inputs.hidden_comment_markdown }}"
+          echo "Will this show up in the output?" >> $GITHUB_STEP_SUMMARY
+
+      - name: Read CSV - blockers
+        id: csv_comment
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./pmd-blocker-comment.csv
+
+      - name: Create MD - other
+        uses: petems/csv-to-md-table-action@master
+        id: csv-comment-md
+        with:
+          csvinput: ${{ steps.csv_comment.outputs.content }}
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v3
+        id: find_comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: ${{ inputs.hidden_comment_markdown }}
+
+      - name: Update comment
+        if: steps.find_comment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          edit-mode: 'replace'
+          body: |
+            ${{ inputs.hidden_comment_markdown }}
+            ## Blockers
+            ${{steps.csv-comment-md.outputs.markdown-table}}
+            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+
+      - name: Create comment
+        if: steps.find_comment.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ${{ inputs.hidden_comment_markdown }}
+            ## Blockers
+            ${{steps.csv-comment-md.outputs.markdown-table}}
+            [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})

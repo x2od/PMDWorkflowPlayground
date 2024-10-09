@@ -8,6 +8,7 @@
         <apexClass>ApexTestQueueItemSelector</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <custom>true</custom>
     <fieldPermissions>
         <editable>false</editable>
         <field>Test_Run__c.Total_Tests__c</field>
