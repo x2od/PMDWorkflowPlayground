@@ -45,15 +45,13 @@ jobs:
           codeScanUrl: https://gov-va.codescan.io
           scanChangedFilesOnly: true
           failOnRedQualityGate: true
-          # args: |
-          #   sonar.verbose=true
-          #   sonar.java.binaries=target
-          #   sonar.projectName=${{ github.event.repository.name }}
-          #   sonar.pullrequest.branch=${{github.head_ref}}
-          #   sonar.pullrequest.base=${{github.base_ref}}
-          #   sonar.pullrequest.key=${{github.event.number}}
-          #   sonar.exclusions=scripts/**,**/aura/**/*.css,**/lwc/**/*.css,**/analyticscc__*,**/skuid__*,**/agf__*,**/ExAM__*,**/dupcheck__*,**/rh2__*,**/rhx__*,**/cnx*,**/SDOC*,**/rhx*,**/contentassets/**,**/dashboards/**,**/documents/**,**/eclair/**,**/email/**,**/emailservices/**,**/networkBranding/**,**/reports/**,**/wave/**,**/staticresources/*,**/ADM*,**/usf*,**/welkins_table*,**/sortablegrid*,**/CMTD*,**/DynPro*,**/LIMITMON*,**/ca_only*,**/flowmagic*,**/ear*,**/followrpt*,**/MPM4*,**/copado*,**/emptracing*,**/HealthCloudGA
-
+          args: |
+            sonar.pullrequest.branch=${{github.head_ref}}
+            sonar.pullrequest.base=${{github.base_ref}}
+            sonar.pullrequest.key=${{github.event.number}}
+      #   sonar.exclusions=scripts/**,**/aura/**/*.css,**/lwc/**/*.css,**/analyticscc__*,**/skuid__*,**/agf__*,**/ExAM__*,**/dupcheck__*,**/rh2__*,**/rhx__*,**/cnx*,**/SDOC*,**/rhx*,**/contentassets/**,**/dashboards/**,**/documents/**,**/eclair/**,**/email/**,**/emailservices/**,**/networkBranding/**,**/reports/**,**/wave/**,**/staticresources/*,**/ADM*,**/usf*,**/welkins_table*,**/sortablegrid*,**/CMTD*,**/DynPro*,**/LIMITMON*,**/ca_only*,**/flowmagic*,**/ear*,**/followrpt*,**/MPM4*,**/copado*,**/emptracing*,**/HealthCloudGA
+      #   sonar.verbose=true
+      #   sonar.projectName=${{ github.event.repository.name }}
       - name: Upload violations file in SARIF format
         uses: github/codeql-action/upload-sarif@v3
         with:
