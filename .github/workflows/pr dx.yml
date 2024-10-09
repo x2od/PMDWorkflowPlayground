@@ -211,7 +211,7 @@ jobs:
     steps:
       - name: Write Timestamp
         id: set_timestamp
-        run: echo "timestamp=$(date --utc +%Y%m%d_%H%M%S)" >> $GITHUB_OUTPUT
+        run: echo "timestamp=$(date --utc +%Y-%m-%d_%H:%M:%S)" >> $GITHUB_OUTPUT
 
       - name: Filter blocker columns
         run: |
