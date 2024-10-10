@@ -45,8 +45,8 @@ jobs:
       - name: SETUP JAVA
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '11'
+          distribution: 'coretto'
+          java-version: '21'
 
       ####################### ALL VIOLATIONS CHECK
       - name: Get changed files
@@ -77,8 +77,8 @@ jobs:
           codeScanUrl: https://gov-va.codescan.io
           scanChangedFilesOnly: false
           failOnRedQualityGate: true
-          generateReportFile: true
-          generateSarifFile: false
+          generateReportFile: false
+          generateSarifFile: true
           args: |
             sonar.inclusions=${{ steps.changed-files.outputs.all_changed_files }}
             sonar.pullrequest.branch=${{github.head_ref}}
