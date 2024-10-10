@@ -14,7 +14,7 @@ public with sharing class DeleteThisTest {
 		}
 	}
 
-	//@SuppressWarnings('PMD')
+	@SuppressWarnings('PMD')
 	@IsTest
 	public static void assertMe() {
 		System.assertEquals(1, 1, 'Math is hard');

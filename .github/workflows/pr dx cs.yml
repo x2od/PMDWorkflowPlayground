@@ -45,7 +45,7 @@ jobs:
       - name: SETUP JAVA
         uses: actions/setup-java@v4
         with:
-          distribution: 'coretto'
+          distribution: 'corretto'
           java-version: '21'
 
       ####################### ALL VIOLATIONS CHECK
