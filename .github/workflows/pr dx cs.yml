@@ -49,6 +49,22 @@ jobs:
           java-version: '21'
 
       ####################### ALL VIOLATIONS CHECK
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          output_renamed_files_as_deleted_and_added: true
+          separator: ','
+          old_new_separator: ','
+          old_new_files_separator: ','
+
+      - name: Add changed files to changed.txt
+        shell: bash
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          echo ${{ steps.changed-files.outputs.all_changed_files }} > changed.txt
+          cat changed.txt
 
       - name: Run CodeScan scan action
         id: codescan
@@ -59,11 +75,12 @@ jobs:
           projectKey: x2od-PMDWorkflowPlayground
           organization: david-schach1-va-gov
           codeScanUrl: https://gov-va.codescan.io
-          scanChangedFilesOnly: true
+          scanChangedFilesOnly: false
           failOnRedQualityGate: true
           generateReportFile: true
           generateSarifFile: false
           args: |
+            sonar.inclusions=${{ steps.changed-files.outputs.all_changed_files }}
             sonar.pullrequest.branch=${{github.head_ref}}
             sonar.pullrequest.base=${{github.base_ref}}
             sonar.pullrequest.key=${{github.event.number}}
