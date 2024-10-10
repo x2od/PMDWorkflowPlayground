@@ -87,6 +87,8 @@ jobs:
             sonar.projectName=${{ github.event.repository.name }}
             sonar.token=${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
             sonar.verbose=true
+            sonar.analysisCache.enabled=false
+            sonar.scm.disabled=false
         env:
           token: ${{ secrets.GITHUB_TOKEN }}
           JAVA_TOOL_OPTIONS: '-Xmx8g'
