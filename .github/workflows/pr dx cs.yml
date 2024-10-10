@@ -1,0 +1,103 @@
+# This is a main workflow to trigger on pull requests for DX repositories
+
+name: Pull Request Scan (DX)
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches:
+      - '**'
+    types: [opened, synchronize, reopened]
+
+env:
+  blocking_severity: 2
+  csv_properties: --property package=false --property problem=false --property ruleSet=false
+  hidden_comment_prefix: <!--dtc-scanner-->
+
+jobs:
+  scan-codescan-pull-request:
+    # permissions:
+    #   contents: read # for actions/checkout to fetch code
+    #   security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+    #   actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    runs-on: ubuntu-latest
+
+    # outputs:
+    #   blockers_text: ${{ steps.csv_blockers.outputs.content }}
+    #   blockers_count: ${{ steps.evaluate_violations_blockers.outputs.blockers_count }}
+
+    steps:
+      # Check out the source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        env:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache files
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.sonar
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SETUP JAVA
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+
+      ####################### ALL VIOLATIONS CHECK
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          output_renamed_files_as_deleted_and_added: true
+          separator: ','
+          old_new_separator: ','
+          old_new_files_separator: ','
+
+      - name: Add changed files to changed.txt
+        shell: bash
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          echo ${{ steps.changed-files.outputs.all_changed_files }} > changed.txt
+          cat changed.txt
+
+      - name: Run CodeScan scan action
+        id: codescan
+        if: github.event_name == 'pull_request'
+        uses: codescan-io/codescan-scanner-action@1.5
+        with:
+          login: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          projectKey: x2od-PMDWorkflowPlayground
+          organization: david-schach1-va-gov
+          codeScanUrl: https://gov-va.codescan.io
+          scanChangedFilesOnly: false
+          failOnRedQualityGate: false
+          generateReportFile: false
+          generateSarifFile: true
+          args: |
+            sonar.inclusions=${{ steps.changed-files.outputs.all_changed_files }}
+            sonar.pullrequest.branch=${{github.head_ref}}
+            sonar.pullrequest.base=${{github.base_ref}}
+            sonar.pullrequest.key=${{github.event.number}}
+            sonar.projectName=${{ github.event.repository.name }}
+            sonar.token=${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+            sonar.verbose=true
+            sonar.analysisCache.enabled=false
+            sonar.scm.disabled=false
+            sonar.java.binaries=target
+        env:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          JAVA_TOOL_OPTIONS: '-Xmx8g'
+      #   sonar.exclusions=scripts/**,**/aura/**/*.css,**/lwc/**/*.css,**/analyticscc__*,**/skuid__*,**/agf__*,**/ExAM__*,**/dupcheck__*,**/rh2__*,**/rhx__*,**/cnx*,**/SDOC*,**/rhx*,**/contentassets/**,**/dashboards/**,**/documents/**,**/eclair/**,**/email/**,**/emailservices/**,**/networkBranding/**,**/reports/**,**/wave/**,**/staticresources/*,**/ADM*,**/usf*,**/welkins_table*,**/sortablegrid*,**/CMTD*,**/DynPro*,**/LIMITMON*,**/ca_only*,**/flowmagic*,**/ear*,**/followrpt*,**/MPM4*,**/copado*,**/emptracing*,**/HealthCloudGA
+      #   sonar.verbose=true
+      - name: Upload violations file in SARIF format
+        if: github.event_name == 'pull_request'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: codescan.sarif
+          category: CodeScan

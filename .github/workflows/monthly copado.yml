@@ -109,7 +109,7 @@ jobs:
           echo "violation_count=$violation_count" >> $GITHUB_OUTPUT
           echo "VIOLATIONS FOUND:" $violation_count  # Print to console
            if [[ $violation_count > 0 ]]; then
-             VIOLATION_STRING="$violation_count Scanning Violations Detected (all severities) - download CSV to check"
+             VIOLATION_STRING="$violation_count Scanning Violations Detected (all severities) - download CSV to view"
              echo "::error::$VIOLATION_STRING"
            elif [[ $violation_count == 0 ]]; then
              echo "::notice::No Scanning Violations Detected"
