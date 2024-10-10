@@ -89,6 +89,7 @@ jobs:
             sonar.verbose=true
             sonar.analysisCache.enabled=false
             sonar.scm.disabled=false
+            sonar.java.binaries=target
         env:
           token: ${{ secrets.GITHUB_TOKEN }}
           JAVA_TOOL_OPTIONS: '-Xmx8g'
