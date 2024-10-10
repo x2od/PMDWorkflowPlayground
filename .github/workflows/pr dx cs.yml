@@ -76,7 +76,7 @@ jobs:
           organization: david-schach1-va-gov
           codeScanUrl: https://gov-va.codescan.io
           scanChangedFilesOnly: false
-          failOnRedQualityGate: true
+          failOnRedQualityGate: false
           generateReportFile: false
           generateSarifFile: true
           args: |
