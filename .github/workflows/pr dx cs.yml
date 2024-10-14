@@ -30,8 +30,81 @@ jobs:
       # Check out the source code
       - name: Checkout source code
         uses: actions/checkout@v4
+  scan-codescan-cli:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+    runs-on: ubuntu-latest
 
-  scan-codescan-pull-request:
+    outputs:
+      filename: ${{ steps.set_filename.outputs.filename }}
+      quality_gate_status: ${{ steps.quality_gate_check.outputs.status }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install sfdx
+        shell: pwsh
+        run: |
+          $version_number='2.58.7'
+          Write-Output "Installing SFDX CLI"
+          npm install -g npm
+          node --version
+          Write-Output "npm install --global @salesforce/cli@$version_number "
+          npm install --global @salesforce/cli@$version_number
+      - name: SETUP JAVA
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: install CS plugin
+        run: |
+          echo "Installing AutoRabit Codescanner SFDX Plugin"
+          echo y | sfdx plugins:install sfdx-codescan-plugin
+
+      - name: cs export util
+        run: |
+          # echo "Installing AutoRabit Codescanner Export Utility"
+          # npm i codescan-export -g
+          # codescan-export -v
+      - name: 'Set Filename'
+        id: set_filename
+        run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> "$GITHUB_OUTPUT"
+
+      # Run scan
+      - name: 'Run scan'
+        id: run_scan
+        run: |
+          # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
+          sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true --server ${{ vars.AUTORABIT_CODESCAN_URI }}
+      - name: Upload violations file in SARIF format
+        if: github.event_name == 'pull_request'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: codescan.sarif
+          category: CodeScan
+
+      - name: Quality Gate Check on PR
+        id: quality_gate_check
+        if:
+          github.event_name == 'pull_request'
+          #&& github.base_ref == 'master'
+        env:
+          TOKEN: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          PR_KEY: ${{github.event.number}}
+          PROJECT_KEY: x2od-PMDWorkflowPlayground
+          CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
+        run: |
+          qg_status=$(curl -s -u "$TOKEN": "$CODESCAN_URL/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY" | jq -r '.projectStatus.status')
+          echo "QG Script --> Quality Gate status is ${qg_status}"
+          if [ "${qg_status}" != "OK" ]; then
+            echo "QG Script --> Quality gate is not OK - exiting with error"
+            exit 1
+          fi
+          echo "status=$qg_status" >> $GITHUB_OUTPUT
+
+  scan-codescan-action:
+    if: !always()
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -131,15 +204,15 @@ jobs:
           echo "QG Script --> Quality Gate status is ${qg_status}"
           if [ "${qg_status}" != "OK" ]; then
             echo "QG Script --> Quality gate is not OK - exiting with error"
-            
+            exit 1
           fi
           echo "status=$qg_status" >> $GITHUB_OUTPUT
 
   fail-for-scan-blockers:
     runs-on: ubuntu-latest
-    needs: [scan-pmd, scan-codescan-pull-request]
+    needs: [scan-pmd, scan-codescan-cli]
     if: always()
     steps:
       - name: Check Blocker Count for Exit Code
-        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }} || needs.scan-scan-codescan-pull-request.outputs.status -ne "OK"
+        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }} || needs.scan-scan-codescan-action.outputs.status -ne "OK"
         run: exit 1
