@@ -13,10 +13,14 @@ env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
   hidden_comment_prefix: <!--dtc-scanner-->
-  run_sarif: 'true'
+  run_sarif: true
+  run_pmd: true
+  run_codescan: false
 
 jobs:
   scan-pmd:
+    name: PMD Scan
+    if: $run_pmd == true
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
