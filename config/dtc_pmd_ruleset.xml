@@ -794,7 +794,7 @@
 		<priority>1</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //Profile/userPermissions/name[text[@Text='ViewSetup'] and ../enabled/text[@Text='true']  and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0)] ]]> </value>
+				<value><![CDATA[ //Profile/userPermissions/name[text[@Text='ViewSetup'] and ../enabled/text[@Text='true']  and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0) ] ]]> </value>
 			</property>
 		</properties>
 	</rule>
@@ -876,15 +876,17 @@
 	<!-- General Metadata -->
 
 	<rule
-		name="MetadataDescriptionPermissionSet"
+		name="MetadataDescriptionPermission"
 		language="xml"
-		message="Add a description to explain custom permission sets"
+		message="Add a description to explain metadata granting permissions"
 		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
-		<description>Provide a description for permission sets</description>
+		<description>Provide a description for permission sets, profiles, and custom permissions</description>
 		<priority>2</priority>
 		<properties>
 			<property name="xpath">
-				<value><![CDATA[ //(PermissionSet)/label[text and ../count(description) = 0] ]]></value>
+				<value><![CDATA[ 
+					//(PermissionSet|Profile|CustomPermission)/label[text and ../count(description) = 0 and ( ancestor::Profile/custom/text[@Text='true']  or  count(ancestor::Profile/custom) = 0)] 
+					]]></value>
 			</property>
 		</properties>
 	</rule>

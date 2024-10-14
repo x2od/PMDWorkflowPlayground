@@ -46,7 +46,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
-          java-version: '21'
+          java-version: '17'
 
       ####################### ALL VIOLATIONS CHECK
       - name: Get changed files

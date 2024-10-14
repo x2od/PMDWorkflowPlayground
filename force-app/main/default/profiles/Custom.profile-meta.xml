@@ -28,6 +28,7 @@
         <field>User_Deactivation_Configuration__mdt.Warning_Days__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <label>Custom</label>
     <pageAccesses>
         <apexPage>SandboxRefreshAdmin</apexPage>
         <enabled>true</enabled>
