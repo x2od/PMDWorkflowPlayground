@@ -63,11 +63,6 @@ jobs:
           echo "Installing AutoRabit Codescanner SFDX Plugin"
           echo y | sfdx plugins:install sfdx-codescan-plugin
 
-      - name: cs export util
-        run: |
-          # echo "Installing AutoRabit Codescanner Export Utility"
-          # npm i codescan-export -g
-          # codescan-export -v
       - name: 'Set Filename'
         id: set_filename
         run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> "$GITHUB_OUTPUT"
@@ -84,7 +79,8 @@ jobs:
         run: |
           npm install -g codescan-export
           codescan-export -v
-          codescan-export ${{vars.AUTORABIT_CODESCAN_ORG}} ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --outputFile=codescan-export.csv --server=${{ vars.AUTORABIT_CODESCAN_URI }} --token=${{secrets.AUTORABIT_CODESCAN_TOKEN}} --statuses "OPEN,REOPENED"
+          codescan-export ${{vars.AUTORABIT_CODESCAN_ORG}} ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --server=${{ vars.AUTORABIT_CODESCAN_URI }} --token=${{secrets.AUTORABIT_CODESCAN_TOKEN}} --statuses "OPEN,REOPENED" *> codescan-export.csv
+          #--outputFile=codescan-export.csv 
           cat codescan-export.csv
 
       # - name: Upload violations file in SARIF format
