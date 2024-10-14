@@ -26,6 +26,11 @@ jobs:
       blockers_text: 0
       blockers_count: 0
 
+    steps:
+      # Check out the source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
   scan-codescan-pull-request:
     permissions:
       contents: read # for actions/checkout to fetch code
