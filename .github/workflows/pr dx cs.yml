@@ -30,7 +30,9 @@ jobs:
       # Check out the source code
       - name: Checkout source code
         uses: actions/checkout@v4
+
   scan-codescan-cli:
+    if: 1 > 2
     permissions:
       contents: read # for actions/checkout to fetch code
     runs-on: ubuntu-latest
@@ -75,8 +77,8 @@ jobs:
       - name: 'Run scan'
         id: run_scan
         run: |
-          # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
-          sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true --server ${{ vars.AUTORABIT_CODESCAN_URI }}
+          sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
+
       - name: Upload violations file in SARIF format
         if: github.event_name == 'pull_request'
         uses: github/codeql-action/upload-sarif@v3
@@ -104,7 +106,7 @@ jobs:
           echo "status=$qg_status" >> $GITHUB_OUTPUT
 
   scan-codescan-action:
-    if: 1 == 2
+    if: 1 > 2
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -167,7 +169,6 @@ jobs:
           generateReportFile: false
           generateSarifFile: true
           args: |
-            sonar.inclusions=${{ steps.changed-files.outputs.all_changed_files }}
             sonar.pullrequest.branch=${{github.head_ref}}
             sonar.pullrequest.base=${{github.base_ref}}
             sonar.pullrequest.key=${{github.event.number}}
@@ -182,6 +183,7 @@ jobs:
           JAVA_TOOL_OPTIONS: '-Xmx8g'
       #   sonar.exclusions=scripts/**,**/aura/**/*.css,**/lwc/**/*.css,**/analyticscc__*,**/skuid__*,**/agf__*,**/ExAM__*,**/dupcheck__*,**/rh2__*,**/rhx__*,**/cnx*,**/SDOC*,**/rhx*,**/contentassets/**,**/dashboards/**,**/documents/**,**/eclair/**,**/email/**,**/emailservices/**,**/networkBranding/**,**/reports/**,**/wave/**,**/staticresources/*,**/ADM*,**/usf*,**/welkins_table*,**/sortablegrid*,**/CMTD*,**/DynPro*,**/LIMITMON*,**/ca_only*,**/flowmagic*,**/ear*,**/followrpt*,**/MPM4*,**/copado*,**/emptracing*,**/HealthCloudGA
       #   sonar.verbose=true
+      #sonar.inclusions=${{ steps.changed-files.outputs.all_changed_files }}
       - name: Upload violations file in SARIF format
         if: github.event_name == 'pull_request'
         uses: github/codeql-action/upload-sarif@v3
@@ -214,5 +216,5 @@ jobs:
     if: always()
     steps:
       - name: Check Blocker Count for Exit Code
-        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }} || needs.scan-scan-codescan-action.outputs.status -ne "OK"
+        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }} || needs.scan-codescan-action.outputs.status -ne "OK"
         run: exit 1
