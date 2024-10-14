@@ -79,8 +79,7 @@ jobs:
         run: |
           npm install -g codescan-export
           codescan-export -v
-          codescan-export ${{vars.AUTORABIT_CODESCAN_ORG}} ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --server=${{ vars.AUTORABIT_CODESCAN_URI }} --token=${{secrets.AUTORABIT_CODESCAN_TOKEN}} --statuses "OPEN,REOPENED" *> codescan-export.csv
-          #--outputFile=codescan-export.csv 
+          codescan-export ${{vars.AUTORABIT_CODESCAN_ORG}} ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --server=${{ vars.AUTORABIT_CODESCAN_URI }} --token=${{secrets.AUTORABIT_CODESCAN_TOKEN}} --statuses "OPEN,REOPENED"  --outputFile=codescan-export.csv *> codescan-export.csv
           cat codescan-export.csv
 
       # - name: Upload violations file in SARIF format
