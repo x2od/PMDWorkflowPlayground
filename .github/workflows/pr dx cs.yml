@@ -1,6 +1,6 @@
 # This is a main workflow to trigger on pull requests for DX repositories
 
-name: Pull Request Scan (DX)
+name: Pull Request Scan (CodeScan DX)
 
 # Controls when the workflow will run
 on:
