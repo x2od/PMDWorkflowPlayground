@@ -76,14 +76,23 @@ jobs:
       - name: 'Run scan'
         id: run_scan
         run: |
-          sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
+          #sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
+          sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
 
-      - name: Upload violations file in SARIF format
-        if: github.event_name == 'pull_request'
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: codescan.sarif
-          category: CodeScan
+      - name: Export CodeScan to CSV
+        id: codescan-export
+        run: |
+          npm install -g codescan-export
+          codescan-export -v
+          codescan-export ${{vars.AUTORABIT_CODESCAN_ORG}} ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --outputFile=codescan-export.csv --server=${{ vars.AUTORABIT_CODESCAN_URI }} --token=${{secrets.AUTORABIT_CODESCAN_TOKEN}} --statuses "OPEN,REOPENED"
+          cat codescan-export.csv
+
+      # - name: Upload violations file in SARIF format
+      #   if: github.event_name == 'pull_request'
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: codescan.sarif
+      #     category: CodeScan
 
       - name: Quality Gate Check on PR
         id: quality_gate_check
