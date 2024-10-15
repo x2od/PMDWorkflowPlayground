@@ -124,17 +124,18 @@ jobs:
           name: scan_result_json
           compression-level: 0
 
-      - name: parse csv
+      - name: parse
         id: parse
         shell: pwsh
         run: | 
           $autorabit_result_file_name = "autorabit_export_result_file.txt"
           $autorabit_result_json_file_name = "autorabit_result_json.txt"
-          $autorabit_codescan_results_content = Get-Content $autorabit_result_file_name
+          $autorabit_codescan_results_content = Get-Content $autorabit_result_json_file_name
           write-host "CODESCAN_RESULTS_CONTENT FOLLOWS:"
           write-host $autorabit_codescan_results_content
 
-          $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Csv
+          # $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Csv
+          $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Json
 
           Write-Host "autorabit csv results : $autorabit_results_csv"
           $critical_issues = $autorabit_results_csv | Where-Object { $_.Severity -eq "CRITICAL" }
