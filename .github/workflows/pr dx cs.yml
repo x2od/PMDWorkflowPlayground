@@ -101,7 +101,8 @@ jobs:
           PROJECT_KEY: x2od-PMDWorkflowPlayground
           CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
         run: |
-          qg_status=$(curl -s -u "$TOKEN": "$CODESCAN_URI/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY" | jq -r '.projectStatus.status')
+          echo "https://app.codescan.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY"
+          qg_status=$(curl -s -u "$TOKEN": "https://app.codescan.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY" | jq -r '.projectStatus.status')
           echo "QG Script --> Quality Gate status is ${qg_status}"
           if [ "${qg_status}" != "OK" ]; then
             echo "QG Script --> Quality gate is not OK - exiting with error"
