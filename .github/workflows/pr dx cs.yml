@@ -209,9 +209,9 @@ jobs:
           echo "$CODESCAN_URI/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY"
 
           qg_status=$(curl -s -u "$TOKEN": "${{ vars.AUTORABIT_CODESCAN_URI }}/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY" | jq -r '.projectStatus.status')
-          echo "QG Script --> Quality Gate status is ${qg_status}"
-          if [ "${qg_status}" != "OK" ]; then
-            echo "QG Script --> Quality gate is not OK - exiting with error"
+          echo "QG Script --> Quality Gate status is $qg_status"
+          if [ "$qg_status" != "OK" ]; then
+            echo "QG Script --> Quality gate is $qg_status (not OK) - exiting with error"
             exit 1
           fi
           echo "status=$qg_status" >> $GITHUB_OUTPUT
