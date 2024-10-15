@@ -102,11 +102,9 @@ jobs:
           PROJECT_KEY: x2od-PMDWorkflowPlayground
           CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
         run: |
-
-
-          qg_status=$(curl -s -u "$TOKEN": "https://app.codescan.io/api/qualitygates/project_status?projectKey=${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}}&pullRequest= ${{github.event.number}}" | jq -r '.projectStatus.status')
-          echo "QG Script --> Quality Gate status is ${qg_status}"
-          if [ "${qg_status}" != "OK" ]; then
+          qg_status=$(curl -s -u "$TOKEN": "$CODESCAN_URI/api/qualitygates/project_status?projectKey=${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}}&pullRequest= ${{github.event.number}}" | jq -r '.projectStatus.status')
+          echo "QG Script --> Quality Gate status is $qg_status"
+          if [ "$qg_status" != "OK" ]; then
             echo "QG Script --> Quality gate is not OK - exiting with error"
             exit 1
           fi
@@ -208,7 +206,7 @@ jobs:
           PROJECT_KEY: x2od-PMDWorkflowPlayground
           CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
         run: |
-          echo "https://app.codescan.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY"
+          echo "$CODESCAN_URI/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY"
 
           qg_status=$(curl -s -u "$TOKEN": "${{ vars.AUTORABIT_CODESCAN_URI }}/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY" | jq -r '.projectStatus.status')
           echo "QG Script --> Quality Gate status is ${qg_status}"
@@ -224,5 +222,5 @@ jobs:
     if: always()
     steps:
       - name: Check Blocker Count for Exit Code
-        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }} || needs.scan-codescan-action.outputs.status -ne "OK" || needs.scan-codescan-cli.outputs status -ne "OK"
+        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }} || ${{needs.scan-codescan-action.outputs.quality_gate_status}} != "OK" || needs.scan-codescan-cli.outputs.quality_gate_status -ne "OK"
         run: exit 1
