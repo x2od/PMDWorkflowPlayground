@@ -115,6 +115,13 @@ jobs:
           # echo "$autorabit_codescan_results" >> $GITHUB_ENV
           # echo "EOF" >> $GITHUB_ENV
 
+      - name: Upload all violations file in CSV format
+        uses: actions/upload-artifact@v4
+        with:
+          path: autorabit_export_result_file.txt
+          name: autorabit_export_result_file
+          compression-level: 0
+
 
       - name: parse csv
         id: parse
@@ -127,7 +134,7 @@ jobs:
           $autorabit_codescan_results_content = Get-Content $autorabit_result_file_name
           write-host "CODESCAN_RESULTS_CONTENT FOLLOWS:"
           write-host $autorabit_codescan_results_content
-          
+
           $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Csv
 
           Write-Host "autorabit csv results : $autorabit_results_csv"
