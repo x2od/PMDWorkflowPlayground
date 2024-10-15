@@ -871,6 +871,38 @@
 		</properties>
 	</rule>
 
+	<rule
+		name="DataClassificationComplianceOrSensitivityRequired"
+		language="xml"
+		message="Fields should specify Compliance Category or Security Classification"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>Fields should specify Compliance Category or Security Classification</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ //CustomField[count(securityClassification) = 0 and count(complianceGroup) = 0] ]]></value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule
+		name="PHIPIIMinimumSensitivity"
+		language="xml"
+		message="PHI/PII must have minimum sensitivity of Confidential"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>PHI/PII must have minimum sensitivity of Confidential</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ //CustomField/complianceGroup/text[
+					matches(@Text, 'PII|HIPAA') 
+					and //securityClassification/text[
+					not(matches(@Text,'Confidential|Restricted|MissionCritical')) ]
+					] ]]></value>
+			</property>
+		</properties>
+	</rule>
+
 	<!-- Metadata XML Rules -->
 
 	<!-- General Metadata -->

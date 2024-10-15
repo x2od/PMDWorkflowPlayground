@@ -164,8 +164,8 @@ jobs:
         with:
           login: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
           projectKey: x2od-PMDWorkflowPlayground
-          organization: david-schach1-va-gov
-          codeScanUrl: https://gov-va.codescan.io
+          organization: veteransaffairs
+          codeScanUrl: https://app.codescan.io
           scanChangedFilesOnly: false
           failOnRedQualityGate: false
           generateReportFile: false
