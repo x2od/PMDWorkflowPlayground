@@ -21,6 +21,7 @@ jobs:
     
     outputs:
       filename: ${{ steps.set_filename.outputs.filename }}
+      SCAN_STATUS: ${{ steps.scan_run.outputs.scan_result_status }}
 
     steps:
       - uses: actions/checkout@v4
@@ -49,18 +50,92 @@ jobs:
       
       - name: cs export util
         run: |
-          # echo "Installing AutoRabit Codescanner Export Utility"
+          echo "Installing AutoRabit Codescanner Export Utility"
 
-          # npm i codescan-export -g
-          # codescan-export -v
+          npm i codescan-export -g
+          codescan-export -v
 
-      - name: 'Set Filename'
+      - name: Set Filename
         id: set_filename
         run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> "$GITHUB_OUTPUT"
 
       # Run scan
-      - name: 'Run scan'
-        id: run_scan
+      # - name: 'Run scan'
+      #   id: run_scan
+      #   run: |
+      #     # # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
+      #     # sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -s ${{ vars.AUTORABIT_CODESCAN_URI }} -D sonar.analysis.report.type=sarif -D sonar.analysis.report.enabled=true
+      
+      - name: autorabit sfdx codescan
+        id: scan_run
+        env:
+          AUTORABIT_CODESCAN_TOKEN: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          AUTORABIT_CODESCAN_ORGANIZATION: ${{ vars.AUTORABIT_CODESCAN_ORG }}
+          AUTORABIT_CODESCAN_PROJECT_KEY: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
+          AUTORABIT_CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
+        shell: pwsh
         run: |
-          # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
-          sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
+          $stop_build_on_quality_gate_fail = $true
+          
+          #save scan to a file
+          $autorabit_result_file_name = "autorabit_export_result_file.txt"
+          $autorabit_result_file = $(sfdx codescan:run --token $env:AUTORABIT_CODESCAN_TOKEN --projectkey $env:AUTORABIT_CODESCAN_PROJECT_KEY --organization $env:AUTORABIT_CODESCAN_ORGANIZATION -s $env:AUTORABIT_CODESCAN_URI --nofail --json *> $autorabit_result_file_name) | Out-Null
+          $autorabit_codescan_results = $(Get-Content $autorabit_result_file)
+          
+          #regex match the content: {} around any whitespace or non-swhitespace characters...aka json
+          $json_regex = "\{([\s\S]*)\}"
+          $codescan_json_regex_match_results = [regex]::match($autorabit_codescan_results, $json_regex)
+          
+          $codescan_json = $null
+          if ($codescan_json_regex_match_results.success) {
+            $codescan_json = $codescan_json_regex_match_results.Groups[0].Value
+          }
+          
+          $codescan_result = $null
+          if (![string]::IsNullOrEmpty(($codescan_json))) {
+          $codescan_result = $codescan_json | ConvertFrom-Json
+          }
+          
+          # establish if the scan was a success or failure
+          $stop_build_on_quality_gate_fail = [System.Convert]::ToBoolean($stop_build_on_quality_gate_fail)
+          $autorabit_codescan_status_result = 1
+          if ($stop_build_on_quality_gate_fail) {
+          $failure_code = 1
+          $success_code = 0
+          $autorabit_codescan_status_result = ( ($codescan_result.result.code -eq 0) -and ($codescan_result.status -eq 0) ) ? $success_code : $failure_code
+          } else {
+            $autorabit_codescan_status_result = $codescan_result.status
+          }
+          
+          # output the status for later
+          "scan_result_status=$autorabit_codescan_status_result" >> $env:GITHUB_OUTPUT
+          
+          # #save result to multi-line gh env var for use in a later step
+          # echo "autorabit_codescan_results<<EOF" >> $GITHUB_ENV
+          # echo "$autorabit_codescan_results" >> $GITHUB_ENV
+          # echo "EOF" >> $GITHUB_ENV
+
+
+      - name: parse csv
+        id: parse
+        shell: pwsh
+        run: | 
+          param(
+          $autorabit_result_file_name
+          )
+
+          $autorabit_codescan_results_content = Get-Content $autorabit_result_file_name
+          write-host "CODESCAN_RESULTS_CONTENT FOLLOWS:"
+          write-host $autorabit_codescan_results_content
+          
+          $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Csv
+
+          Write-Host "autorabit csv results : $autorabit_results_csv"
+          $critical_issues = $autorabit_results_csv | Where-Object { $_.Severity -eq "CRITICAL" }
+
+          if ( $critical_issues.count -gt 0 ) {
+              Write-Host "CRITICAL ISSUES FOUND: $critical_issues"
+              Throw "CRITICAL ISSUES DISCOVERED: $critical_issues"
+          }
+
+
