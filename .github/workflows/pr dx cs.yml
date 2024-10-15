@@ -13,6 +13,7 @@ env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
   hidden_comment_prefix: <!--dtc-scanner-->
+  upload_sarif: false
 
 jobs:
   scan-pmd:
@@ -103,7 +104,7 @@ jobs:
         run: |
           echo "https://app.codescan.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY"
 
-          qg_status=$(curl -s -u "$TOKEN": "https://app.codescan.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY" | jq -r '.projectStatus.status')
+          qg_status=$(curl -s -u "$TOKEN": "https://app.codescan.io/api/qualitygates/project_status?projectKey=${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}}&pullRequest= ${{github.event.number}}" | jq -r '.projectStatus.status')
           echo "QG Script --> Quality Gate status is ${qg_status}"
           if [ "${qg_status}" != "OK" ]; then
             echo "QG Script --> Quality gate is not OK - exiting with error"
@@ -190,7 +191,7 @@ jobs:
       #   sonar.verbose=true
       #sonar.inclusions=${{ steps.changed-files.outputs.all_changed_files }}
       - name: Upload violations file in SARIF format
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && ${{env.upload_sarif == true }}
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: codescan.sarif
