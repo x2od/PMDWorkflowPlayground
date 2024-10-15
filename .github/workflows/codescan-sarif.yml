@@ -79,6 +79,7 @@ jobs:
           
           #save scan to a file
           $autorabit_result_file_name = "autorabit_export_result_file.txt"
+          $autorabit_result_json_file_name = "autorabit_result_json.txt"
           $autorabit_result_file = $(sfdx codescan:run --token $env:AUTORABIT_CODESCAN_TOKEN --projectkey $env:AUTORABIT_CODESCAN_PROJECT_KEY --organization $env:AUTORABIT_CODESCAN_ORGANIZATION -s $env:AUTORABIT_CODESCAN_URI --nofail --json *> $autorabit_result_file_name) | Out-Null
           $autorabit_codescan_results = $(Get-Content $autorabit_result_file_name)
           
@@ -90,6 +91,7 @@ jobs:
           if ($codescan_json_regex_match_results.success) {
             $codescan_json = $codescan_json_regex_match_results.Groups[0].Value
           }
+          $codescan_json *> $autorabit_result_json_file_name
           
           $codescan_result = $null
           if (![string]::IsNullOrEmpty(($codescan_json))) {
@@ -118,19 +120,16 @@ jobs:
       - name: Upload all violations file in CSV format
         uses: actions/upload-artifact@v4
         with:
-          path: autorabit_export_result_file.txt
-          name: autorabit_export_result_file
+          path: autorabit_result_json.txt
+          name: scan_result_json
           compression-level: 0
-
 
       - name: parse csv
         id: parse
         shell: pwsh
         run: | 
-          param(
-          $autorabit_result_file_name
-          )
-
+          $autorabit_result_file_name = "autorabit_export_result_file.txt"
+          $autorabit_result_json_file_name = "autorabit_result_json.txt"
           $autorabit_codescan_results_content = Get-Content $autorabit_result_file_name
           write-host "CODESCAN_RESULTS_CONTENT FOLLOWS:"
           write-host $autorabit_codescan_results_content
