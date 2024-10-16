@@ -62,6 +62,7 @@ jobs:
       # Run scan
       - name: 'Run scan'
         id: run_scan
+        shell: pwsh
         run: |
           $autorabit_result_file_name = "autorabit_export_result_file.txt"
           $autorabit_result_json_file_name = "autorabit_result_json.txt"
