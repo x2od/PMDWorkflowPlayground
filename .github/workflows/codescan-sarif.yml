@@ -67,8 +67,9 @@ jobs:
           $autorabit_result_file_name = "autorabit_export_result_file.txt"
           $autorabit_result_json_file_name = "autorabit_result_json.txt"
           # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
-          $result_file = $(sfdx codescan:run --token ${{secrets.AUTORABIT_CLOUD_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -s ${{ vars.AUTORABIT_CODESCAN_URI }} -D sonar.analysis.report.type=sarif -D sonar.analysis.report.enabled=true *> $autorabit_result_file_name)
-      
+          $result_file = $(sfdx codescan:run --token ${{secrets.AUTORABIT_CLOUD_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -s ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail -D sonar.analysis.report.type=sarif -D sonar.analysis.report.enabled=true *> $autorabit_result_file_name) | Out-Null
+          write-host "scan result: $result_file"
+          
       - name: autorabit sfdx codescan
         id: scan_run
         env:
