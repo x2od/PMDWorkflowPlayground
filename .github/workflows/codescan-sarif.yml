@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     
 env:
-  AUTORABIT_CODESCAN_TOKEN:               ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+  AUTORABIT_CODESCAN_TOKEN:               ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
   AUTORABIT_CODESCAN_ORGANIZATION:        ${{ vars.AUTORABIT_CODESCAN_ORG }}
   AUTORABIT_CODESCAN_PROJECT_KEY:         ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
   AUTORABIT_CODESCAN_URI:                 ${{ vars.AUTORABIT_CODESCAN_URI }}
@@ -60,16 +60,18 @@ jobs:
         run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> "$GITHUB_OUTPUT"
 
       # Run scan
-      # - name: 'Run scan'
-      #   id: run_scan
-      #   run: |
-      #     # # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
-      #     # sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -s ${{ vars.AUTORABIT_CODESCAN_URI }} -D sonar.analysis.report.type=sarif -D sonar.analysis.report.enabled=true
+      - name: 'Run scan'
+        id: run_scan
+        run: |
+          $autorabit_result_file_name = "autorabit_export_result_file.txt"
+          $autorabit_result_json_file_name = "autorabit_result_json.txt"
+          # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
+          $result_file = $(sfdx codescan:run --token ${{secrets.AUTORABIT_CLOUD_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -s ${{ vars.AUTORABIT_CODESCAN_URI }} -D sonar.analysis.report.type=sarif -D sonar.analysis.report.enabled=true *> $autorabit_result_file_name)
       
       - name: autorabit sfdx codescan
         id: scan_run
         env:
-          AUTORABIT_CODESCAN_TOKEN: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          AUTORABIT_CODESCAN_TOKEN: ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
           AUTORABIT_CODESCAN_ORGANIZATION: ${{ vars.AUTORABIT_CODESCAN_ORG }}
           AUTORABIT_CODESCAN_PROJECT_KEY: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
           AUTORABIT_CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
@@ -80,7 +82,7 @@ jobs:
           #save scan to a file
           $autorabit_result_file_name = "autorabit_export_result_file.txt"
           $autorabit_result_json_file_name = "autorabit_result_json.txt"
-          $autorabit_result_file = $(sfdx codescan:run --token $env:AUTORABIT_CODESCAN_TOKEN --projectkey $env:AUTORABIT_CODESCAN_PROJECT_KEY --organization $env:AUTORABIT_CODESCAN_ORGANIZATION -s $env:AUTORABIT_CODESCAN_URI --nofail --json *> $autorabit_result_file_name) | Out-Null
+          # $autorabit_result_file = $(sfdx codescan:run --token $env:AUTORABIT_CODESCAN_TOKEN --projectkey $env:AUTORABIT_CODESCAN_PROJECT_KEY --organization $env:AUTORABIT_CODESCAN_ORGANIZATION -s $env:AUTORABIT_CODESCAN_URI --nofail --json *> $autorabit_result_file_name) | Out-Null
           $autorabit_codescan_results = $(Get-Content $autorabit_result_file_name)
           
           #regex match the content: {} around any whitespace or non-swhitespace characters...aka json
@@ -117,12 +119,27 @@ jobs:
           # echo "$autorabit_codescan_results" >> $GITHUB_ENV
           # echo "EOF" >> $GITHUB_ENV
 
-      - name: Upload all violations file in CSV format
+      - name: Upload quality gate info
         uses: actions/upload-artifact@v4
         with:
           path: autorabit_result_json.txt
           name: scan_result_json
           compression-level: 0
+
+      - name: Upload full scan info
+        uses: actions/upload-artifact@v4
+        with:
+          path: autorabit_export_result_file.txt
+          name: scan_result_output
+          compression-level: 0
+
+      - name: Upload sarif
+        uses: actions/upload-artifact@v4
+        with:
+          path: codescan.sarif
+          name: scan_sarif
+          compression-level: 0
+
 
       - name: parse
         id: parse
