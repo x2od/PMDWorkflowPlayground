@@ -1,4 +1,4 @@
-name: ARCS SARIF
+name: ARCS GOV SARIF
 
 # run-name: Repository PMD scan by @${{ github.actor }}
 
