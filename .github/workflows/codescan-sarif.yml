@@ -71,7 +71,7 @@ jobs:
       #     write-host "scan result: $result_file"
           
       - name: Run Codescan On Push
-        uses: codescan-io/codescan-scanner-action@1.4
+        uses: codescan-io/codescan-scanner-action@1.5
         with:
           organization: veteransaffairs
           projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
