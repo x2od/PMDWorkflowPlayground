@@ -76,6 +76,7 @@ jobs:
           organization: veteransaffairs
           projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
           login: ${{ secrets.AUTORABIT_GOV_TOKEN }}
+          server: ${{ vars.AUTORABIT_CODESCAN_GOV_URI }}
           failOnRedQualityGate: true
           generateSarifFile: true
           generateReportFile: true
