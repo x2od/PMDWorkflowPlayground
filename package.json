@@ -44,17 +44,19 @@
     "@salesforce/eslint-plugin-lightning": "^1.0.0",
     "@salesforce/sfdx-lwc-jest": "^5.1.0",
     "@x2od/prettier-config": "^0.0.3",
+    "codescan-export": "^1.0.7",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest": "^28.8.3",
     "eslint-plugin-prettier": "^5.2.1",
     "highlightjs-apex": "^1.4.0",
+    "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "marked": "^14.1.2",
     "prettier": "^3.3.3",
     "prettier-plugin-apex": "^2.1.5",
-    "release-please": "^16.14.2"
+    "release-please": "^16.14.0"
   },
   "lint-staged": {
     "force-app/**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,yaml,yml}": [

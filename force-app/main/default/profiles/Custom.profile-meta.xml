@@ -20,7 +20,7 @@
     </objectPermissions>
     <classAccesses>
         <apexClass>CalloutRequestMock</apexClass>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
     </classAccesses>
     <custom>true</custom>
     <fieldPermissions>
@@ -28,6 +28,7 @@
         <field>User_Deactivation_Configuration__mdt.Warning_Days__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <label>Custom</label>
     <pageAccesses>
         <apexPage>SandboxRefreshAdmin</apexPage>
         <enabled>true</enabled>

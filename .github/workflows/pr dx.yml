@@ -1,6 +1,6 @@
 # This is a main workflow to trigger on pull requests for DX repositories
 
-name: Pull Request Scan (DX)
+name: Pull Request Scan (DX) - PMD
 
 # Controls when the workflow will run
 on:
@@ -13,10 +13,14 @@ env:
   blocking_severity: 2
   csv_properties: --property package=false --property problem=false --property ruleSet=false
   hidden_comment_prefix: <!--dtc-scanner-->
-  run_sarif: 'true'
+  run_sarif: true
+  run_pmd: true
+  run_codescan: false
 
 jobs:
   scan-pmd:
+    name: PMD Scan
+    if: $run_pmd == true
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -192,7 +196,7 @@ jobs:
         id: pmd_sarif
         if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }} && $run_sarif == 'true'
         run: |
-          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority 2
+          ~/pmd/bin/pmd check --file-list changed.txt --rulesets config/dtc_pmd_ruleset.xml --format sarif --report-file pmd-cli-report.sarif --no-cache --no-progress --no-fail-on-violation --no-fail-on-error --minimum-priority $blocking_severity
 
       - name: Upload violations file in SARIF format
         if: ${{ steps.evaluate_violations_all.outputs.violation_count > 0 }} && $run_sarif == 'true'
@@ -209,11 +213,16 @@ jobs:
     if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }}
     runs-on: ubuntu-latest
     steps:
+      - name: Write Timestamp
+        id: set_timestamp
+        run: echo "timestamp=$(date --utc +%Y-%m-%d_%H:%M:%S)" >> $GITHUB_OUTPUT
+
       - name: Filter blocker columns
         run: |
           printf '${{ needs.scan-pmd.outputs.blockers_text}}' > pmd-blockers-input.csv  
           cut -d "," -f 1,3,4 pmd-blockers-input.csv >> pmd-blocker-comment.csv
           cat pmd-blocker-comment.csv
+
       - name: Read CSV - other
         id: csv_comment
         uses: juliangruber/read-file-action@v1
@@ -240,9 +249,9 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ${{ env.hidden_comment_prefix }}
-            ## Blockers
-            ${{steps.csv-comment-md.outputs.markdown-table}}
+            ## Blockers in Most Recent Commit (Last update ${{steps.set_timestamp.outputs.timestamp}} UTC)
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+            ${{steps.csv-comment-md.outputs.markdown-table}}
 
       - name: Update comment
         if: ${{ steps.find_comment.outputs.comment-id != '' }}
@@ -252,9 +261,9 @@ jobs:
           edit-mode: 'replace'
           body: |
             ${{ env.hidden_comment_prefix }}
-            ## Blockers
-            ${{steps.csv-comment-md.outputs.markdown-table}}
+            ## Blockers in Most Recent Commit (Last update ${{steps.set_timestamp.outputs.timestamp}} UTC)
             [View details](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})
+            ${{steps.csv-comment-md.outputs.markdown-table}}
 
   # call-blockers-comment:
   #   needs: scan-pmd
