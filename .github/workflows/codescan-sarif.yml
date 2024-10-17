@@ -74,7 +74,7 @@ jobs:
         uses: codescan-io/codescan-scanner-action@1.4
         with:
           organization: veteransaffairs
-          projectKey: ${{ secrets.AUTORABIT_CODESCAN_PROJECT_KEY }}
+          projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
           login: ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
           failOnRedQualityGate: true
           generateSarifFile: true
