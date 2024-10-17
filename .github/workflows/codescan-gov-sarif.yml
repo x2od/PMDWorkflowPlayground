@@ -73,7 +73,7 @@ jobs:
       - name: Run Codescan On Push
         uses: codescan-io/codescan-scanner-action@1.4
         with:
-          organization: veteransaffairs
+          organization: gov-va
           projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
           login: ${{ secrets.AUTORABIT_GOV_TOKEN }}
           codeScanUrl: ${{ vars.AUTORABIT_CODESCAN_GOV_URI }}
