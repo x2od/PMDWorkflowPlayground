@@ -896,8 +896,28 @@
 			<property name="xpath">
 				<value><![CDATA[ //CustomField/complianceGroup/text[
 					matches(@Text, 'PII|HIPAA') 
-					and //securityClassification/text[
+					and (//securityClassification/text[
 					not(matches(@Text,'Confidential|Restricted|MissionCritical')) ]
+					or count(//securityClassification) = 0)
+					] ]]></value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule
+		name="PHIPIIMinimumClassification"
+		language="xml"
+		message="PHI/PII must have minimum sensitivity of Confidential"
+		class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+		<description>PHI/PII must have minimum sensitivity of Confidential</description>
+		<priority>2</priority>
+		<properties>
+			<property name="xpath">
+				<value><![CDATA[ //securityClassification/text[
+					not(matches(@Text,'Confidential|Restricted|MissionCritical')) and 
+					//CustomField/complianceGroup/text[
+					matches(@Text, 'PII|HIPAA') 
+					] 
 					] ]]></value>
 			</property>
 		</properties>
