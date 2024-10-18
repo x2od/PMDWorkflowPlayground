@@ -98,7 +98,7 @@ jobs:
           # #save scan to a file
           $autorabit_result_file_name = "autorabit_export_result_file.txt"
           $autorabit_result_json_file_name = "autorabit_result_json.txt"
-          $autorabit_result_file = $(sfdx codescan:run --token $env:AUTORABIT_CODESCAN_TOKEN --projectkey $env:AUTORABIT_CODESCAN_PROJECT_KEY --organization $env:AUTORABIT_CODESCAN_ORGANIZATION -s $env:AUTORABIT_CODESCAN_URI --nofail --json *> $autorabit_result_file_name) | Out-Null
+          $autorabit_result_file = $(sfdx codescan:run --token $env:AUTORABIT_CODESCAN_TOKEN --projectkey $env:AUTORABIT_CODESCAN_PROJECT_KEY --organization $env:AUTORABIT_CODESCAN_ORGANIZATION -s $env:AUTORABIT_CODESCAN_URI -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true --nofail --json *> $autorabit_result_file_name) | Out-Null
           $autorabit_codescan_results = $(Get-Content $autorabit_result_file_name)
           
           #regex match the content: {} around any whitespace or non-swhitespace characters...aka json
