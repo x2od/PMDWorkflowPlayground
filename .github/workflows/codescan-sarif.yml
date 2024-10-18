@@ -59,26 +59,28 @@ jobs:
         id: set_filename
         run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> "$GITHUB_OUTPUT"
 
-      # Run scan
-      # - name: 'Run scan'
-      #   id: run_scan
-      #   shell: pwsh
-      #   run: |
-      #     $autorabit_result_file_name = "autorabit_export_result_file.txt"
-      #     $autorabit_result_json_file_name = "autorabit_result_json.txt"
-      #     # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
-      #     $result_file = $(sfdx codescan:run --token ${{secrets.AUTORABIT_CLOUD_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization veteransaffairs -s ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail -D sonar.analysis.report.type=sarif -D sonar.analysis.report.enabled=true *> $autorabit_result_file_name) | Out-Null
-      #     write-host "scan result: $result_file"
+      #  # Run scan
+      - name: 'Run scan'
+        id: run_scan
+        shell: pwsh
+        run: |
+          $autorabit_result_file_name = "autorabit_export_result_file.txt"
+          $autorabit_result_json_file_name = "autorabit_result_json.txt"
+          # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
+          $result_file = $(sfdx codescan:run --token ${{secrets.AUTORABIT_CLOUD_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization veteransaffairs -s ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail -D sonar.analysis.report.type=sarif -D sonar.analysis.report.enabled=true *> $autorabit_result_file_name) | Out-Null
+          write-host "scan result: $result_file"
+          write-host "File list:"
+          write-host $(Get-ChildItem -Name)
           
-      - name: Run Codescan On Push
-        uses: codescan-io/codescan-scanner-action@1.5
-        with:
-          organization: veteransaffairs
-          projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
-          login: ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
-          failOnRedQualityGate: true
-          generateSarifFile: true
-          generateReportFile: true
+      # - name: Run Codescan On Push
+      #   uses: codescan-io/codescan-scanner-action@1.5
+      #   with:
+      #     organization: veteransaffairs
+      #     projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
+      #     login: ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
+      #     failOnRedQualityGate: true
+      #     generateSarifFile: true
+      #     generateReportFile: true
 
       - name: autorabit sfdx codescan
         id: scan_run
