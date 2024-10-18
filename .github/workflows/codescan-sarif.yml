@@ -68,7 +68,7 @@ jobs:
           $autorabit_result_json_file_name = "autorabit_result_json.txt"
           # sfdx codescan:run --token ${CODESCAN_TOKEN} --projectkey ${MY_PROJECT_KEY} --organization ${MY_PROJECT_KEY} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true
           # $result_file = $(sfdx codescan:run --token ${{secrets.AUTORABIT_CLOUD_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization veteransaffairs -s ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail -Dsonar.analysis.report.type=csv -Dsonar.analysis.report.enabled=true *> $autorabit_result_file_name) | Out-Null
-          $result_file = $(sfdx codescan:run --token ${{secrets.AUTORABIT_CLOUD_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization veteransaffairs -s ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail -Dsonar.analysis.report.enabled=true *> $autorabit_result_file_name) | Out-Null
+          $result_file = $(sfdx codescan:run --token ${{secrets.AUTORABIT_CLOUD_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization veteransaffairs -s ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail *> $autorabit_result_file_name) | Out-Null
 
           write-host "scan result: $result_file"
           write-host "File list:"
@@ -96,44 +96,44 @@ jobs:
           # $stop_build_on_quality_gate_fail = $true
           
           # #save scan to a file
-          # $autorabit_result_file_name = "autorabit_export_result_file.txt"
-          # $autorabit_result_json_file_name = "autorabit_result_json.txt"
+          $autorabit_result_file_name = "autorabit_export_result_file.txt"
+          $autorabit_result_json_file_name = "autorabit_result_json.txt"
           # $autorabit_result_file = $(sfdx codescan:run --token $env:AUTORABIT_CODESCAN_TOKEN --projectkey $env:AUTORABIT_CODESCAN_PROJECT_KEY --organization $env:AUTORABIT_CODESCAN_ORGANIZATION -s $env:AUTORABIT_CODESCAN_URI --nofail --json *> $autorabit_result_file_name) | Out-Null
-          # $autorabit_codescan_results = $(Get-Content $autorabit_result_file_name)
+          $autorabit_codescan_results = $(Get-Content $autorabit_result_file_name)
           
-          # #regex match the content: {} around any whitespace or non-swhitespace characters...aka json
-          # $json_regex = "\{([\s\S]*)\}"
-          # $codescan_json_regex_match_results = [regex]::match($autorabit_codescan_results, $json_regex)
+          #regex match the content: {} around any whitespace or non-swhitespace characters...aka json
+          $json_regex = "\{([\s\S]*)\}"
+          $codescan_json_regex_match_results = [regex]::match($autorabit_codescan_results, $json_regex)
           
-          # $codescan_json = $null
-          # if ($codescan_json_regex_match_results.success) {
-          #   $codescan_json = $codescan_json_regex_match_results.Groups[0].Value
-          # }
-          # $codescan_json *> $autorabit_result_json_file_name
+          $codescan_json = $null
+          if ($codescan_json_regex_match_results.success) {
+            $codescan_json = $codescan_json_regex_match_results.Groups[0].Value
+          }
+          $codescan_json *> $autorabit_result_json_file_name
           
-          # $codescan_result = $null
-          # if (![string]::IsNullOrEmpty(($codescan_json))) {
-          # $codescan_result = $codescan_json | ConvertFrom-Json
-          # }
+          $codescan_result = $null
+          if (![string]::IsNullOrEmpty(($codescan_json))) {
+          $codescan_result = $codescan_json | ConvertFrom-Json
+          }
           
-          # # establish if the scan was a success or failure
-          # $stop_build_on_quality_gate_fail = [System.Convert]::ToBoolean($stop_build_on_quality_gate_fail)
-          # $autorabit_codescan_status_result = 1
-          # if ($stop_build_on_quality_gate_fail) {
-          # $failure_code = 1
-          # $success_code = 0
-          # $autorabit_codescan_status_result = ( ($codescan_result.result.code -eq 0) -and ($codescan_result.status -eq 0) ) ? $success_code : $failure_code
-          # } else {
-          #   $autorabit_codescan_status_result = $codescan_result.status
-          # }
+          # establish if the scan was a success or failure
+          $stop_build_on_quality_gate_fail = [System.Convert]::ToBoolean($stop_build_on_quality_gate_fail)
+          $autorabit_codescan_status_result = 1
+          if ($stop_build_on_quality_gate_fail) {
+          $failure_code = 1
+          $success_code = 0
+          $autorabit_codescan_status_result = ( ($codescan_result.result.code -eq 0) -and ($codescan_result.status -eq 0) ) ? $success_code : $failure_code
+          } else {
+            $autorabit_codescan_status_result = $codescan_result.status
+          }
           
-          # # output the status for later
-          # "scan_result_status=$autorabit_codescan_status_result" >> $env:GITHUB_OUTPUT
+          # output the status for later
+          "scan_result_status=$autorabit_codescan_status_result" >> $env:GITHUB_OUTPUT
           
-          # # #save result to multi-line gh env var for use in a later step
-          # # echo "autorabit_codescan_results<<EOF" >> $GITHUB_ENV
-          # # echo "$autorabit_codescan_results" >> $GITHUB_ENV
-          # # echo "EOF" >> $GITHUB_ENV
+          # #save result to multi-line gh env var for use in a later step
+          # echo "autorabit_codescan_results<<EOF" >> $GITHUB_ENV
+          # echo "$autorabit_codescan_results" >> $GITHUB_ENV
+          # echo "EOF" >> $GITHUB_ENV
 
       - name: Upload quality gate info
         uses: actions/upload-artifact@v4
