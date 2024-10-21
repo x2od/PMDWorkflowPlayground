@@ -7,7 +7,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>VistA Ids User Field - View/Edit</label>
+    <label>VistA Ids User Field - Edit</label>
     <userPermissions>
         <enabled>false</enabled>
         <name>ViewSetup</name>
