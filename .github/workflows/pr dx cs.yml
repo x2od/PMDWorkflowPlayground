@@ -1,0 +1,234 @@
+# This is a main workflow to trigger on pull requests for DX repositories
+
+name: Pull Request Scan (CodeScan DX)
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches:
+      - '**'
+    types: [opened, synchronize, reopened]
+
+env:
+  blocking_severity: 2
+  csv_properties: --property package=false --property problem=false --property ruleSet=false
+  hidden_comment_prefix: <!--dtc-scanner-->
+  upload_sarif: false
+
+jobs:
+  scan-pmd:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    runs-on: ubuntu-latest
+    outputs:
+      blockers_text: 0
+      blockers_count: 0
+
+    steps:
+      # Check out the source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+  scan-codescan-cli:
+    if: ((1 == 2))
+    permissions:
+      contents: read # for actions/checkout to fetch code
+    runs-on: ubuntu-latest
+
+    outputs:
+      filename: ${{ steps.set_filename.outputs.filename }}
+      quality_gate_status: ${{ steps.quality_gate_check.outputs.status }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install sfdx
+        shell: pwsh
+        run: |
+          $version_number='2.58.7'
+          Write-Output "Installing SFDX CLI"
+          npm install -g npm
+          node --version
+          Write-Output "npm install --global @salesforce/cli@$version_number "
+          npm install --global @salesforce/cli@$version_number
+      - name: SETUP JAVA
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: install CS plugin
+        run: |
+          echo "Installing AutoRabit Codescanner SFDX Plugin"
+          echo y | sfdx plugins:install sfdx-codescan-plugin
+
+      - name: 'Set Filename'
+        id: set_filename
+        run: echo "filename=${{ github.event.repository.name }}_$(date --utc +%Y%m%d_%H%M%SZ)" >> "$GITHUB_OUTPUT"
+
+      # Run scan
+      - name: 'Run scan'
+        id: run_scan
+        run: |
+          #sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
+          sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
+
+      - name: Export CodeScan to CSV
+        id: codescan-export
+        run: |
+          npm install -g codescan-export
+          codescan-export -v
+          codescan-export ${{vars.AUTORABIT_CODESCAN_ORG}} ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --server=${{ vars.AUTORABIT_CODESCAN_URI }} --token=${{secrets.AUTORABIT_CODESCAN_TOKEN}} --statuses "OPEN,REOPENED"  --outputFile=codescan-export.csv
+          cat codescan-export.csv
+
+      # - name: Upload violations file in SARIF format
+      #   if: github.event_name == 'pull_request'
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: codescan.sarif
+      #     category: CodeScan
+
+      - name: Quality Gate Check on PR
+        id: quality_gate_check
+        if:
+          github.event_name == 'pull_request'
+          #&& github.base_ref == 'master'
+        env:
+          TOKEN: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          PR_KEY: ${{github.event.number}}
+          PROJECT_KEY: x2od-PMDWorkflowPlayground
+          CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
+        run: |
+          qg_status=$(curl -s -u "$TOKEN": "$CODESCAN_URI/api/qualitygates/project_status?projectKey=${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}}&pullRequest= ${{github.event.number}}" | jq -r '.projectStatus.status')
+          echo "QG Script --> Quality Gate status is $qg_status"
+          if [ "$qg_status" != "OK" ]; then
+            echo "QG Script --> Quality gate is not OK - exiting with error"
+            exit 1
+          fi
+          echo "status=$qg_status" >> $GITHUB_OUTPUT
+
+  scan-codescan-action:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      quality_gate_status: ${{ steps.quality_gate_check.outputs.status }}
+    steps:
+      # Check out the source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        env:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache files
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.sonar
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SETUP JAVA
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      ####################### ALL VIOLATIONS CHECK
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          output_renamed_files_as_deleted_and_added: true
+          separator: ','
+          old_new_separator: ','
+          old_new_files_separator: ','
+
+      - name: Add changed files to changed.txt
+        shell: bash
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          echo ${{ steps.changed-files.outputs.all_changed_files }} > changed.txt
+          cat changed.txt
+
+      - name: Run CodeScan scan action
+        id: codescan
+        if: github.event_name == 'pull_request'
+        uses: codescan-io/codescan-scanner-action@1.5
+        with:
+          login: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          projectKey: x2od-PMDWorkflowPlayground
+          organization: veteransaffairs
+          codeScanUrl: https://app.codescan.io
+          scanChangedFilesOnly: false
+          failOnRedQualityGate: false
+          generateReportFile: false
+          generateSarifFile: true
+          args: |
+            sonar.pullrequest.branch=${{github.head_ref}}
+            sonar.pullrequest.base=${{github.base_ref}}
+            sonar.pullrequest.key=${{github.event.number}}
+            sonar.projectName=${{ github.event.repository.name }}
+            sonar.token=${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+            sonar.verbose=true
+            sonar.analysisCache.enabled=false
+            sonar.scm.disabled=false
+            sonar.java.binaries=target
+        env:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          JAVA_TOOL_OPTIONS: '-Xmx8g'
+      #   sonar.exclusions=scripts/**,**/aura/**/*.css,**/lwc/**/*.css,**/analyticscc__*,**/skuid__*,**/agf__*,**/ExAM__*,**/dupcheck__*,**/rh2__*,**/rhx__*,**/cnx*,**/SDOC*,**/rhx*,**/contentassets/**,**/dashboards/**,**/documents/**,**/eclair/**,**/email/**,**/emailservices/**,**/networkBranding/**,**/reports/**,**/wave/**,**/staticresources/*,**/ADM*,**/usf*,**/welkins_table*,**/sortablegrid*,**/CMTD*,**/DynPro*,**/LIMITMON*,**/ca_only*,**/flowmagic*,**/ear*,**/followrpt*,**/MPM4*,**/copado*,**/emptracing*,**/HealthCloudGA
+      #   sonar.verbose=true
+      #sonar.inclusions=${{ steps.changed-files.outputs.all_changed_files }}
+      - name: Upload violations file in SARIF format
+        if: github.event_name == 'pull_request' && 1 == 2
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: codescan.sarif
+          category: CodeScan
+
+      - name: Quality Gate Check on PR
+        id: quality_gate_check
+        if:
+          github.event_name == 'pull_request'
+          #&& github.base_ref == 'master'
+        env:
+          TOKEN: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          PR_KEY: ${{github.event.number}}
+          PROJECT_KEY: x2od-PMDWorkflowPlayground
+          CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
+        run: |
+          echo "$CODESCAN_URI/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY"
+
+          qg_status=$(curl -s -u "$TOKEN": "${{ vars.AUTORABIT_CODESCAN_URI }}/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY" | jq -r '.projectStatus.status')
+          echo "QG Script --> Quality Gate status is $qg_status"
+          if [ "$qg_status" != "OK" ]; then
+            echo "QG Script --> Quality gate is $qg_status (not OK) - exiting with error"
+            exit 1
+          fi
+          echo "status=$qg_status" >> $GITHUB_OUTPUT
+
+  fail-for-scan-blockers:
+    runs-on: ubuntu-latest
+    needs: [scan-pmd, scan-codescan-cli, scan-codescan-action]
+    if: always()
+    steps:
+      - name: Check Blocker Count for Exit Code
+        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }}
+        run: exit 1
+      - name: Check Action Quality Gate Status
+        if: ${{needs.scan-codescan-action.outputs.quality_gate_status}} != "OK"
+        run: |
+          echo "Quality Gate Status: ${{needs.scan-codescan-action.outputs.quality_gate_status}}"
+          exit 1
+      - name: Check CLI Quality Gate Status
+        if: ${{needs.scan-codescan-cli.outputs.quality_gate_status}} != "OK"
+        run: exit 1

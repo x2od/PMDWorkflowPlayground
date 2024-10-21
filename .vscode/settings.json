@@ -34,5 +34,9 @@
 		"editor.formatOnSave": false
 	},
 	"git.autofetch": true,
-	"codeAnalyzer.pMD.customConfigFile": "config/dtc_pmd_ruleset.xml"
+	"codeAnalyzer.pMD.customConfigFile": "config/dtc_pmd_ruleset.xml",
+	"codescan.connectedMode.project": {
+		"connectionId": "CodeScanCloud_old",
+		"projectKey": "x2od-PMDWorkflowPlayground"
+	}
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Grants Read/Write access to the VistA_Ids__c field on User. Required to be assigned to the user that is listed as the executor of the custom SSO Registration Handler class. Also used for Well Hive Scheduling solution.</description>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>User.VistA_Ids__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>VistA Ids User Field - Edit</label>
+    <userPermissions>
+        <enabled>false</enabled>
+        <name>ViewSetup</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ModifyAllData</name>
+    </userPermissions>
+</PermissionSet>
