@@ -71,7 +71,7 @@ jobs:
       #     write-host "scan result: $result_file"
           
       - name: Run Codescan On Push
-        uses: codescan-io/codescan-scanner-action@1.4
+        uses: codescan-io/codescan-scanner-action@1.6
         with:
           organization: gov-va
           projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
@@ -154,25 +154,25 @@ jobs:
           compression-level: 0
 
 
-      - name: parse
-        id: parse
-        shell: pwsh
-        run: | 
-          $autorabit_result_file_name = "autorabit_export_result_file.txt"
-          $autorabit_result_json_file_name = "autorabit_result_json.txt"
-          $autorabit_codescan_results_content = Get-Content $autorabit_result_json_file_name
-          write-host "CODESCAN_RESULTS_CONTENT FOLLOWS:"
-          write-host $autorabit_codescan_results_content
+      # - name: parse
+      #   id: parse
+      #   shell: pwsh
+      #   run: | 
+      #     $autorabit_result_file_name = "autorabit_export_result_file.txt"
+      #     $autorabit_result_json_file_name = "autorabit_result_json.txt"
+      #     $autorabit_codescan_results_content = Get-Content $autorabit_result_json_file_name
+      #     write-host "CODESCAN_RESULTS_CONTENT FOLLOWS:"
+      #     write-host $autorabit_codescan_results_content
 
-          # $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Csv
-          $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Json
+      #     # $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Csv
+      #     $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Json
 
-          Write-Host "autorabit csv results : $autorabit_results_csv"
-          $critical_issues = $autorabit_results_csv | Where-Object { $_.Severity -eq "CRITICAL" }
+      #     Write-Host "autorabit csv results : $autorabit_results_csv"
+      #     $critical_issues = $autorabit_results_csv | Where-Object { $_.Severity -eq "CRITICAL" }
 
-          if ( $critical_issues.count -gt 0 ) {
-              Write-Host "CRITICAL ISSUES FOUND: $critical_issues"
-              Throw "CRITICAL ISSUES DISCOVERED: $critical_issues"
-          }
+      #     if ( $critical_issues.count -gt 0 ) {
+      #         Write-Host "CRITICAL ISSUES FOUND: $critical_issues"
+      #         Throw "CRITICAL ISSUES DISCOVERED: $critical_issues"
+      #     }
 
 

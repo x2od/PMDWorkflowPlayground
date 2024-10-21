@@ -74,66 +74,66 @@ jobs:
       #     write-host "File list:"
       #     write-host $(Get-ChildItem -Name)
           
-      # - name: Run Codescan On Push
-      #   uses: codescan-io/codescan-scanner-action@1.5
-      #   with:
-      #     organization: veteransaffairs
-      #     projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
-      #     login: ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
-      #     failOnRedQualityGate: true
-      #     generateSarifFile: true
-      #     generateReportFile: true
+      - name: Run Codescan On Push
+        uses: codescan-io/codescan-scanner-action@1.6
+        with:
+          organization: veteransaffairs
+          projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
+          login: ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
+          failOnRedQualityGate: true
+          generateSarifFile: true
+          generateReportFile: true
 
-      - name: autorabit sfdx codescan
-        id: scan_run
-        env:
-          AUTORABIT_CODESCAN_TOKEN: ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
-          AUTORABIT_CODESCAN_ORGANIZATION: veteransaffairs
-          AUTORABIT_CODESCAN_PROJECT_KEY: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
-          AUTORABIT_CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
-        shell: pwsh
-        run: |
-          # $stop_build_on_quality_gate_fail = $true
+      # - name: autorabit sfdx codescan
+      #   id: scan_run
+      #   env:
+      #     AUTORABIT_CODESCAN_TOKEN: ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
+      #     AUTORABIT_CODESCAN_ORGANIZATION: veteransaffairs
+      #     AUTORABIT_CODESCAN_PROJECT_KEY: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
+      #     AUTORABIT_CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
+      #   shell: pwsh
+      #   run: |
+      #     # $stop_build_on_quality_gate_fail = $true
           
-          # #save scan to a file
-          $autorabit_result_file_name = "autorabit_export_result_file.txt"
-          $autorabit_result_json_file_name = "autorabit_result_json.txt"
-          $autorabit_result_file = $(sfdx codescan:run --token $env:AUTORABIT_CODESCAN_TOKEN --projectkey $env:AUTORABIT_CODESCAN_PROJECT_KEY --organization $env:AUTORABIT_CODESCAN_ORGANIZATION -s $env:AUTORABIT_CODESCAN_URI --nofail --json *> $autorabit_result_file_name) | Out-Null
-          $autorabit_codescan_results = $(Get-Content $autorabit_result_file_name)
+      #     # #save scan to a file
+      #     $autorabit_result_file_name = "autorabit_export_result_file.txt"
+      #     $autorabit_result_json_file_name = "autorabit_result_json.txt"
+      #     $autorabit_result_file = $(sfdx codescan:run --token $env:AUTORABIT_CODESCAN_TOKEN --projectkey $env:AUTORABIT_CODESCAN_PROJECT_KEY --organization $env:AUTORABIT_CODESCAN_ORGANIZATION -s $env:AUTORABIT_CODESCAN_URI --nofail --json *> $autorabit_result_file_name) | Out-Null
+      #     $autorabit_codescan_results = $(Get-Content $autorabit_result_file_name)
           
-          #regex match the content: {} around any whitespace or non-swhitespace characters...aka json
-          $json_regex = "\{([\s\S]*)\}"
-          $codescan_json_regex_match_results = [regex]::match($autorabit_codescan_results, $json_regex)
+      #     #regex match the content: {} around any whitespace or non-swhitespace characters...aka json
+      #     $json_regex = "\{([\s\S]*)\}"
+      #     $codescan_json_regex_match_results = [regex]::match($autorabit_codescan_results, $json_regex)
           
-          $codescan_json = $null
-          if ($codescan_json_regex_match_results.success) {
-            $codescan_json = $codescan_json_regex_match_results.Groups[0].Value
-          }
-          $codescan_json *> $autorabit_result_json_file_name
+      #     $codescan_json = $null
+      #     if ($codescan_json_regex_match_results.success) {
+      #       $codescan_json = $codescan_json_regex_match_results.Groups[0].Value
+      #     }
+      #     $codescan_json *> $autorabit_result_json_file_name
           
-          $codescan_result = $null
-          if (![string]::IsNullOrEmpty(($codescan_json))) {
-          $codescan_result = $codescan_json | ConvertFrom-Json
-          }
+      #     $codescan_result = $null
+      #     if (![string]::IsNullOrEmpty(($codescan_json))) {
+      #     $codescan_result = $codescan_json | ConvertFrom-Json
+      #     }
           
-          # establish if the scan was a success or failure
-          $stop_build_on_quality_gate_fail = [System.Convert]::ToBoolean($stop_build_on_quality_gate_fail)
-          $autorabit_codescan_status_result = 1
-          if ($stop_build_on_quality_gate_fail) {
-          $failure_code = 1
-          $success_code = 0
-          $autorabit_codescan_status_result = ( ($codescan_result.result.code -eq 0) -and ($codescan_result.status -eq 0) ) ? $success_code : $failure_code
-          } else {
-            $autorabit_codescan_status_result = $codescan_result.status
-          }
+      #     # establish if the scan was a success or failure
+      #     $stop_build_on_quality_gate_fail = [System.Convert]::ToBoolean($stop_build_on_quality_gate_fail)
+      #     $autorabit_codescan_status_result = 1
+      #     if ($stop_build_on_quality_gate_fail) {
+      #     $failure_code = 1
+      #     $success_code = 0
+      #     $autorabit_codescan_status_result = ( ($codescan_result.result.code -eq 0) -and ($codescan_result.status -eq 0) ) ? $success_code : $failure_code
+      #     } else {
+      #       $autorabit_codescan_status_result = $codescan_result.status
+      #     }
           
-          # output the status for later
-          "scan_result_status=$autorabit_codescan_status_result" >> $env:GITHUB_OUTPUT
+      #     # output the status for later
+      #     "scan_result_status=$autorabit_codescan_status_result" >> $env:GITHUB_OUTPUT
           
-          # #save result to multi-line gh env var for use in a later step
-          # echo "autorabit_codescan_results<<EOF" >> $GITHUB_ENV
-          # echo "$autorabit_codescan_results" >> $GITHUB_ENV
-          # echo "EOF" >> $GITHUB_ENV
+      #     # #save result to multi-line gh env var for use in a later step
+      #     # echo "autorabit_codescan_results<<EOF" >> $GITHUB_ENV
+      #     # echo "$autorabit_codescan_results" >> $GITHUB_ENV
+      #     # echo "EOF" >> $GITHUB_ENV
 
       - name: Upload quality gate info
         uses: actions/upload-artifact@v4
@@ -157,24 +157,24 @@ jobs:
           compression-level: 0
 
 
-      - name: parse
-        id: parse
-        shell: pwsh
-        run: | 
-          $autorabit_result_file_name = "autorabit_export_result_file.txt"
-          $autorabit_result_json_file_name = "autorabit_result_json.txt"
-          $autorabit_codescan_results_content = Get-Content $autorabit_result_json_file_name
-          write-host "CODESCAN_RESULTS_CONTENT FOLLOWS:"
-          write-host $autorabit_codescan_results_content
+      # - name: parse
+      #   id: parse
+      #   shell: pwsh
+      #   run: | 
+      #     $autorabit_result_file_name = "autorabit_export_result_file.txt"
+      #     $autorabit_result_json_file_name = "autorabit_result_json.txt"
+      #     $autorabit_codescan_results_content = Get-Content $autorabit_result_json_file_name
+      #     write-host "CODESCAN_RESULTS_CONTENT FOLLOWS:"
+      #     write-host $autorabit_codescan_results_content
 
-          # $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Csv
-          $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Json
+      #     # $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Csv
+      #     $autorabit_results_csv = $autorabit_codescan_results_content | ConvertFrom-Json
 
-          Write-Host "autorabit csv results : $autorabit_results_csv"
-          $critical_issues = $autorabit_results_csv | Where-Object { $_.Severity -eq "CRITICAL" }
+      #     Write-Host "autorabit csv results : $autorabit_results_csv"
+      #     $critical_issues = $autorabit_results_csv | Where-Object { $_.Severity -eq "CRITICAL" }
 
-          if ( $critical_issues.count -gt 0 ) {
-              Write-Host "CRITICAL ISSUES FOUND: $critical_issues"
-              Throw "CRITICAL ISSUES DISCOVERED: $critical_issues"
-          }
+      #     if ( $critical_issues.count -gt 0 ) {
+      #         Write-Host "CRITICAL ISSUES FOUND: $critical_issues"
+      #         Throw "CRITICAL ISSUES DISCOVERED: $critical_issues"
+      #     }
 
