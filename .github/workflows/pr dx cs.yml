@@ -222,5 +222,11 @@ jobs:
     if: always()
     steps:
       - name: Check Blocker Count for Exit Code
-        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }} || ${{needs.scan-codescan-action.outputs.quality_gate_status}} != "OK" || needs.scan-codescan-cli.outputs.quality_gate_status -ne "OK"
+        if: ${{ needs.scan-pmd.outputs.blockers_count > 0 }}
+        run: exit 1
+      - name: Check Action Quality Gate Status
+        if: ${{needs.scan-codescan-action.outputs.quality_gate_status}} != "OK"
+        run: exit 1
+      - name: Check CLI Quality Gate Status
+        if: ${{needs.scan-codescan-cli.outputs.quality_gate_status}} != "OK"
         run: exit 1
