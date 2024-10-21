@@ -226,7 +226,9 @@ jobs:
         run: exit 1
       - name: Check Action Quality Gate Status
         if: ${{needs.scan-codescan-action.outputs.quality_gate_status}} != "OK"
-        run: exit 1
+        run: |
+          echo "Quality Gate Status: ${{needs.scan-codescan-action.outputs.quality_gate_status}}"
+          exit 1
       - name: Check CLI Quality Gate Status
         if: ${{needs.scan-codescan-cli.outputs.quality_gate_status}} != "OK"
         run: exit 1

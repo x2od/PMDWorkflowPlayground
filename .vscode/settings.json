@@ -36,7 +36,7 @@
 	"git.autofetch": true,
 	"codeAnalyzer.pMD.customConfigFile": "config/dtc_pmd_ruleset.xml",
 	"codescan.connectedMode.project": {
-		"connectionId": "david-schach1-va-gov",
+		"connectionId": "CodeScanCloud_old",
 		"projectKey": "x2od-PMDWorkflowPlayground"
 	}
 }
