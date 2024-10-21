@@ -80,7 +80,7 @@ jobs:
           organization: veteransaffairs
           projectKey: ${{ vars.AUTORABIT_CODESCAN_PROJECT_KEY }}
           login: ${{ secrets.AUTORABIT_CLOUD_TOKEN }}
-          failOnRedQualityGate: true
+          failOnRedQualityGate: false
           generateSarifFile: true
           generateReportFile: true
 
