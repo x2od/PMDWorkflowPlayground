@@ -231,16 +231,21 @@
         <unique>false</unique>
     </fields>
     <fields>
-        <fullName>HRPAS_American_Indian_Alaskan_Native__c</fullName>
-        <encryptionScheme>None</encryptionScheme>
-        <externalId>false</externalId>
-        <label>American Indian Or Alaskan Native</label>
-        <length>200</length>
-        <required>false</required>
-        <trackHistory>false</trackHistory>
-        <trackTrending>false</trackTrending>
-        <type>Text</type>
-        <unique>false</unique>
+        <fullName>DTCModule__c</fullName>
+    <businessStatus>Active</businessStatus>
+    <description>The DTC Module that contains this class.</description>
+    <inlineHelpText>The DTC Module that contains this class</inlineHelpText>
+    <label>DTC Module</label>
+    <referenceTo>DTCModule__c</referenceTo>
+    <relationshipLabel>Module Classes</relationshipLabel>
+    <relationshipName>Module_Classes</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <securityClassification>Internal</securityClassification>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
     </fields>
     <fields>
         <fullName>HRPAS_Asian__c</fullName>

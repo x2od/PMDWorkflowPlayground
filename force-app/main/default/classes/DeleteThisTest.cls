@@ -14,18 +14,17 @@ public with sharing class DeleteThisTest {
 		}
 	}
 
-	@SuppressWarnings('PMD')
 	@IsTest
-	public static void assertMe() {
+	public static void assert_Me() {
 		System.debug('hello world');
 		System.assertEquals(1, 1, 'Math is hard');
 	}
 
-	@IsTest
-	private static void name() {
+	private static testMethod void name() {
 		List<Contact> cons = [SELECT Id FROM Contact];
-		//cons = null;
-		System.runAs(new User(Id = UserInfo.getUserId())) {
+		cons = new List<Contact>();
+		User usr = new User(Id = UserInfo.getUserId());
+		System.runAs(usr) {
 			System.debug('Foo'); //NOPMD
 			Assert.isTrue(true, 'this');
 		}

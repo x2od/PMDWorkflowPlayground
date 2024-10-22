@@ -14,6 +14,8 @@ env:
   csv_properties: --property package=false --property problem=false --property ruleSet=false
   hidden_comment_prefix: <!--dtc-scanner-->
   upload_sarif: false
+  autorabit_codescan_uri: https://gov-va.codescan.io
+  AUTORABIT_CODESCAN_PROJECT_KEY: x2od-playground
 
 jobs:
   scan-pmd:
@@ -73,15 +75,15 @@ jobs:
       - name: 'Run scan'
         id: run_scan
         run: |
-          #sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
-          sfdx codescan:run --token ${{secrets.AUTORABIT_CODESCAN_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
+          #sfdx codescan:run --token ${{secrets.AUTORABIT_GOV_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} -Dsonar.analysis.report.type=sarif -Dsonar.analysis.report.enabled=true --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
+          sfdx codescan:run --token ${{secrets.AUTORABIT_GOV_TOKEN}} --projectkey ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --organization ${{vars.AUTORABIT_CODESCAN_ORG}} --server ${{ vars.AUTORABIT_CODESCAN_URI }} --nofail
 
       - name: Export CodeScan to CSV
         id: codescan-export
         run: |
           npm install -g codescan-export
           codescan-export -v
-          codescan-export ${{vars.AUTORABIT_CODESCAN_ORG}} ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --server=${{ vars.AUTORABIT_CODESCAN_URI }} --token=${{secrets.AUTORABIT_CODESCAN_TOKEN}} --statuses "OPEN,REOPENED"  --outputFile=codescan-export.csv
+          codescan-export ${{vars.AUTORABIT_CODESCAN_ORG}} ${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}} --server=${{ vars.AUTORABIT_CODESCAN_URI }} --token=${{secrets.AUTORABIT_GOV_TOKEN}} --statuses "OPEN,REOPENED"  --outputFile=codescan-export.csv
           cat codescan-export.csv
 
       # - name: Upload violations file in SARIF format
@@ -97,9 +99,9 @@ jobs:
           github.event_name == 'pull_request'
           #&& github.base_ref == 'master'
         env:
-          TOKEN: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          TOKEN: ${{ secrets.AUTORABIT_GOV_TOKEN }}
           PR_KEY: ${{github.event.number}}
-          PROJECT_KEY: x2od-PMDWorkflowPlayground
+          PROJECT_KEY: x2od-playground
           CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
         run: |
           qg_status=$(curl -s -u "$TOKEN": "$CODESCAN_URI/api/qualitygates/project_status?projectKey=${{vars.AUTORABIT_CODESCAN_PROJECT_KEY}}&pullRequest= ${{github.event.number}}" | jq -r '.projectStatus.status')
@@ -164,10 +166,10 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: codescan-io/codescan-scanner-action@1.5
         with:
-          login: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
-          projectKey: x2od-PMDWorkflowPlayground
-          organization: veteransaffairs
-          codeScanUrl: https://app.codescan.io
+          login: ${{ secrets.AUTORABIT_GOV_TOKEN }}
+          projectKey: x2od-playground
+          organization: gov-va
+          codeScanUrl: ${{ vars.autorabit_codescan_uri }}
           scanChangedFilesOnly: false
           failOnRedQualityGate: false
           generateReportFile: false
@@ -177,7 +179,7 @@ jobs:
             sonar.pullrequest.base=${{github.base_ref}}
             sonar.pullrequest.key=${{github.event.number}}
             sonar.projectName=${{ github.event.repository.name }}
-            sonar.token=${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+            sonar.token=${{ secrets.AUTORABIT_GOV_TOKEN }}
             sonar.verbose=true
             sonar.analysisCache.enabled=false
             sonar.scm.disabled=false
@@ -201,9 +203,9 @@ jobs:
           github.event_name == 'pull_request'
           #&& github.base_ref == 'master'
         env:
-          TOKEN: ${{ secrets.AUTORABIT_CODESCAN_TOKEN }}
+          TOKEN: ${{ secrets.AUTORABIT_GOV_TOKEN }}
           PR_KEY: ${{github.event.number}}
-          PROJECT_KEY: x2od-PMDWorkflowPlayground
+          PROJECT_KEY: x2od-playground
           CODESCAN_URI: ${{ vars.AUTORABIT_CODESCAN_URI }}
         run: |
           echo "$CODESCAN_URI/api/qualitygates/project_status?projectKey=$PROJECT_KEY&pullRequest=$PR_KEY"
